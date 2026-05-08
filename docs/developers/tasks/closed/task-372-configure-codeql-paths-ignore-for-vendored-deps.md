@@ -1,9 +1,11 @@
 ---
 id: TASK-372
 title: Configure CodeQL to ignore vendored test-framework code
-status: active
+status: closed
+closed: 2026-05-08
 opened: 2026-05-08
 effort: Small (<2h)
+effort_actual: XS (<30m)
 complexity: Junior
 human-in-loop: No
 ---

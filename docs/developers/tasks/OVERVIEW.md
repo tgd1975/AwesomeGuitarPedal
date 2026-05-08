@@ -3,7 +3,7 @@
 
 <!-- HEADER -->
 
-⚪ **Open: 15** | 🔵 **Active: 2** | 🟡 **Paused: 4** | 🟢 **Closed: 0** | **Total: 21** | ░░░░░░░░░░ 0%
+⚪ **Open: 15** | 🔵 **Active: 1** | 🟡 **Paused: 4** | 🟢 **Closed: 1** | **Total: 21** | ░░░░░░░░░░ 5%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -24,7 +24,6 @@ _No tasks or epics closed since v0.4.1 yet._
 
 | ID | Title | Effort | Complexity | Status |
 |----|-------|--------|------------|--------|
-| [TASK-372](active/task-372-configure-codeql-paths-ignore-for-vendored-deps.md) | Configure CodeQL to ignore vendored test-framework code | Small (<2h) | Junior | 🔵 **active** |
 | [TASK-373](active/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) | Junior | 🔵 **active** |
 
 ## Paused Tasks
@@ -60,6 +59,7 @@ _No tasks or epics closed since v0.4.1 yet._
 
 | ID | Title | Effort |
 |----|-------|--------|
+| [TASK-372](closed/task-372-configure-codeql-paths-ignore-for-vendored-deps.md) | Configure CodeQL to ignore vendored test-framework code | Small (<2h) |
 
 ## Archived Releases
 
