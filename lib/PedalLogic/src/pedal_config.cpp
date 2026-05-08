@@ -12,7 +12,6 @@
 
 // Forward declaration for platform-specific factory (avoids pulling in full DI headers)
 IFileSystem* createFileSystem();
-ILogger* createLogger();
 
 /**
  * @brief Core parsing and application of hardware config JSON.
@@ -48,24 +47,38 @@ bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
     }
 
     if (doc.containsKey("numProfiles"))
+    {
         hardwareConfig.numProfiles = doc["numProfiles"];
+    }
     if (doc.containsKey("numSelectLeds"))
+    {
         hardwareConfig.numSelectLeds = doc["numSelectLeds"];
+    }
     if (doc.containsKey("numButtons"))
+    {
         hardwareConfig.numButtons = doc["numButtons"];
+    }
     if (doc.containsKey("ledBluetooth"))
+    {
         hardwareConfig.ledBluetooth = doc["ledBluetooth"];
+    }
     if (doc.containsKey("ledPower"))
+    {
         hardwareConfig.ledPower = doc["ledPower"];
+    }
     if (doc.containsKey("buttonSelect"))
+    {
         hardwareConfig.buttonSelect = doc["buttonSelect"];
+    }
 
     if (doc.containsKey("ledSelect"))
     {
         ArduinoJson::JsonArray arr = doc["ledSelect"];
         uint8_t n = arr.size() < 6 ? static_cast<uint8_t>(arr.size()) : 6;
         for (uint8_t i = 0; i < n; i++)
+        {
             hardwareConfig.ledSelect[i] = arr[i];
+        }
     }
 
     if (doc.containsKey("buttonPins"))
@@ -73,7 +86,9 @@ bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
         ArduinoJson::JsonArray arr = doc["buttonPins"];
         uint8_t n = arr.size() < 26 ? static_cast<uint8_t>(arr.size()) : 26;
         for (uint8_t i = 0; i < n; i++)
+        {
             hardwareConfig.buttonPins[i] = arr[i];
+        }
     }
 
     // pairing_pin: integer 0–999999 enables passkey auth; null or absent = no pairing.

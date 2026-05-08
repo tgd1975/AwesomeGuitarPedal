@@ -68,7 +68,7 @@ kanban
 
 ## Other
 
-_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 2 closed · ███░░░░░░░ 29%_
 
 ```mermaid
 kanban
@@ -81,5 +81,7 @@ kanban
   Active
   Paused
   Closed
+    TASK_372["Configure CodeQL to ignore vendored test-framework code"]
+    TASK_373["Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge"]
 ```
 

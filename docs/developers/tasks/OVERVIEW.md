@@ -3,7 +3,7 @@
 
 <!-- HEADER -->
 
-⚪ **Open: 15** | 🔵 **Active: 0** | 🟡 **Paused: 4** | 🟢 **Closed: 0** | **Total: 19** | ░░░░░░░░░░ 0%
+⚪ **Open: 15** | 🔵 **Active: 0** | 🟡 **Paused: 4** | 🟢 **Closed: 2** | **Total: 21** | █░░░░░░░░░ 10%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -13,15 +13,15 @@
 
 <a id="burn-up"></a>
 
-## Burn-up since v0.4.0
+## Burn-up since v0.4.1
 
 <table><tr><td>
 
 ```mermaid
 xychart-beta
     title "Cumulative tasks closed"
-    x-axis ["04-29"]
-    line [25]
+    x-axis ["05-08"]
+    line [1]
 ```
 
 </td><td>
@@ -29,8 +29,8 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Cumulative epics closed"
-    x-axis ["04-29"]
-    line [2]
+    x-axis ["05-08"]
+    line [0]
 ```
 
 </td><td>
@@ -38,9 +38,9 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
-    x-axis ["04-29"]
-    line [0]
-    line [0]
+    x-axis ["05-08"]
+    line [1]
+    line [0.25]
 ```
 
 </td></tr></table>
@@ -49,7 +49,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-04-29 | 25 | 25 | 0 | 0 | 0 | 0 | 2 | 2 |
+| 2026-05-08 | 1 | 1 | 1 | 1 | 0.2 | 0.2 | 0 | 0 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -91,6 +91,8 @@ _No active tasks._
 
 | ID | Title | Effort |
 |----|-------|--------|
+| [TASK-372](closed/task-372-configure-codeql-paths-ignore-for-vendored-deps.md) | Configure CodeQL to ignore vendored test-framework code | Small (<2h) |
+| [TASK-373](closed/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) |
 
 ## Archived Releases
 

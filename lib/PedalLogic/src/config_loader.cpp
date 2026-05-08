@@ -151,7 +151,7 @@ bool ConfigLoader::loadFromString(ProfileManager& profileManager,
     }
 
     JsonArray profiles = doc["profiles"];
-    for (uint8_t i = 0; i < profiles.size() && i < hardwareConfig.numProfiles; i++)
+    for (size_t i = 0; i < profiles.size() && i < hardwareConfig.numProfiles; i++)
     {
         JsonObject profileJson = profiles[i];
         const char* profileName = profileJson["name"] | "";
@@ -160,7 +160,7 @@ bool ConfigLoader::loadFromString(ProfileManager& profileManager,
         auto newProfile = std::make_unique<Profile>(profileName);
         newProfile->setDescription(profileDescription);
         populateProfileFromJson(*newProfile, profileJson["buttons"], keyboard);
-        profileManager.addProfile(i, std::move(newProfile));
+        profileManager.addProfile(static_cast<uint8_t>(i), std::move(newProfile));
     }
 
     profileManager.resetToFirstProfile();
