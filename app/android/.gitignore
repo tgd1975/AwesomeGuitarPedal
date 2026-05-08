@@ -12,3 +12,10 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Exception: the stable debug keystore is committed so CI builds and local builds
+# all sign sideload APKs with the same key (lets users upgrade in place between
+# releases). Debug keystores carry no security value — well-known password "android",
+# alias "androiddebugkey". Real Play Store signing key tracking is in TASK-160 and
+# stays gitignored above.
+!keystores/debug.keystore

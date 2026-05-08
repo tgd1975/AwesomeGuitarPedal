@@ -1,0 +1,142 @@
+# USB HID Keyboard/Keypad Page (0x07), Usage Tables 1.21 §10.
+# Each entry maps a usage_id to a display label + category.
+# Glyphs and icons are added by overlay.yaml — keep this file
+# spec-faithful only.
+#
+# Format: { usage_id (decimal): { label: <str>, category: <str> } }
+# Categories: letter, number, navigation, edit, modifier, function,
+#             punctuation, system, media, locking, numpad, language
+
+4: { label: a, category: letter }
+5: { label: b, category: letter }
+6: { label: c, category: letter }
+7: { label: d, category: letter }
+8: { label: e, category: letter }
+9: { label: f, category: letter }
+10: { label: g, category: letter }
+11: { label: h, category: letter }
+12: { label: i, category: letter }
+13: { label: j, category: letter }
+14: { label: k, category: letter }
+15: { label: l, category: letter }
+16: { label: m, category: letter }
+17: { label: n, category: letter }
+18: { label: o, category: letter }
+19: { label: p, category: letter }
+20: { label: q, category: letter }
+21: { label: r, category: letter }
+22: { label: s, category: letter }
+23: { label: t, category: letter }
+24: { label: u, category: letter }
+25: { label: v, category: letter }
+26: { label: w, category: letter }
+27: { label: x, category: letter }
+28: { label: y, category: letter }
+29: { label: z, category: letter }
+
+30: { label: '1', category: number }
+31: { label: '2', category: number }
+32: { label: '3', category: number }
+33: { label: '4', category: number }
+34: { label: '5', category: number }
+35: { label: '6', category: number }
+36: { label: '7', category: number }
+37: { label: '8', category: number }
+38: { label: '9', category: number }
+39: { label: '0', category: number }
+
+40: { label: Enter, category: edit }
+41: { label: Esc, category: edit }
+42: { label: Backspace, category: edit }
+43: { label: Tab, category: edit }
+44: { label: Space, category: edit }
+
+45: { label: '-', category: punctuation }
+46: { label: '=', category: punctuation }
+47: { label: '[', category: punctuation }
+48: { label: ']', category: punctuation }
+49: { label: \, category: punctuation }
+51: { label: ';', category: punctuation }
+52: { label: "'", category: punctuation }
+53: { label: '`', category: punctuation }
+54: { label: ',', category: punctuation }
+55: { label: '.', category: punctuation }
+56: { label: /, category: punctuation }
+
+57: { label: Caps Lock, category: locking }
+
+58: { label: F1, category: function }
+59: { label: F2, category: function }
+60: { label: F3, category: function }
+61: { label: F4, category: function }
+62: { label: F5, category: function }
+63: { label: F6, category: function }
+64: { label: F7, category: function }
+65: { label: F8, category: function }
+66: { label: F9, category: function }
+67: { label: F10, category: function }
+68: { label: F11, category: function }
+69: { label: F12, category: function }
+
+70: { label: Print Screen, category: system }
+71: { label: Scroll Lock, category: locking }
+72: { label: Pause, category: system }
+73: { label: Insert, category: edit }
+74: { label: Home, category: navigation }
+75: { label: Page Up, category: navigation }
+76: { label: Delete, category: edit }
+77: { label: End, category: navigation }
+78: { label: Page Down, category: navigation }
+79: { label: Right, category: navigation }
+80: { label: Left, category: navigation }
+81: { label: Down, category: navigation }
+82: { label: Up, category: navigation }
+
+83: { label: Num Lock, category: locking }
+84: { label: KP /, category: numpad }
+85: { label: KP *, category: numpad }
+86: { label: KP -, category: numpad }
+87: { label: KP +, category: numpad }
+88: { label: KP Enter, category: numpad }
+89: { label: KP 1, category: numpad }
+90: { label: KP 2, category: numpad }
+91: { label: KP 3, category: numpad }
+92: { label: KP 4, category: numpad }
+93: { label: KP 5, category: numpad }
+94: { label: KP 6, category: numpad }
+95: { label: KP 7, category: numpad }
+96: { label: KP 8, category: numpad }
+97: { label: KP 9, category: numpad }
+98: { label: KP 0, category: numpad }
+99: { label: KP ., category: numpad }
+
+# Spec usage 100 = "Non-US \ and |" — not a useful chip label;
+# omit and let the unmapped-HID hex fallback handle.
+
+101: { label: Menu, category: system }
+102: { label: Power, category: system }
+103: { label: KP =, category: numpad }
+
+# F13–F24
+104: { label: F13, category: function }
+105: { label: F14, category: function }
+106: { label: F15, category: function }
+107: { label: F16, category: function }
+108: { label: F17, category: function }
+109: { label: F18, category: function }
+110: { label: F19, category: function }
+111: { label: F20, category: function }
+112: { label: F21, category: function }
+113: { label: F22, category: function }
+114: { label: F23, category: function }
+115: { label: F24, category: function }
+
+# Modifier usage IDs (0xE0–0xE7)
+224: { label: Ctrl, category: modifier }
+225: { label: Shift, category: modifier }
+226: { label: Alt, category: modifier }
+227: { label: GUI, category: modifier }
+228: { label: Right Ctrl, category: modifier }
+229: { label: Right Shift, category: modifier }
+230: { label: Right Alt, category: modifier }
+231: { label: Right GUI, category: modifier }

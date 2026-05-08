@@ -92,13 +92,23 @@ uint32_t EventDispatcher::getLongPressThreshold(uint8_t button) const
 void EventDispatcher::clearHandlers()
 {
     for (auto& handler : handlers)
+    {
         handler = nullptr;
+    }
     for (auto& handler : releaseHandlers)
+    {
         handler = nullptr;
+    }
     for (auto& handler : longPressHandlers_)
+    {
         handler = nullptr;
+    }
     for (auto& handler : doublePressHandlers_)
+    {
         handler = nullptr;
+    }
     for (auto& t : longPressThresholds_)
+    {
         t = 0;
+    }
 }

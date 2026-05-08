@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1-low-confidence
 ---
 
-# Task and idea management system
-
 Realize the docs-as-code task and idea management system designed in
 [IDEA-021](../../ideas/open/idea-021-task_system_concept_for_small_teams.md):
 file-based tasks and ideas, status-from-folder conventions, a central

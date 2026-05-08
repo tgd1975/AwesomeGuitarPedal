@@ -6,8 +6,8 @@ status: paused
 effort: Medium (2-8h)
 complexity: Medium
 human-in-loop: Verify
-epic: feature_test
-order: 3
+epic: nrf52840-blocked
+order: 4
 prerequisites: [TASK-246]
 ---
 
@@ -64,6 +64,7 @@ its bond store.
 
 ## Notes
 
+- Originally belongs to feature epic `feature_test` by scope; routed to EPIC-025 nrf52840-blocked while nRF52840 hardware is unavailable. Once [TASK-359](task-359-remove-nrf5-task-routing-skill.md) closes, this task can be re-homed to `feature_test`.
 - ESP32 fix lives at
   [lib/hardware/esp32/include/ble_keyboard_adapter.h](../../../../lib/hardware/esp32/include/ble_keyboard_adapter.h)
   — read it for the two-posture pattern (MITM=true + DisplayOnly when

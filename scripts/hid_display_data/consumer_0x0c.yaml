@@ -1,0 +1,30 @@
+# USB HID Consumer Page (0x0C), Usage Tables 1.21 §15.
+# Selection limited to the controls a foot-pedal would realistically
+# emit; the consumer page itself is enormous and most of it is dead
+# weight here. Add more entries when a profile actually uses them.
+
+181: { label: Next Track, category: media }
+182: { label: Prev Track, category: media }
+183: { label: Stop, category: media }
+184: { label: Eject, category: media }
+205: { label: Play/Pause, category: media }
+
+224: { label: Volume, category: media }
+225: { label: Balance, category: media }
+226: { label: Mute, category: media }
+233: { label: Volume Up, category: media }
+234: { label: Volume Down, category: media }
+
+# Application launch
+402: { label: Calculator, category: media }
+416: { label: Email, category: media }
+554: { label: Find, category: media }
+
+# Browser controls
+547: { label: Browser Search, category: media }
+548: { label: Home Page, category: media }
+549: { label: Browser Back, category: media }
+550: { label: Browser Forward, category: media }
+551: { label: Browser Stop, category: media }
+552: { label: Refresh, category: media }
+553: { label: Bookmarks, category: media }

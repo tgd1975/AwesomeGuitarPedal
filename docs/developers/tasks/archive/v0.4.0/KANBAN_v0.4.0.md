@@ -78,4 +78,3 @@ kanban
   Paused
   Closed
 ```
-

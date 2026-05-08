@@ -23,7 +23,7 @@ Steps:
    - Determine the test plan (see below)
    - Add relevant notes about dependencies, risks, or considerations
 
-3a. **Soft nudge to split L/XL tasks.** If `--effort L` or `--effort XL`
+4. **Soft nudge to split L/XL tasks.** If `--effort L` or `--effort XL`
     was supplied (or, when the user did not supply `--effort`, the
     suggestion you arrived at in step 3 is L/XL), pause before writing
     the file and propose a candidate split. Sketch 2–4 smaller tasks,
@@ -35,7 +35,7 @@ Steps:
       the previous one), give them the same `epic:` as the original
       proposal, and assign contiguous `order:` values starting from
       whatever `next_order` was derived for the original. Skip step
-      3a recursively for these children — they are already small.
+      4 (the split nudge) recursively for these children — they are already small.
     - **Keep whole** → write the original task, but add a
       `## Sizing rationale` section to the body capturing the user's
       one-line reason for keeping it whole. Ask the user for that
@@ -56,8 +56,8 @@ Steps:
     Effort that is bumped up to L/XL after creation is out of scope for
     this nudge.
 
-4. Present the suggestions to the user for review and correction
-5. Write the file to `docs/developers/tasks/open/` with this enhanced template:
+5. Present the suggestions to the user for review and correction
+6. Write the file to `docs/developers/tasks/open/` with this enhanced template:
 
 ```markdown
 ---
@@ -98,7 +98,7 @@ prerequisites: [TASK-NNN, TASK-NNN]   # omit entirely if none
 ## Sizing rationale
 
 <!-- Include this section ONLY when effort is L or XL AND the user kept the
-     task whole (or skipped the split nudge per step 3a). Omit otherwise. -->
+     task whole (or skipped the split nudge per step 4). Omit otherwise. -->
 
 <one line explaining why this task is intentionally sized L/XL and not split>
 
@@ -161,9 +161,9 @@ prerequisites: [TASK-NNN, TASK-NNN]   # omit entirely if none
    these as `?` — they must be set so the overview table is meaningful.
 
 <!-- markdownlint-disable MD029 -->
-6. Run `python scripts/housekeep.py --apply` to regenerate `OVERVIEW.md`, `EPICS.md`,
+7. Run `python scripts/housekeep.py --apply` to regenerate `OVERVIEW.md`, `EPICS.md`,
    and `KANBAN.md`.
-7. **Documentation check** — after writing the task file, assess whether the work
+8. **Documentation check** — after writing the task file, assess whether the work
    described would require updating user-facing or developer documentation:
 
    - **User-facing docs** (`docs/builders/`, `docs/musicians/`, `README.md`): new
@@ -190,7 +190,7 @@ prerequisites: [TASK-NNN, TASK-NNN]   # omit entirely if none
    - `docs/developers/ARCHITECTURE.md` — update the Action class hierarchy diagram
    ```
 
-8. Report the new task ID and file path.
+9. Report the new task ID and file path.
 <!-- markdownlint-enable MD029 -->
 
 Do not commit.

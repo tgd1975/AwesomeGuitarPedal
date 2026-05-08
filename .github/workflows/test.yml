@@ -105,6 +105,10 @@ jobs:
           path: test-results/
           retention-days: 30
 
+  # Coverage threshold (gcovr --fail-under-line 80) is intentionally CI-only.
+  # The local pre-commit hook (scripts/pre-commit) does NOT enforce it — running
+  # gcovr on every commit is too slow for an interactive workflow. A drop below
+  # 80% will fail this CI job, not the local commit. See TASK-321 closing notes.
   coverage:
     name: Code Coverage
     runs-on: ubuntu-latest

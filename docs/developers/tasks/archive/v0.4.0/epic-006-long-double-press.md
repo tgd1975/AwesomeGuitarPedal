@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Long-press and double-press detection
-
 Implement long-press and double-press event detection across the full stack:
 firmware detection logic, EventDispatcher multi-event API, config schema
 extension, main.cpp wiring, simulator support, profile configurator fields,

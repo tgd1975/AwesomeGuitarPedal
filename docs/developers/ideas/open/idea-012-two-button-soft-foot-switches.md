@@ -1,6 +1,7 @@
 ---
 id: IDEA-012
 title: Two-Button Rugged Pedal — Metal/Wood Enclosure
+category: hardware
 description: A stomp-proof two-button pedal variant with a metal top panel, wooden side elements, LiPo battery, ESP32 with display, back panel, and dual LEDs per button — the production-grade alternative to the 3D-printed prototype.
 ---
 

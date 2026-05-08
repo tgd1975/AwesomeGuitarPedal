@@ -1,6 +1,7 @@
 ---
 id: IDEA-018
 title: Bill of Materials — Prototype
+category: docs
 description: A complete, sourced BOM for the default 4-button prototype with part numbers, quantities, costs, and substitution notes — replacing the current placeholder list in BUILD_GUIDE.md.
 ---
 

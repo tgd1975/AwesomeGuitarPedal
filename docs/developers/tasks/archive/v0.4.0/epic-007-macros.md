@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Macro action system
-
 Implement support for macros: sequences or parallel groups of actions triggered
 by a single button press. Covers the Action::Type enum extension, MacroAction
 class and step engine, config loader parsing, main.cpp wiring, and host tests.

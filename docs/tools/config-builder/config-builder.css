@@ -331,6 +331,38 @@ details[open] > .sub-action-summary::before { transform: rotate(90deg); }
   letter-spacing: 0.06em;
 }
 
+/* ── Independent actions section ─────────────────────────────────────────── */
+
+.independent-actions {
+  margin-top: 24px;
+  border: 1px solid var(--asp-border);
+  border-radius: var(--asp-radius-card);
+  background: var(--asp-surface-raised);
+  padding: 8px 12px;
+}
+
+.independent-actions-summary {
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.independent-actions-summary::-webkit-details-marker { display: none; }
+
+.independent-actions[open] > .independent-actions-summary {
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--asp-border);
+  padding-bottom: 8px;
+}
+
+.ind-help {
+  font-weight: 400;
+  color: var(--asp-text-muted, #666);
+  font-size: 13px;
+  margin-left: 6px;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 800px) {

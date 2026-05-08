@@ -1,5 +1,5 @@
 #include "config_loader.h"
-#include "ble_config_reassembler.h" // JSON_DOC_CAPACITY
+#include "ble_config_reassembler.h" // kJsonDocCapacity
 #include "button_constants.h"
 #include "config.h"
 #include "delayed_action.h"
@@ -19,9 +19,8 @@
 
 using namespace ArduinoJson;
 
-// Forward declarations for platform-specific factories
+// Forward declaration for platform-specific factory (createLogger comes from i_logger.h)
 IFileSystem* createFileSystem();
-ILogger* createLogger(); // NOLINT(readability-redundant-declaration)
 
 namespace
 {
@@ -136,7 +135,7 @@ bool ConfigLoader::loadFromString(ProfileManager& profileManager,
                                   IBleKeyboard* keyboard,
                                   const std::string& jsonConfig)
 {
-    DynamicJsonDocument doc(JSON_DOC_CAPACITY);
+    DynamicJsonDocument doc(kJsonDocCapacity);
     DeserializationError error = deserializeJson(doc, jsonConfig);
 
     if (error)
@@ -161,6 +160,17 @@ bool ConfigLoader::loadFromString(ProfileManager& profileManager,
         newProfile->setDescription(profileDescription);
         populateProfileFromJson(*newProfile, profileJson["buttons"], keyboard);
         profileManager.addProfile(static_cast<uint8_t>(i), std::move(newProfile));
+    }
+
+    if (doc.containsKey("independentActions"))
+    {
+        auto independent = std::make_unique<Profile>("__independent__");
+        populateProfileFromJson(*independent, doc["independentActions"], keyboard);
+        profileManager.setIndependentActions(std::move(independent));
+    }
+    else
+    {
+        profileManager.setIndependentActions(nullptr);
     }
 
     profileManager.resetToFirstProfile();
@@ -199,6 +209,29 @@ void ConfigLoader::populateProfileFromJson(Profile& profile,
                                            JsonObject buttons,
                                            IBleKeyboard* keyboard)
 {
+    // Build an action from a named sub-object (e.g. "longPress", "doublePress")
+    // and hand it to the supplied registrar. No-op if the key is absent or the
+    // payload does not produce a valid action.
+    auto attachVariant = [&](JsonObject actionJson, const char* variantKey, auto registrar)
+    {
+        if (! actionJson.containsKey(variantKey))
+        {
+            return;
+        }
+        JsonObject variantJson = actionJson[variantKey];
+        auto variantAction = createActionFromJson(variantJson, keyboard);
+        if (! variantAction)
+        {
+            return;
+        }
+        const char* variantName = variantJson["name"] | "";
+        if (variantName[0] != '\0')
+        {
+            variantAction->setName(variantName);
+        }
+        registrar(std::move(variantAction));
+    };
+
     char buttonName[2];
     for (uint8_t b = 0; b < hardwareConfig.numButtons; b++)
     {
@@ -221,31 +254,14 @@ void ConfigLoader::populateProfileFromJson(Profile& profile,
             profile.addAction(b, std::move(action));
         }
 
-        if (actionJson.containsKey("longPress"))
-        {
-            JsonObject lpJson = actionJson["longPress"];
-            auto lpAction = createActionFromJson(lpJson, keyboard);
-            if (lpAction)
-            {
-                const char* lpName = lpJson["name"] | "";
-                if (lpName[0] != '\0')
-                    lpAction->setName(lpName);
-                profile.addLongPressAction(b, std::move(lpAction));
-            }
-        }
-
-        if (actionJson.containsKey("doublePress"))
-        {
-            JsonObject dpJson = actionJson["doublePress"];
-            auto dpAction = createActionFromJson(dpJson, keyboard);
-            if (dpAction)
-            {
-                const char* dpName = dpJson["name"] | "";
-                if (dpName[0] != '\0')
-                    dpAction->setName(dpName);
-                profile.addDoublePressAction(b, std::move(dpAction));
-            }
-        }
+        attachVariant(actionJson,
+                      "longPress",
+                      [&](std::unique_ptr<Action> a)
+                      { profile.addLongPressAction(b, std::move(a)); });
+        attachVariant(actionJson,
+                      "doublePress",
+                      [&](std::unique_ptr<Action> a)
+                      { profile.addDoublePressAction(b, std::move(a)); });
     }
 }
 
@@ -343,7 +359,9 @@ std::unique_ptr<Action> ConfigLoader::createActionFromJson(const JsonObject& act
                 {
                     auto inner = createActionFromJson(actionObj, keyboard);
                     if (inner)
+                    {
                         step.push_back(std::move(inner));
+                    }
                 }
                 macro->addStep(std::move(step));
             }

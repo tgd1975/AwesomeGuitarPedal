@@ -1,6 +1,7 @@
 ---
 id: IDEA-014
 title: Automated Hardware Testing Rig
+category: tooling
 description: A relay-based test interface with optocoupler output detection that enables fully automated on-device testing without human intervention
 ---
 

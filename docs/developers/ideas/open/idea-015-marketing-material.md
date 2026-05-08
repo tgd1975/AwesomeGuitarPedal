@@ -1,6 +1,7 @@
 ---
 id: IDEA-015
 title: Marketing Material
+category: outreach
 description: Create compelling marketing material to attract musicians and builders
 ---
 

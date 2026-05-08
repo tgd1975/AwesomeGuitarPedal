@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Snapshot OVERVIEW / EPICS / KANBAN into archive/<version>/ on release.
+"""Snapshot OVERVIEW / EPICS / KANBAN into `archive/<version>/` on release.
 
 When a release is cut, the live `docs/developers/tasks/{OVERVIEW,EPICS,KANBAN}.md`
 keep evolving. This helper freezes the post-archive state into the

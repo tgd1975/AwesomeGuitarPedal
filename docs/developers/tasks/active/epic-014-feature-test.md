@@ -8,8 +8,6 @@ closed:
 assigned:
 ---
 
-# End-to-end feature tests
-
 Manual and scripted feature tests covering the full stack: CLI scan/validate/
 upload commands, Flutter app home screen, BLE connection, profile list, action
 editor, upload screen, JSON preview, iOS build/deploy, and integration edge

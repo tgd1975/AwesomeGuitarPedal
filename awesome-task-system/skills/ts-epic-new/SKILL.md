@@ -26,6 +26,11 @@ status: open            # derived by housekeep.py — do not edit manually
 opened: YYYY-MM-DD
 closed:                 # set by housekeep.py when all tasks close
 assigned:               # optional — username of the owner
+branch: feature/<slug>  # optional — suggested git branch for tasks in this epic.
+                        # Auto-filled with feature/<slug> (the same slug used in
+                        # the filename). The user may edit or delete this line
+                        # before committing. /ts-task-active soft-warns when the
+                        # current branch differs from this value.
 ---
 
 # <Short title>
@@ -70,12 +75,18 @@ accurate indefinitely.
    supplied idea context in their invocation.
 4. Write the file to `docs/developers/tasks/open/` using the template
    above. Fill `id`, `name`, `title`, `opened` (today in YYYY-MM-DD),
-   and leave `status: open`, `closed:` empty, `assigned:` empty. If the
-   user provided idea IDs, include the plain-text seeding sentence in the
-   body (see **Idea linking** above). The user can add `assigned:`
-   manually later — not prompted by default.
+   and leave `status: open`, `closed:` empty, `assigned:` empty. Set
+   `branch: feature/<slug>` using the **exact slug from step 2** —
+   reuse the value verbatim, do not re-derive it from the title. If
+   the user provided idea IDs, include the plain-text seeding sentence
+   in the body (see **Idea linking** above). The user can add
+   `assigned:` manually later — not prompted by default.
 5. Run `python scripts/housekeep.py --apply` to regenerate OVERVIEW.md.
 6. Report the new epic ID and file path.
+
+The filename slug is already lowercase + hyphens + digits, which is
+always a valid git ref — no extra sanitization is needed before
+writing it as `feature/<slug>`. Do not invent one.
 
 Do not commit — epics are usually introduced together with their first
 tasks, and the user will commit the bundle.

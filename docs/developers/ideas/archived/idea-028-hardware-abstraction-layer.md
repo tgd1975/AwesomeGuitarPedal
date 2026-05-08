@@ -1,14 +1,13 @@
 ---
 id: IDEA-028
 title: Hardware Abstraction Layer — replace #ifdef soup with a platform class hierarchy
+category: firmware
 description: Introduce an abstract PedalApp base class and per-hardware specializations to eliminate platform #ifdefs from main.cpp and PedalLogic sources.
 ---
 
 ## Archive Reason
 
 2026-04-29 — Realized by EPIC-020 (HAL Refactor). All 5 phases shipped: PedalApp / BlePedalApp / {Esp32,Nrf52840,Host}PedalApp class hierarchy, IFileSystem DI, host integration tests.
-
-# Hardware Abstraction Layer — replace #ifdef soup with a platform class hierarchy
 
 ## Motivation
 

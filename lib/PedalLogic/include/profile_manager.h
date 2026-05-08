@@ -39,6 +39,21 @@ public:
     const Profile* getProfile(uint8_t profileIndex) const;
 
     /**
+     * @brief Install the profile-independent action set
+     *
+     * Stores a Profile-shaped action set that fires alongside the active
+     * profile's actions on every button event, regardless of which profile
+     * is selected. Pass nullptr to clear. Switching profiles never touches
+     * this set. See IDEA-024 / TASK-306.
+     */
+    void setIndependentActions(std::unique_ptr<Profile> independentActions);
+
+    /**
+     * @brief Returns the profile-independent action set, or nullptr if none.
+     */
+    const Profile* getIndependentActions() const { return independentActions_.get(); }
+
+    /**
      * @brief Advance to the next populated profile slot and trigger blink feedback
      *
      * Skips empty slots and wraps around.  Triggers a 3-blink sequence on all
@@ -95,6 +110,7 @@ private:
     void updateLEDs();
 
     std::array<std::unique_ptr<Profile>, MAX_PROFILES> profileSlots;
+    std::unique_ptr<Profile> independentActions_; /**< Profile-independent actions (IDEA-024) */
     uint8_t currentProfile = 0;
 
     std::vector<ILEDController*> selectLeds; /**< Profile-select LED controllers */

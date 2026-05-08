@@ -6,7 +6,7 @@
 
 static constexpr uint16_t END_SEQ = 0xFFFF;
 
-enum class UploadCheck
+enum class UploadCheck : std::uint8_t
 {
     Ok,
     ParseFailed,   // JSON does not parse — maps to ERROR:parse_failed
@@ -19,17 +19,23 @@ enum class UploadCheck
 // Loose by design — the CLI's pre-flight does full JSON-Schema validation.
 static UploadCheck classifyUpload(const std::string& buffer)
 {
-    ArduinoJson::DynamicJsonDocument doc(JSON_DOC_CAPACITY);
+    ArduinoJson::DynamicJsonDocument doc(kJsonDocCapacity);
     if (ArduinoJson::deserializeJson(doc, buffer))
+    {
         return UploadCheck::ParseFailed;
+    }
 
     if (! doc.containsKey("profiles") || ! doc["profiles"].is<ArduinoJson::JsonArray>())
+    {
         return UploadCheck::SchemaInvalid;
+    }
 
     for (ArduinoJson::JsonObject profile : doc["profiles"].as<ArduinoJson::JsonArray>())
     {
         if (! profile.containsKey("buttons") || ! profile["buttons"].is<ArduinoJson::JsonObject>())
+        {
             return UploadCheck::SchemaInvalid;
+        }
     }
     return UploadCheck::Ok;
 }
@@ -48,17 +54,23 @@ BleConfigReassembler::BleConfigReassembler(ProfileManager* pm,
       reboot_(std::move(rebootFn))
 {
     if (! delay_)
+    {
         delay_ = [](uint32_t ms) { delay(ms); };
+    }
     if (! millis_)
+    {
         millis_ = []() -> uint32_t { return static_cast<uint32_t>(millis()); };
+    }
 }
 
 void BleConfigReassembler::onChunk(const uint8_t* data, size_t len, bool isHw)
 {
     if (len < 2)
+    {
         return;
+    }
 
-    uint16_t seq = (static_cast<uint16_t>(data[0]) << 8) | data[1];
+    auto seq = static_cast<uint16_t>((static_cast<uint16_t>(data[0]) << 8) | data[1]);
 
     if (seq == 0x0000)
     {
@@ -74,14 +86,20 @@ void BleConfigReassembler::onChunk(const uint8_t* data, size_t len, bool isHw)
     }
 
     if (! transferInProgress_)
+    {
         return;
+    }
 
     if (seq == END_SEQ)
     {
         if (hwTransfer_)
+        {
             applyHwTransfer();
+        }
         else
+        {
             applyTransfer();
+        }
         return;
     }
 
@@ -93,7 +111,7 @@ void BleConfigReassembler::onChunk(const uint8_t* data, size_t len, bool isHw)
     }
 
     size_t payloadLen = len - 2;
-    if (buffer_.size() + payloadLen > MAX_CONFIG_BYTES)
+    if (buffer_.size() + payloadLen > kMaxConfigBytes)
     {
         notifyStatus("ERROR:too_large");
         resetTransfer();
@@ -167,7 +185,9 @@ void BleConfigReassembler::applyHwTransfer()
     blinkSuccess();
     resetTransfer();
     if (reboot_)
+    {
         reboot_();
+    }
 }
 
 void BleConfigReassembler::resetTransfer()
@@ -181,7 +201,9 @@ void BleConfigReassembler::resetTransfer()
 void BleConfigReassembler::notifyStatus(const char* s)
 {
     if (statusCb_)
+    {
         statusCb_(s);
+    }
 }
 
 void BleConfigReassembler::blinkSuccess()
@@ -189,10 +211,14 @@ void BleConfigReassembler::blinkSuccess()
     for (int i = 0; i < 3; i++)
     {
         for (auto* led : selectLeds_)
+        {
             led->setState(true);
+        }
         delay_(150);
         for (auto* led : selectLeds_)
+        {
             led->setState(false);
+        }
         delay_(150);
     }
     pm_->update(millis_());
@@ -201,8 +227,12 @@ void BleConfigReassembler::blinkSuccess()
 void BleConfigReassembler::blinkFailure()
 {
     for (auto* led : selectLeds_)
+    {
         led->setState(true);
+    }
     delay_(500);
     for (auto* led : selectLeds_)
+    {
         led->setState(false);
+    }
 }

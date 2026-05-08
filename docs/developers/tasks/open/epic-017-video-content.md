@@ -8,8 +8,6 @@ closed:
 assigned:
 ---
 
-# Video content and channel
-
 Produce the full set of demo videos covering setup/installation, button
 configuration, builder workflow, advanced features, real-world usage, and
 troubleshooting. Also covers setting up the video platform channel to host

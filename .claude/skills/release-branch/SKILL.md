@@ -76,8 +76,14 @@ Invoke as `/release-branch vX.Y.Z`. If no version is given, read the current ver
    BASE=$(git merge-base HEAD main)
    git reset --soft $BASE
    git add CHANGELOG.md
-   git commit -m "<confirmed message>"
+   ASP_COMMIT_BYPASS="release-branch: squash commit" \
+       git commit -m "<confirmed message>"
    ```
+
+   The bypass is required because the squash commit's file set is
+   "everything in the branch" — not enumerable as a flat pathspec
+   list. See [docs/developers/COMMIT_POLICY.md](../../../docs/developers/COMMIT_POLICY.md);
+   the bypass is logged to `.git/asp-commit-bypass.log`.
 
 2. **Push branch**:
 
@@ -124,6 +130,21 @@ Invoke as `/release-branch vX.Y.Z`. If no version is given, read the current ver
    pass; otherwise omit it for an immediate merge. Stop and surface any merge
    error (conflicts, failing required checks) — do not retry blindly.
 
+   **CI merge gate.** Branch protection on `main` requires every gating CI
+   check to be green and the branch to be up-to-date with `main` before a
+   merge is allowed (linear history is also enforced — only `--squash` or
+   `--rebase` work). If `gh pr merge` reports "required statuses must
+   pass" or similar, **fail loudly**: print the failing check names and
+   stop. Do **not** wait silently or poll the gate from this skill — the
+   user needs to see which check is red and decide how to resolve it
+   (fix and push, or open a separate task). The required-checks list and
+   the recipe for changing it live in
+   [DEVELOPMENT_SETUP.md](../../../docs/developers/DEVELOPMENT_SETUP.md#ci-merge-gate-branch-protection-on-main).
+
+   Note: `--merge` (true merge commit) is rejected by the linear-history
+   rule. If the user picks it, surface the constraint and ask them to
+   choose `--squash` (the project default) or `--rebase` instead.
+
    Only fall back to "merge in the GitHub UI" if the user explicitly asks for a
    manual review pass.
 
@@ -167,11 +188,14 @@ Invoke as `/release-branch vX.Y.Z`. If no version is given, read the current ver
     git add docs/developers/tasks/archive/vX.Y.Z/
     ```
 
-5. **Commit the bump and archive**:
+5. **Commit the bump and archive**.
+
+    Multi-file release operation — uses the documented bypass:
 
     ```bash
     git add platformio.ini include/version.h
-    git commit -m "chore: bump version to vX.Y.Z and archive closed tasks"
+    ASP_COMMIT_BYPASS="release-branch: version bump + archive" \
+        git commit -m "chore: bump version to vX.Y.Z and archive closed tasks"
     ```
 
 6. **Create annotated tag**:

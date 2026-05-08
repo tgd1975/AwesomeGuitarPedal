@@ -70,6 +70,14 @@ and discussion are welcome via issues and pull requests.
 Pre-built firmware binaries are published with each
 [GitHub Release](../../releases). Download the file for your hardware:
 
+> **Versioning:** every deliverable in this project — firmware, the Flutter
+> configurator app, the npm tooling, and the task-system package — ships under
+> the **same version number**. If a release moves firmware from `v0.4.1` to
+> `v0.5.0`, the Flutter app and the other deliverables move too, even when their
+> code did not change. We do not skip-bump unchanged artifacts. See
+> [docs/developers/CI_PIPELINE.md — Version policy](docs/developers/CI_PIPELINE.md#version-policy)
+> for the rationale.
+
 | Platform | File |
 |----------|------|
 | ESP32 (NodeMCU-32S) | `firmware-nodemcu-32s-vX.Y.Z.bin` |

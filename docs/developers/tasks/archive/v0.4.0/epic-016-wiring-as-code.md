@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Wiring harness diagrams as code (WireViz)
-
 Replace Fritzing breadboard-layout PNGs with WireViz YAML harness diagrams
 that CI renders automatically. Covers WireViz/Graphviz toolchain installation,
 ESP32 and nRF52840 harness files, SVG and BOM generation, pre-commit hook, CI

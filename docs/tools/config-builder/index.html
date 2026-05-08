@@ -4,11 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AwesomeStudioPedal — Profile Builder</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta property="og:title" content="AwesomeStudioPedal — Profile Builder">
+  <meta property="og:description" content="Build a profiles.json without writing JSON by hand">
+  <meta property="og:image" content="https://tgd1975.github.io/AwesomeStudioPedal/tools/config-builder/asp-social-preview.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AwesomeStudioPedal — Profile Builder">
+  <meta name="twitter:description" content="Build a profiles.json without writing JSON by hand">
+  <meta name="twitter:image" content="https://tgd1975.github.io/AwesomeStudioPedal/tools/config-builder/asp-social-preview.png">
   <link rel="stylesheet" href="config-builder.css">
 </head>
 <body>
 
 <header class="asp-header">
+  <a class="asp-mark-link" href="https://github.com/tgd1975/AwesomeStudioPedal" title="AwesomeStudioPedal on GitHub">
+    <img class="asp-mark" src="asp-mark.svg" alt="AwesomeStudioPedal" width="40" height="40">
+  </a>
   <div>
     <h1>AwesomeStudioPedal — Profile Builder</h1>
     <p class="subtitle">Build a profiles.json without writing JSON by hand</p>
@@ -30,6 +42,7 @@
     </div>
     <div id="profiles-tabs"></div>
     <div id="active-profile-form"></div>
+    <div id="independent-actions-section"></div>
   </section>
 
   <!-- Preview panel -->
@@ -120,6 +133,9 @@
   <option value="KEY_NUM_PERIOD">
 </datalist>
 
+<span class="asp-version-stamp" title="AwesomeStudioPedal version"></span>
+
+<script src="../version.js"></script>
 <script src="vendor/ajv.min.js"></script>
 <script src="../profiles-gallery.js"></script>
 <script src="builder.js"></script>

@@ -37,6 +37,9 @@ class ProfileListScreen extends StatelessWidget {
             tooltip: 'More actions',
             onSelected: (v) {
               if (v == 'import_config') _importConfig(context);
+              if (v == 'independent_actions') {
+                context.push('/independent-actions');
+              }
             },
             itemBuilder: (_) => const [
               PopupMenuItem(
@@ -44,6 +47,16 @@ class ProfileListScreen extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(Icons.settings_input_component),
                   title: Text('Import Hardware Config'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'independent_actions',
+                child: ListTile(
+                  leading: Icon(Icons.star_border),
+                  title: Text('Independent actions'),
+                  subtitle:
+                      Text('Fire on every button event regardless of profile'),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),

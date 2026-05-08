@@ -31,6 +31,25 @@ BURNUP_ENABLED = bool(tsc.get(_CFG, "visualizations", "burnup", "enabled", defau
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
 FIELD_RE = re.compile(r"^(\w[\w-]*):\s*(.+)$", re.MULTILINE)
+
+
+def _md_cell(text):
+    """Escape free-text frontmatter for safe rendering in a markdown table cell.
+
+    Mirrors the helper in housekeep.py — kept duplicated to avoid an
+    import cycle (this module is invoked as a CLI from housekeep, and
+    housekeep also imports configuration from task_system_config).
+    Guards against MD033 (`<word>` parsed as inline HTML) and pipe
+    characters that would split table cells.
+    """
+    return (
+        str(text)
+        .replace("|", "\\|")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
 MARKER_START = "<!-- GENERATED -->"
 MARKER_END = "<!-- END GENERATED -->"
 # A small second block above GENERATED that holds the counts line and the
@@ -102,9 +121,9 @@ def generate_release_overview(version, release_dir):
     ]
     for t in tasks:
         task_id = t.get("id", "?")
-        title = t.get("title", t["_file"])
-        effort = t.get("effort", "?")
-        complexity = t.get("complexity", "?")
+        title = _md_cell(t.get("title", t["_file"]))
+        effort = _md_cell(t.get("effort", "?"))
+        complexity = _md_cell(t.get("complexity", "?"))
         lines.append(f"| [{task_id}]({t['_file']}) | {title} | {effort} | {complexity} |")
 
     out_path = os.path.join(release_dir, "OVERVIEW.md")
@@ -256,9 +275,9 @@ def main():
                 ]
         for t in tasks:
             task_id = t.get("id", "?")
-            title = t.get("title", t["_file"])
-            effort = t.get("effort", "?")
-            complexity = t.get("complexity", "?")
+            title = _md_cell(t.get("title", t["_file"]))
+            effort = _md_cell(t.get("effort", "?"))
+            complexity = _md_cell(t.get("complexity", "?"))
             status = t.get("status", "open")
             if status == "active":
                 status_badge = "🔵 **active**"
@@ -319,8 +338,8 @@ def main():
 
     for t in closed_tasks:
         task_id = t.get("id", "?")
-        title = t.get("title", t["_file"])
-        effort = t.get("effort", "?")
+        title = _md_cell(t.get("title", t["_file"]))
+        effort = _md_cell(t.get("effort", "?"))
         lines.append(f"| [{task_id}](closed/{t['_file']}) | {title} | {effort} |")
 
     if archived_releases:
@@ -340,6 +359,7 @@ def main():
 
     header_block = (
         HEADER_START + "\n\n"
+        + "<!-- markdownlint-disable-file MD033 -->\n\n"
         + "\n".join(header_lines).strip("\n")
         + "\n\n" + HEADER_END + "\n\n"
     )

@@ -30,10 +30,24 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // Override the auto-generated debug keystore with a stable, repo-committed one
+        // so APKs signed by CI (and any local build) all carry the same key. This lets
+        // sideload users upgrade in place between releases. Real Play Store signing is
+        // tracked in TASK-160; until then, both debug and release builds use this key.
+        getByName("debug") {
+            storeFile = file("../keystores/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // TODO(TASK-160): replace with a real release signing config for Play Store.
+            // For sideload distribution via GitHub Releases we sign with the stable
+            // debug key configured above.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

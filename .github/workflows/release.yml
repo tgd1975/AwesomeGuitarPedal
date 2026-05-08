@@ -17,7 +17,7 @@ permissions:
   contents: write  # needed to create GitHub Releases and upload assets
 
 jobs:
-  # ─── Host unit tests ───────────────────────────────────────────────────────
+  # ─── Host C++ unit tests (gates firmware builds) ───────────────────────────
   test:
     name: Host Unit Tests
     runs-on: ubuntu-latest
@@ -39,6 +39,37 @@ jobs:
       - name: Run tests
         run: .vscode/build/test/pedal_tests --gtest_brief=1
 
+  # ─── Flutter quality (gates Android build) ─────────────────────────────────
+  flutter-quality:
+    name: Flutter Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read Flutter version
+        id: flutter-version
+        run: echo "version=$(cat app/.flutter-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter-version.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: app
+        run: flutter analyze
+
+      - name: Run tests
+        working-directory: app
+        run: flutter test
+
   # ─── Firmware build — ESP32 ────────────────────────────────────────────────
   build-esp32:
     name: Build ESP32 firmware
@@ -58,16 +89,20 @@ jobs:
       - name: Build ESP32 firmware
         run: pio run -e nodemcu-32s
 
-      - name: Rename binary
+      - name: Package artifacts
         run: |
           TAG="${{ github.ref_name }}${{ github.event.inputs.tag }}"
           cp .pio/build/nodemcu-32s/firmware.bin \
-             awesome-pedal-esp32-${TAG}.bin
+             firmware-nodemcu-32s-${TAG}.bin
+          zip firmware-nodemcu-32s-${TAG}-debug.zip \
+              .pio/build/nodemcu-32s/firmware.elf
 
       - uses: actions/upload-artifact@v4
         with:
           name: firmware-esp32
-          path: awesome-pedal-esp32-*.bin
+          path: |
+            firmware-nodemcu-32s-*.bin
+            firmware-nodemcu-32s-*-debug.zip
           retention-days: 7
 
   # ─── Firmware build — nRF52840 ─────────────────────────────────────────────
@@ -89,23 +124,67 @@ jobs:
       - name: Build nRF52840 firmware
         run: pio run -e feather-nrf52840
 
-      - name: Rename binary
+      - name: Package artifacts
         run: |
           TAG="${{ github.ref_name }}${{ github.event.inputs.tag }}"
-          cp .pio/build/feather-nrf52840/firmware.bin \
-             awesome-pedal-nrf52840-${TAG}.bin
+          cp .pio/build/feather-nrf52840/firmware.hex \
+             firmware-feather-nrf52840-${TAG}.hex
+          cp .pio/build/feather-nrf52840/firmware.zip \
+             firmware-feather-nrf52840-${TAG}.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: firmware-nrf52840
-          path: awesome-pedal-nrf52840-*.bin
+          path: |
+            firmware-feather-nrf52840-*.hex
+            firmware-feather-nrf52840-*.zip
+          retention-days: 7
+
+  # ─── Android APK build (debug-signed; real signing deferred to TASK-160) ───
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    needs: flutter-quality
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read Flutter version
+        id: flutter-version
+        run: echo "version=$(cat app/.flutter-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter-version.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Build APK (release, debug-signed)
+        working-directory: app
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: |
+          TAG="${{ github.ref_name }}${{ github.event.inputs.tag }}"
+          cp app/build/app/outputs/flutter-apk/app-release.apk \
+             awesome-studio-pedal-${TAG}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-android
+          path: awesome-studio-pedal-*.apk
           retention-days: 7
 
   # ─── GitHub Release ────────────────────────────────────────────────────────
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [build-esp32, build-nrf52840]
+    needs: [build-esp32, build-nrf52840, build-android]
 
     steps:
       - uses: actions/checkout@v4
@@ -151,6 +230,11 @@ jobs:
         with:
           name: firmware-nrf52840
 
+      - name: Download Android artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-android
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -158,8 +242,11 @@ jobs:
           name: "AwesomeStudioPedal ${{ steps.tag.outputs.value }}"
           body: ${{ steps.changelog.outputs.body }}
           files: |
-            awesome-pedal-esp32-*.bin
-            awesome-pedal-nrf52840-*.bin
+            firmware-nodemcu-32s-*.bin
+            firmware-nodemcu-32s-*-debug.zip
+            firmware-feather-nrf52840-*.hex
+            firmware-feather-nrf52840-*.zip
+            awesome-studio-pedal-*.apk
           draft: false
           prerelease: false
 

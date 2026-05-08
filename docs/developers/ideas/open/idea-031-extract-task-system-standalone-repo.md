@@ -1,6 +1,7 @@
 ---
 id: IDEA-031
 title: Extract the task-and-idea system into a standalone public GitHub repository
+category: tooling
 description: Lift the docs-as-code task + idea management system out of AwesomeStudioPedal into its own public repo so other small teams can use it and this project can consume it as an installable tool.
 related: IDEA-021, IDEA-026
 ---

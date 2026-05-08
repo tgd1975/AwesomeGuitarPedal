@@ -10,8 +10,6 @@ effort_actual: Medium (2-8h)
 effort_actual_source: heuristic-v1
 ---
 
-# Circuit-skill documentation diagrams
-
 Add diagrams to the IDEA-027 design documents — pipeline, dataflow, decision flows,
 static structure, contributor workflow, and the slot vocabulary's spatial layout —
 so the dense prose specifications become readable at a glance.

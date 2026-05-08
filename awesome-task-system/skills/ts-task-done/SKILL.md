@@ -67,17 +67,29 @@ Steps:
 3. Run `python scripts/housekeep.py --apply` — this moves the file to `closed/` and
    regenerates `OVERVIEW.md`, `EPICS.md`, and `KANBAN.md`.
 
-4. Stage and commit. The closing this skill performs **owns the
+1. Stage and commit. The closing this skill performs **owns the
    resulting OVERVIEW/EPICS/KANBAN regen** — those regen lines reflect
    *this task moving to closed*, so they are part of this commit even
-   under the "commit only your own work" rule in `CLAUDE.md`. Stage:
+   under the "commit only your own work" rule in `CLAUDE.md`.
 
-   - The renamed task file (`active|paused|open → closed`).
+   The pathspec list must include **both** the source path and the
+   destination path of the housekeep rename. Naming only the
+   destination commits the addition but leaves the source-side
+   deletion orphaned in the working tree as a `D` entry — this is
+   the exact bug TASK-347 fixed. Both paths must appear:
+
+   - Source path of the rename — the file's old location, one of
+     `docs/developers/tasks/active/task-NNN-<slug>.md`,
+     `docs/developers/tasks/paused/task-NNN-<slug>.md`, or
+     `docs/developers/tasks/open/task-NNN-<slug>.md` depending on
+     where the task was before housekeep moved it.
+   - Destination path —
+     `docs/developers/tasks/closed/task-NNN-<slug>.md`.
    - `docs/developers/tasks/OVERVIEW.md`,
      `docs/developers/tasks/EPICS.md`,
      `docs/developers/tasks/KANBAN.md`.
-   - Any per-release archive overview that housekeep just touched (e.g.
-     `docs/developers/tasks/archive/v0.X.Y/OVERVIEW.md`).
+   - Any per-release archive overview that housekeep just touched
+     (e.g. `docs/developers/tasks/archive/v0.X.Y/OVERVIEW.md`).
 
    Do **not** stage unrelated working-tree changes — other in-flight
    sessions' files must stay out. If a parallel session already had
@@ -85,8 +97,8 @@ Steps:
    them; that is fine and expected — the index always reflects current
    on-disk state, not "who edited what".
 
-   Then create a commit with the message:
-   `close TASK-NNN: <task title from frontmatter>`
-   Do NOT push.
+   Commit via `/commit` with the message
+   `close TASK-NNN: <task title from frontmatter>` and the full
+   pathspec list above. Do NOT push.
 
-5. Report: "TASK-NNN moved to closed/, overviews updated, and committed."
+2. Report: "TASK-NNN moved to closed/, overviews updated, and committed."

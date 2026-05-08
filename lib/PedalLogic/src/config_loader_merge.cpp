@@ -1,4 +1,4 @@
-#include "ble_config_reassembler.h" // JSON_DOC_CAPACITY
+#include "ble_config_reassembler.h" // kJsonDocCapacity
 #include "config.h"
 #include "config_loader.h"
 #include "profile.h"
@@ -51,7 +51,7 @@ bool ConfigLoader::mergeConfig(ProfileManager& profileManager,
                                IBleKeyboard* keyboard,
                                const std::string& jsonConfig)
 {
-    DynamicJsonDocument doc(JSON_DOC_CAPACITY);
+    DynamicJsonDocument doc(kJsonDocCapacity);
     DeserializationError error = deserializeJson(doc, jsonConfig);
 
     if (error)
@@ -89,6 +89,14 @@ bool ConfigLoader::mergeConfig(ProfileManager& profileManager,
         logger_->log("Added profile: ", profileName);
     }
 
+    if (doc.containsKey("independentActions"))
+    {
+        auto independent = std::make_unique<Profile>("__independent__");
+        populateProfileFromJson(*independent, doc["independentActions"], keyboard);
+        profileManager.setIndependentActions(std::move(independent));
+        logger_->log("Replaced independent actions");
+    }
+
     logLoadedConfig(profileManager);
     return true;
 }
@@ -117,7 +125,7 @@ bool ConfigLoader::replaceProfile(ProfileManager& profileManager,
         return false;
     }
 
-    DynamicJsonDocument doc(JSON_DOC_CAPACITY);
+    DynamicJsonDocument doc(kJsonDocCapacity);
     DeserializationError error = deserializeJson(doc, jsonConfig);
 
     if (error)

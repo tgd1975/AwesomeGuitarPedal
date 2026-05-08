@@ -20,7 +20,9 @@ void MacroAction::getJsonProperties(JsonObject& json) const
 void MacroAction::execute()
 {
     if (steps_.empty() || running_)
+    {
         return;
+    }
 
     currentStep_ = 0;
     running_ = true;
@@ -42,15 +44,21 @@ void MacroAction::execute()
 void MacroAction::executeRelease()
 {
     if (! running_ || currentStep_ >= steps_.size())
+    {
         return;
+    }
     for (auto& action : steps_[currentStep_])
+    {
         action->executeRelease();
+    }
 }
 
 void MacroAction::update()
 {
     if (! running_)
+    {
         return;
+    }
 
     // Poll in-progress actions in the current step (e.g. DelayedAction timer ticks).
     if (currentStep_ < steps_.size())
@@ -58,7 +66,9 @@ void MacroAction::update()
         for (auto& action : steps_[currentStep_])
         {
             if (action->isInProgress())
+            {
                 action->execute();
+            }
         }
     }
 
@@ -77,17 +87,23 @@ void MacroAction::update()
 void MacroAction::fireCurrentStep()
 {
     for (auto& action : steps_[currentStep_])
+    {
         action->execute();
+    }
 }
 
 bool MacroAction::currentStepDone() const
 {
     if (currentStep_ >= steps_.size())
+    {
         return true;
+    }
     for (const auto& action : steps_[currentStep_])
     {
         if (action->isInProgress())
+        {
             return false;
+        }
     }
     return true;
 }

@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Flutter mobile app
-
 Build the Flutter mobile app for Android and iOS: repo restructure, project
 scaffold, BLE service layer (scan, connect, chunked upload), Dart data models,
 profile configurator screens, file import/export, BLE upload screen, app tests,

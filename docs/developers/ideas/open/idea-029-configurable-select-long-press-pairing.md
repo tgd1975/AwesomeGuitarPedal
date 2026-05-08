@@ -1,10 +1,9 @@
 ---
 id: IDEA-029
 title: Configurable SELECT Long-Press to Activate BLE Pairing Mode
+category: firmware
 description: Very-long-press on the SELECT button activates BLE pairing mode; the feature is opt-in via config.json so it can be disabled for testing and CI.
 ---
-
-# Configurable SELECT Long-Press to Activate BLE Pairing Mode
 
 ## Motivation
 

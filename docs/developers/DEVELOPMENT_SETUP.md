@@ -231,6 +231,171 @@ var is unset, so the strict requirement is only when you have multiple devices p
 
 ---
 
+## Git hooks
+
+The repo's pre-commit hook (formatting, schema validation, `platformio.ini`
+lint, unit tests, secret scan, task-system regen) lives at
+[`scripts/pre-commit`](../../scripts/pre-commit).
+The security-review hooks (`pre-merge-commit`, `post-merge`, `pre-rebase`)
+live in [`scripts/git-hooks/`](../../scripts/git-hooks/). Install all of them
+in one go after cloning:
+
+```bash
+bash scripts/install_git_hooks.sh
+```
+
+The installer is idempotent and safe to re-run. It:
+
+- symlinks the security-review hooks (or copies them on Windows where symlinks
+  fail), and
+- writes a tiny wrapper at `.git/hooks/pre-commit` that `exec`s
+  `scripts/pre-commit`. The wrapper means edits to `scripts/pre-commit`
+  take effect immediately on every platform — no re-install needed.
+
+To bypass the security-review hooks for a single command:
+`ASP_SKIP_SECURITY_REVIEW=1 git pull`. The pre-commit hook can be bypassed
+with `git commit --no-verify`, but this is strongly discouraged — see the
+"Pre-commit hook failures on unrelated changes" section in
+[`CLAUDE.md`](../../CLAUDE.md) for the case-by-case decision rules.
+
+### platformio.ini lint
+
+When `platformio.ini` is in the staged pathspec, the pre-commit hook runs
+[`scripts/validate_platformio_ini.py`](../../scripts/validate_platformio_ini.py),
+which wraps `pio project config` and `pio project config --lint` to catch
+syntax errors, bad value types (e.g. non-integer `upload_speed`), and
+unknown / typo'd keys (e.g. `boord =` instead of `board =`). The same
+script runs in CI as the `Static Analysis / platformio.ini lint` job on
+every push and PR.
+
+To reproduce a CI failure locally:
+
+```bash
+python scripts/validate_platformio_ini.py
+```
+
+The script auto-discovers `pio` in `~/.platformio/penv/bin/pio` if it is
+not on `PATH` (the pip-installed PlatformIO ships its own venv).
+
+---
+
+## CI merge gate (branch protection on `main`)
+
+The local pre-commit hook is the first line of defence; the CI merge gate
+on `main` is the second. GitHub branch protection on `main` requires every
+listed check to report success before the **Merge pull request** button
+becomes available, and requires the PR branch to be up to date with
+`main` before merging. Linear history is enforced — no merge commits.
+This matches the existing `/release-branch` squash-and-merge flow.
+
+### Required checks
+
+The check name in the table is the value GitHub uses, which is the
+`name:` of the job inside the workflow file (not the workflow file name).
+Renaming a job silently breaks branch protection — see "How to add a new
+required check" below.
+
+| Check name | Workflow file | Job |
+|---|---|---|
+| C++ Format Check | `test.yml` | `cpp-format` |
+| Markdown Lint | `test.yml` | `markdown-lint` |
+| Mermaid Diagram Lint | `test.yml` | `mermaid-lint` |
+| Host Unit Tests | `test.yml` | `unit-tests` |
+| Code Coverage | `test.yml` | `coverage` |
+| clang-tidy | `static-analysis.yml` | `clang-tidy` |
+| platformio.ini lint | `static-analysis.yml` | `platformio-ini` |
+| Analyze, test, and build APK | `app.yml` | `build-and-test` |
+| Flutter Quality | `flutter.yml` | `flutter-quality` |
+| Validate profile files | `profiles.yml` | `validate-profiles` |
+| Build API Documentation | `docs.yml` | `build-docs` |
+| CodeQL | `codeql-analysis.yml` | `analyze` |
+
+Branch protection also has these settings on `main`:
+
+- Require pull request before merging.
+- Require branches to be up to date before merging.
+- Require linear history (no merge commits).
+- Do not allow administrators to bypass.
+
+### Checks deliberately excluded (for now)
+
+These checks run on every PR but are **not** required gates yet because
+they are currently red on `main`. Each is a planned-required gate; the
+linked task will turn it green, after which the gate-list above must be
+updated and branch protection synced (see "How to add a new required
+check").
+
+| Check name | Blocked by |
+|---|---|
+| Schemdraw staleness guard (`docs.yml › schematic-check`) | TASK-370 (Schemdraw SVGs are non-deterministic) |
+
+`release.yml` jobs (`Build ESP32 firmware`, `Build nRF52840 firmware`,
+`Build Android APK`, `Create GitHub Release`) and `Deploy to GitHub
+Pages` are excluded by design — they only run on `main` push or tag, so
+they do not produce check runs on PRs and cannot gate them.
+
+`Auto-merge Dependabot patch updates` from `dependabot-automerge.yml`
+is internal to Dependabot's flow and is not a generic merge gate.
+
+### How to add a new required check
+
+GitHub stores required checks by **name**, not by job ID. The name comes
+from the `name:` field of the job inside the workflow YAML. A required
+check that has never produced a check run cannot be added — GitHub does
+not know it exists yet. The order is therefore:
+
+1. Add the workflow / job in `.github/workflows/<file>.yml`. Make sure
+   the job has an explicit `name:` — otherwise GitHub falls back to the
+   job ID, which is rarely what you want, and renaming later silently
+   breaks the gate.
+2. Open a PR with a commit that triggers the new workflow on
+   `pull_request`. Wait for the run to finish (success or failure does
+   not matter — GitHub registers the check name on first run).
+3. Add the new check name to the **Required checks** table in this
+   document. Keep the table in alphabetical order of workflow file for
+   easy diff.
+4. Add the same check name to GitHub branch protection on `main`:
+
+   ```bash
+   # See current required checks
+   gh api repos/:owner/:repo/branches/main/protection/required_status_checks \
+     --jq '.contexts'
+
+   # Replace the full list (additive flag: --add not supported by the API).
+   # Edit the JSON to include every existing check + the new one, then:
+   gh api -X PATCH repos/:owner/:repo/branches/main/protection/required_status_checks \
+     --input required_checks.json
+   ```
+
+   The `--input` form expects a JSON file with the full check list:
+   `{"strict": true, "contexts": ["Check 1", "Check 2", ...]}`. Always
+   round-trip through `--jq '.contexts'` first to avoid dropping a
+   check by accident.
+5. Open a throwaway PR that triggers a deliberate failure of the new
+   check, and confirm the **Merge pull request** button is disabled
+   with a "required statuses must pass" message. Close the PR without
+   merging.
+
+If a check that previously gated `main` is renamed in its workflow YAML,
+the old name stays required (and now never reports), and the new name
+is unknown to branch protection. To rename safely:
+
+1. Land the rename on a feature branch and let CI run once with the new
+   name.
+2. Add the new name to required checks (step 4 above).
+3. Remove the old name in the same `--input` JSON.
+
+### Local vs CI
+
+Local pre-commit hooks (`scripts/pre-commit`) and `/lint` cover the same
+ground as several gates, but the gate is enforced server-side and is the
+final word. A passing `/commit` does **not** guarantee a mergeable PR —
+the PR still has to clear the CI gate listed above. See
+[`docs/developers/COMMIT_POLICY.md`](COMMIT_POLICY.md) for how the local
+hook composes with the gate.
+
+---
+
 ## Flutter app development
 
 The companion app lives in `app/`. It requires Flutter (installed at `/opt/flutter` on the

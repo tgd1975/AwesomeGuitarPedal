@@ -1,14 +1,13 @@
 ---
 id: IDEA-044
 title: Action Editor value field clears (or contextualises) when Action Type changes
+category: apps
 description: When the user changes Action Type in the Action Editor, the value field currently keeps its previous text — so switching from "Key (named)" / KEY_PAGE_UP to "Media Key" leaves the field reading `KEY_PAGE_UP`, which is meaningless under the new type. Make the field reset, or at least show a type-appropriate placeholder.
 ---
 
 ## Archive Reason
 
 2026-04-28 — Converted to TASK-280.
-
-# Action Editor value field resets on Action Type change
 
 ## The Idea in One Sentence
 

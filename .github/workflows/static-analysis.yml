@@ -31,5 +31,34 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          find lib/PedalLogic/src -name "*.cpp" | \
-            xargs clang-tidy -p .vscode/build
+          # Derive the lint set from compile_commands.json so any host-built
+          # .cpp gets linted automatically (TASK-348). Excludes third-party
+          # (_deps/, googletest, arduinojson) and the test harness (/test/) —
+          # headers are linted transitively through their includer.
+          python3 -c "
+          import json, re
+          excluded = re.compile(r'_deps/|/test/|arduinojson|googletest')
+          files = sorted({e['file'] for e in json.load(open('.vscode/build/compile_commands.json'))
+                          if not excluded.search(e['file'])})
+          print('\n'.join(files))
+          " | xargs clang-tidy -p .vscode/build
+
+  platformio-ini:
+    name: platformio.ini lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PlatformIO
+        run: pip install --quiet platformio
+
+      - name: Lint platformio.ini
+        # scripts/validate_platformio_ini.py wraps `pio project config` and
+        # `pio project config --lint` so unknown keys (typos like `boord`)
+        # are promoted to errors. Static — no toolchain install, no build.
+        run: python scripts/validate_platformio_ini.py

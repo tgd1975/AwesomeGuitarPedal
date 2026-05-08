@@ -18,7 +18,9 @@ namespace
         {
             std::ifstream inFile(path);
             if (! inFile)
+            {
                 return false;
+            }
 
             content = std::string((std::istreambuf_iterator<char>(inFile)),
                                   std::istreambuf_iterator<char>());
@@ -29,7 +31,9 @@ namespace
         {
             std::ofstream outFile(path);
             if (! outFile)
+            {
                 return false;
+            }
 
             outFile << content;
             return outFile.good();

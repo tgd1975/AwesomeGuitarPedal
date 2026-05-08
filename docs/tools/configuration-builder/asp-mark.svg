@@ -1,0 +1,39 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  
+  <rect x="4" y="4" width="56" height="56" rx="3" fill="none" stroke="#E8E8F0" stroke-width="1.75"></rect>
+
+  
+  <g stroke="#E8E8F0">
+    <g transform="translate(10 10)">
+      <circle r="2.6" fill="none" stroke-width="1"></circle>
+      <line x1="-1.6" y1="0" x2="1.6" y2="0" stroke-width="0.9"></line>
+      <line x1="0" y1="-1.6" x2="0" y2="1.6" stroke-width="0.9"></line>
+    </g>
+    <g transform="translate(54 10)">
+      <circle r="2.6" fill="none" stroke-width="1"></circle>
+      <line x1="-1.6" y1="0" x2="1.6" y2="0" stroke-width="0.9"></line>
+      <line x1="0" y1="-1.6" x2="0" y2="1.6" stroke-width="0.9"></line>
+    </g>
+    <g transform="translate(10 54)">
+      <circle r="2.6" fill="none" stroke-width="1"></circle>
+      <line x1="-1.6" y1="0" x2="1.6" y2="0" stroke-width="0.9"></line>
+      <line x1="0" y1="-1.6" x2="0" y2="1.6" stroke-width="0.9"></line>
+    </g>
+    <g transform="translate(54 54)">
+      <circle r="2.6" fill="none" stroke-width="1"></circle>
+      <line x1="-1.6" y1="0" x2="1.6" y2="0" stroke-width="0.9"></line>
+      <line x1="0" y1="-1.6" x2="0" y2="1.6" stroke-width="0.9"></line>
+    </g>
+  </g>
+
+  
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#E8E8F0" stroke-width="1" opacity="0.55"></circle>
+
+  
+  <circle cx="32" cy="32" r="13" fill="#F0B030"></circle>
+
+  
+  <circle cx="32" cy="32" r="3" fill="#E8E8F0"></circle>
+  <circle cx="32" cy="32" r="1" fill="#F0B030"></circle>
+</svg>

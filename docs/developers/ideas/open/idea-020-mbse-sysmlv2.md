@@ -1,6 +1,7 @@
 ---
 id: IDEA-020
 title: MBSE System Documentation with SysML v2
+category: docs
 description: Retroactively document the system using SysML v2 textual notation — stakeholder needs, derived requirements, structural architecture, behavioural models, and interface contracts — all as committed text files with CI validation and rendered output.
 ---
 

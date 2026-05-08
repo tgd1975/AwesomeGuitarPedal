@@ -100,6 +100,19 @@ header {
   flex-wrap: wrap;
 }
 
+.asp-mark-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.asp-mark-link .asp-mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
 .header-title h1 {
   font-size: 17px;
   font-weight: 600;
@@ -148,7 +161,7 @@ header {
   letter-spacing: 0.06em;
 }
 
-header a {
+header nav a {
   margin-left: auto;
   font-family: var(--asp-font-mono);
   font-size: 11px;
@@ -158,7 +171,7 @@ header a {
   white-space: nowrap;
 }
 
-header a:hover { text-decoration: underline; }
+header nav a:hover { text-decoration: underline; }
 
 /* ── Main layout ─────────────────────────────────────────────────────────── */
 
@@ -254,10 +267,6 @@ main {
   user-select: none;
   -webkit-user-select: none;
   box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.pedal-btn:hover {
-  background: color-mix(in srgb, var(--asp-surface-raised) 80%, var(--asp-text) 20%);
 }
 
 .pedal-btn:active,
@@ -499,5 +508,5 @@ main {
 
   .output-panel { min-height: 400px; }
 
-  header a { margin-left: 0; }
+  header nav a { margin-left: 0; }
 }

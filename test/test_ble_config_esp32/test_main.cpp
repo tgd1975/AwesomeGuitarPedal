@@ -33,7 +33,6 @@
 #include "config.h"
 #include "i_led_controller.h"
 #include "led_controller.h"
-#include "null_led_controller.h"
 #include "pedal_config.h"
 #include "profile_manager.h"
 

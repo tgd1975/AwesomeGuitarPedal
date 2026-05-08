@@ -1,6 +1,7 @@
 ---
 id: IDEA-000
 title: Initial Prototype
+category: hardware
 description: The working ESP32 BLE pedal that existed before any ideas were tracked — hardcoded, single-platform, no configurator.
 ---
 

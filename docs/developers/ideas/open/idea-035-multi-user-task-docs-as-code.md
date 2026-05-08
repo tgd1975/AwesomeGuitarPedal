@@ -1,10 +1,9 @@
 ---
 id: IDEA-035
 title: Multi-User Workflow for Docs-as-Code Task System
+category: tooling
 description: How to evolve the docs-as-code task and idea system from "single user, current branch is the truth" to "two or more people working in parallel branches" without losing the things that make the current system pleasant.
 ---
-
-# Multi-User Workflow for Docs-as-Code Task System
 
 ## The problem
 

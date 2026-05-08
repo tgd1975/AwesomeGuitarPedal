@@ -34,6 +34,11 @@ const Profile* ProfileManager::getProfile(uint8_t profileIndex) const
     return nullptr;
 }
 
+void ProfileManager::setIndependentActions(std::unique_ptr<Profile> independentActions)
+{
+    independentActions_ = std::move(independentActions);
+}
+
 uint8_t ProfileManager::switchProfile()
 {
     uint8_t numProfiles = hardwareConfig.numProfiles;
@@ -185,6 +190,17 @@ bool ProfileManager::hasActiveDelayedAction() const
         for (uint8_t b = 0; b < Profile::MAX_BUTTONS; b++)
         {
             const Action* action = slot->getAction(b);
+            if (action && action->isInProgress())
+            {
+                return true;
+            }
+        }
+    }
+    if (independentActions_)
+    {
+        for (uint8_t b = 0; b < Profile::MAX_BUTTONS; b++)
+        {
+            const Action* action = independentActions_->getAction(b);
             if (action && action->isInProgress())
             {
                 return true;

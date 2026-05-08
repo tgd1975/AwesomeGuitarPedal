@@ -1,6 +1,7 @@
 ---
 id: IDEA-011
 title: PCB Board Design
+category: hardware
 description: Custom PCB to replace the breadboard/prototype setup for reliability and manufacturability
 ---
 

@@ -1,6 +1,7 @@
 ---
 id: IDEA-019
 title: Wiring as Code — Schematic-as-Code for Documentation and Netlist Generation
+category: tooling
 description: Replace the Fritzing-exported PNG diagrams with code-defined schematics that CI renders automatically, produce readable diffs on circuit changes, and lay the groundwork for PCB design (IDEA-011).
 ---
 

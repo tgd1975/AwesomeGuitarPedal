@@ -56,10 +56,27 @@
       "Bash(flutter run *)",
       "Bash(flutter build *)",
       "Bash(flutter install)",
-      "Bash(flutter install *)"
+      "Bash(flutter install *)",
+      "Bash(python3 scripts/security_review_changes.py *)",
+      "Bash(bash scripts/install_git_hooks.sh)",
+      "Bash(scripts/commit-pathspec.sh *)",
+      "Bash(./scripts/commit-pathspec.sh *)",
+      "Edit(.claude-recap.md)",
+      "Write(.claude-recap.md)"
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'nohup python3 scripts/claude_recap.py >/dev/null 2>&1 & disown ; exit 0'",
+            "statusMessage": "Triggering background claude-recap..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

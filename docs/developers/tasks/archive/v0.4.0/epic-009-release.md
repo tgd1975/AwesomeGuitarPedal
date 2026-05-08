@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Release workflow
-
 Update and maintain the release automation: Makefile targets, README badges,
 GitHub Release publishing, and artifact bundling.
 

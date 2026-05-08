@@ -1,6 +1,7 @@
 ---
 id: IDEA-022
 title: MkDocs Documentation Site
+category: docs
 description: Introduce MkDocs as a unified documentation platform for both developer-facing and public-facing content — replacing a growing flat collection of Markdown files with a navigable, searchable, CI-rendered site.
 ---
 

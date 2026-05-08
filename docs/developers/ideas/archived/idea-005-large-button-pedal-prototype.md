@@ -1,6 +1,7 @@
 ---
 id: IDEA-005
 title: Large Button Pedal Prototype
+category: hardware
 description: Design and build a prototype with larger, more accessible buttons
 status: closed
 closed: 2026-04-21
