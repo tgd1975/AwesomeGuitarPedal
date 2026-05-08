@@ -37,26 +37,34 @@ Action* Profile::getAction(uint8_t button) const
 void Profile::addLongPressAction(uint8_t button, std::unique_ptr<Action> action)
 {
     if (button < MAX_BUTTONS)
+    {
         longPressActions_[button] = std::move(action);
+    }
 }
 
 void Profile::addDoublePressAction(uint8_t button, std::unique_ptr<Action> action)
 {
     if (button < MAX_BUTTONS)
+    {
         doublePressActions_[button] = std::move(action);
+    }
 }
 
 Action* Profile::getLongPressAction(uint8_t button) const
 {
     if (button < MAX_BUTTONS && longPressActions_[button])
+    {
         return longPressActions_[button].get();
+    }
     return nullptr;
 }
 
 Action* Profile::getDoublePressAction(uint8_t button) const
 {
     if (button < MAX_BUTTONS && doublePressActions_[button])
+    {
         return doublePressActions_[button].get();
+    }
     return nullptr;
 }
 
