@@ -1,0 +1,5 @@
+name: ASP CodeQL config
+
+paths-ignore:
+  - "**/_deps/**"
+  - ".vscode/build*/**"
