@@ -3,7 +3,7 @@
 
 <!-- HEADER -->
 
-⚪ **Open: 16** | 🔵 **Active: 1** | 🟡 **Paused: 4** | 🟢 **Closed: 0** | **Total: 21** | ░░░░░░░░░░ 0%
+⚪ **Open: 15** | 🔵 **Active: 2** | 🟡 **Paused: 4** | 🟢 **Closed: 0** | **Total: 21** | ░░░░░░░░░░ 0%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -25,6 +25,7 @@ _No tasks or epics closed since v0.4.1 yet._
 | ID | Title | Effort | Complexity | Status |
 |----|-------|--------|------------|--------|
 | [TASK-372](active/task-372-configure-codeql-paths-ignore-for-vendored-deps.md) | Configure CodeQL to ignore vendored test-framework code | Small (<2h) | Junior | 🔵 **active** |
+| [TASK-373](active/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) | Junior | 🔵 **active** |
 
 ## Paused Tasks
 
@@ -54,7 +55,6 @@ _No tasks or epics closed since v0.4.1 yet._
 | [TASK-260](open/task-260-unify-version-numbers-across-deliverables.md) | Unify version numbers across all deliverables (firmware, app, CLI, simulator, …) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-303](open/task-303-simulator-boots-with-demo-loaded.md) | Simulator boots with demo profiles loaded; community gallery still reachable | Small (<2h) | Junior | ⚪ open |
 | [TASK-304](open/task-304-simulator-button-no-hover-reaction.md) | Simulator pedal buttons must not react to mouse hover | XS (<30m) | Junior | ⚪ open |
-| [TASK-373](open/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) | Junior | ⚪ open |
 
 ## Closed Tasks
 

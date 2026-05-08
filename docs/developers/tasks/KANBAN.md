@@ -68,7 +68,7 @@ kanban
 
 ## Other
 
-_⚪ 6 open · 🔵 1 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 5 open · 🔵 2 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
 
 ```mermaid
 kanban
@@ -78,9 +78,9 @@ kanban
     TASK_260["Unify version numbers across all deliverables (firmware, app, CLI, simulator, …)"]
     TASK_303["Simulator boots with demo profiles loaded; community gallery still reachable"]
     TASK_304["Simulator pedal buttons must not react to mouse hover"]
-    TASK_373["Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge"]
   Active
     TASK_372["Configure CodeQL to ignore vendored test-framework code"]
+    TASK_373["Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge"]
   Paused
   Closed
 ```

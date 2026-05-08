@@ -1,7 +1,7 @@
 ---
 id: TASK-373
 title: Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge
-status: open
+status: active
 opened: 2026-05-08
 effort: Small (<2h)
 complexity: Junior

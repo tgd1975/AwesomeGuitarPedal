@@ -62,7 +62,7 @@ bool ConfigLoader::mergeConfig(ProfileManager& profileManager,
 
     JsonArray profiles = doc["profiles"];
 
-    for (uint8_t newIdx = 0; newIdx < profiles.size() && newIdx < hardwareConfig.numProfiles;
+    for (size_t newIdx = 0; newIdx < profiles.size() && newIdx < hardwareConfig.numProfiles;
          newIdx++)
     {
         JsonObject profileJson = profiles[newIdx];
