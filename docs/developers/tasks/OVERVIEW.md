@@ -3,7 +3,7 @@
 
 <!-- HEADER -->
 
-⚪ **Open: 15** | 🔵 **Active: 1** | 🟡 **Paused: 4** | 🟢 **Closed: 1** | **Total: 21** | ░░░░░░░░░░ 5%
+⚪ **Open: 15** | 🔵 **Active: 0** | 🟡 **Paused: 4** | 🟢 **Closed: 2** | **Total: 21** | █░░░░░░░░░ 10%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -15,16 +15,48 @@
 
 ## Burn-up since v0.4.1
 
-_No tasks or epics closed since v0.4.1 yet._
+<table><tr><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative tasks closed"
+    x-axis ["05-08"]
+    line [1]
+```
+
+</td><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative epics closed"
+    x-axis ["05-08"]
+    line [0]
+```
+
+</td><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative effort hours — green: estimate, blue: actual"
+    x-axis ["05-08"]
+    line [1]
+    line [0.25]
+```
+
+</td></tr></table>
+
+_Legend: green line = estimate (midpoint hours from `effort:`); blue line = actual (midpoint hours from `effort_actual:`)._
+
+| Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
+|------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
+| 2026-05-08 | 1 | 1 | 1 | 1 | 0.2 | 0.2 | 0 | 0 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-373](active/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) | Junior | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -60,6 +92,7 @@ _No tasks or epics closed since v0.4.1 yet._
 | ID | Title | Effort |
 |----|-------|--------|
 | [TASK-372](closed/task-372-configure-codeql-paths-ignore-for-vendored-deps.md) | Configure CodeQL to ignore vendored test-framework code | Small (<2h) |
+| [TASK-373](closed/task-373-fix-cpp-comparison-with-wider-type-in-config-loader.md) | Fix cpp/comparison-with-wider-type findings in config_loader and config_loader_merge | Small (<2h) |
 
 ## Archived Releases
 
