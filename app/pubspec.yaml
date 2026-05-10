@@ -1,7 +1,7 @@
 name: awesome_studio_pedal
 description: Configure AwesomeStudioPedal profiles and hardware settings over BLE.
 publish_to: 'none'
-version: 1.0.0+1
+version: 0.5.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

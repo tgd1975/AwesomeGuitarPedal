@@ -1,6 +1,6 @@
 {
   "name": "awesome-studio-pedal",
-  "version": "1.0.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "generate-profiles-index": "node scripts/generate-profiles-index.js",

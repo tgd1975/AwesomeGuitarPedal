@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  const ASP_VERSION = 'v0.4.1';
+  const ASP_VERSION = 'v0.5.0';
 
   window.ASP_VERSION = ASP_VERSION;
 
