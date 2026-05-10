@@ -113,7 +113,7 @@ kanban
 
 ## Other
 
-_⚪ 3 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 4 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
 
 ```mermaid
 kanban
@@ -121,6 +121,7 @@ kanban
     TASK_148["Reorganise Developer Documentation"]
     TASK_352["Investigate pre-commit hook latency — reorganize, parallelize, or skip irrelevant checks"]
     TASK_370["Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass"]
+    TASK_374["Make release.yml tolerate locally-archived closed tasks"]
   Active
   Paused
   Closed
