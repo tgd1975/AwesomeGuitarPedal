@@ -1,0 +1,21 @@
+{
+  "_doc": "Test fixture for TASK-307 — exercises top-level independentActions block. Slot A has both a profile action and an independent action; slot B has only an independent action.",
+  "profiles": [
+    {
+      "name": "01 Score Navigator",
+      "buttons": {
+        "A": { "type": "SendCharAction", "name": "Prev Page", "value": "KEY_PAGE_UP" }
+      }
+    },
+    {
+      "name": "02 VLC",
+      "buttons": {
+        "A": { "type": "SendMediaKeyAction", "name": "Play/Pause", "value": "MEDIA_PLAY_PAUSE" }
+      }
+    }
+  ],
+  "independentActions": {
+    "A": { "type": "SerialOutputAction", "name": "Log press", "value": "Button A pressed (independent)" },
+    "B": { "type": "SerialOutputAction", "name": "B-only", "value": "Button B has no profile binding — only independent fires" }
+  }
+}

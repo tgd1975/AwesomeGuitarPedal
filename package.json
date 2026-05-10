@@ -5,7 +5,9 @@
   "scripts": {
     "generate-profiles-index": "node scripts/generate-profiles-index.js",
     "validate-profiles": "node scripts/validate-profiles.js",
-    "check-minbuttons": "node scripts/check-minbuttons.js"
+    "check-minbuttons": "node scripts/check-minbuttons.js",
+    "test-simulator": "node scripts/test-simulator-independent-actions.js",
+    "test-config-builder": "node scripts/test-config-builder-independent-actions.js"
   },
   "devDependencies": {
     "ajv": "^8.17.1"

@@ -30,3 +30,12 @@ only your own work" rule in `CLAUDE.md` they count as the user/agent's
 own output for this transition. Stage them alongside the renamed task
 file. Other in-flight sessions' regen lines may be intermixed — that
 is fine; the index reflects current on-disk state.
+
+**Rename pathspec — both sides.** Housekeep does
+`git mv closed/task-NNN.md → open/task-NNN.md`. The pathspec list
+passed to `/commit` must include **both** the old (`closed/`) and
+new (`open/`) paths; naming only the destination commits the
+addition but leaves the source-side deletion orphaned in the working
+tree as a `D` entry. This is the bug TASK-347 fixed end-to-end.
+The wrapper now accepts rename sources, but it can only commit the
+deletion side if you name it.

@@ -33,7 +33,7 @@ involve the user when one **fails**:
    Capture the serial as `$DEV`.
    - 0 devices → ask the user: "No Android device detected over adb.
      Plug in the phone and enable USB debugging, then say go."
-   - >1 devices → ask the user: "Multiple devices visible: <list>.
+   - >1 devices → ask the user: "Multiple devices visible: `<list>`.
      Which one should I drive? (or set `ANDROID_SERIAL=<serial>`)"
    - 1 device → proceed silently, do not ask for confirmation.
 2. `adb -s $DEV shell getprop ro.product.model` and `ro.build.version.release`
@@ -67,11 +67,13 @@ APK=$APP/build/app/outputs/flutter-apk/app-release.apk
   `-t` allows test packages.
 - Grant runtime permissions up front so no system dialog interrupts
   the flow:
+
   ```
   for p in BLUETOOTH_CONNECT BLUETOOTH_SCAN ACCESS_FINE_LOCATION; do
     adb -s $DEV shell pm grant $PKG android.permission.$p || true
   done
   ```
+
 - Force-stop any prior instance: `adb -s $DEV shell am force-stop $PKG`.
 - Launch the main activity: `adb -s $DEV shell monkey -p $PKG -c android.intent.category.LAUNCHER 1`.
 - Wait for the home screen to appear (see helpers below).
@@ -320,7 +322,7 @@ The allowlist sees `Bash(adb -s $DEV shell input tap 540 863 && sleep 2 && ...)`
   rules like `Bash(for *)`, `Bash(while *)`, `Bash(awk *)`,
   `Bash(sed *)`, or `Bash(python3 -c *)`. Those rules turn the
   allowlist into a permission-bypass: any prompt-injected payload
-  inside a tool result that starts with `for ` or `python3 -c` would
+  inside a tool result that starts with `for` or `python3 -c` would
   match. Keep the allowlist **scoped to specific tools and specific
   argument shapes**, even if it costs an extra prompt or two.
 - **Redirects (`>`, `>>`, `|`) are part of the literal command.** A
@@ -615,6 +617,7 @@ file — feature-test results live in `FEATURE_TEST_PLAN.md` and are
 appended by the human-in-the-loop reviewer.
 
 On **FAIL**, print:
+
 - The pass/fail line for each step that ran.
 - `ui_dump` of the failing screen.
 - The last 200 lines of `logcat_since`.

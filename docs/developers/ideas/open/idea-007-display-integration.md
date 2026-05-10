@@ -1,6 +1,7 @@
 ---
 id: IDEA-007
 title: Display Integration
+category: hardware
 description: Add a display to show profile info — small (profile name) or larger (full config)
 ---
 

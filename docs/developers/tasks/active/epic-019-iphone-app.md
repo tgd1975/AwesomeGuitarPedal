@@ -8,8 +8,6 @@ closed:
 assigned:
 ---
 
-# iPhone app — build, test and ship
-
 Bring the Flutter app to iPhone: stand up the macOS + Xcode build, verify the
 full feature-test suite on a physical iPhone, and submit to the Apple App
 Store. Blocked on hardware acquisition (no iPhone currently available) rather

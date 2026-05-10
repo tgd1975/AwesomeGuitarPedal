@@ -1,10 +1,9 @@
 ---
 id: IDEA-042
 title: One-click profile contribution from the app to the community profiles repository
+category: apps
 description: A near-frictionless "Share this profile" flow inside the mobile app and web tools that submits a user's profile to the community repo for maintainer review — no Git, no fork, no PR knowledge required.
 ---
-
-# One-click profile contribution from the app to the community profiles repository
 
 ## The Idea in One Sentence
 
@@ -82,7 +81,7 @@ checklist). The maintainer reviews on GitHub, edits if needed, and runs a one-sh
 
 - writes the JSON to `profiles/<n>-button/<slug>.json`,
 - regenerates `index.json` (the existing IDEA-017 CI step),
-- closes the issue with a "merged as <commit-sha>" comment.
+- closes the issue with a "merged as `<commit-sha>`" comment.
 
 **Option B — Pending PRs as the queue.** The endpoint opens a PR directly (via a bot account)
 with the new profile file already in the right path. The maintainer reviews the diff, edits in

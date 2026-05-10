@@ -1,6 +1,7 @@
 ---
 id: IDEA-023
 title: LED Current-Limiting Resistor Guide — Matched Brightness for 5 mm LEDs
+category: docs
 description: A builder-facing reference table for selecting the correct Vorwiderstand for any common 5 mm LED colour so they appear at roughly equal perceived brightness when driven directly from a 3.3 V GPIO.
 ---
 

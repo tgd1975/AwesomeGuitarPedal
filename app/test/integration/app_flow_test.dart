@@ -17,10 +17,15 @@ void main() {
     late MockBleService mockBle;
 
     setUp(() {
+      App.skipSplashForTesting = true;
       mockBle = MockBleService();
       when(mockBle.isConnected).thenReturn(false);
       when(mockBle.lastError).thenReturn(null);
       when(mockBle.scan()).thenAnswer((_) async => []);
+    });
+
+    tearDown(() {
+      App.skipSplashForTesting = false;
     });
 
     Widget buildApp() {

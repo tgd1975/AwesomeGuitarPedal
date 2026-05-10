@@ -140,6 +140,19 @@ html, body {
   flex-wrap: wrap;
 }
 
+.asp-header .asp-mark-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.asp-header .asp-mark-link .asp-mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
 .asp-header h1 {
   font-size: 17px;
   font-weight: 600;
@@ -328,4 +341,18 @@ html, body {
   overflow: auto;
   padding: 16px;
   white-space: pre;
+}
+
+/* Version stamp — small unobtrusive vX.Y.Z in bottom-right corner.
+   Filled in by docs/tools/version.js on DOMContentLoaded. */
+.asp-version-stamp {
+  position: fixed;
+  right: 10px;
+  bottom: 8px;
+  font-family: var(--asp-font-mono);
+  font-size: 11px;
+  color: var(--asp-text-dim);
+  pointer-events: none;
+  user-select: none;
+  z-index: 100;
 }

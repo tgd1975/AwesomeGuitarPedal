@@ -78,9 +78,13 @@ public:
         // to single-character ASCII; serialise the same way in reverse.
         const char* name = lookupKeyName(static_cast<uint8_t>(key));
         if (name != nullptr)
+        {
             json["value"] = name;
+        }
         else
+        {
             json["value"] = std::string(1, key);
+        }
     }
 
     /**

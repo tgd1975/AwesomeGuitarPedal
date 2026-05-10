@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Developer experience
-
 Improve the developer experience: Makefile refactoring, build target
 discoverability, and help presentation.
 

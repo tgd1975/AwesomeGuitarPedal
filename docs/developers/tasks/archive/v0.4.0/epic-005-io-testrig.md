@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# I/O test rig
-
 Audit and strengthen the PinAction host test coverage, implement
 getJsonProperties, and run an on-device GPIO test rig for the ESP32. Lays the
 groundwork for the automated hardware testing vision described in IDEA-014

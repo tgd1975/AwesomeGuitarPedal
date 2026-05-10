@@ -4,6 +4,7 @@
 #include "i_led_controller.h"
 #include "i_logger.h"
 #include "profile_manager.h"
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -12,7 +13,7 @@
 // Wire ceiling for an uploaded config (profiles or hardware config). Anything
 // larger is rejected by the reassembler before the parser ever sees it.
 //
-// JSON_DOC_CAPACITY is the matching ArduinoJson 6 DynamicJsonDocument capacity
+// kJsonDocCapacity is the matching ArduinoJson 6 DynamicJsonDocument capacity
 // used by every parse/serialise site that touches an uploaded config. AJ6
 // sizes the *token tree*, not the input string — rule of thumb is ~2.5× the
 // JSON length for our shape (profiles → buttons → action objects), so 16 KB
@@ -20,19 +21,14 @@
 // deeply-nested macros.
 //
 // CLI (scripts/pedal_config.py) and the Flutter app pre-flight on
-// MAX_CONFIG_BYTES so the user gets a clear "file too large" message instead
+// kMaxConfigBytes so the user gets a clear "file too large" message instead
 // of a cryptic ERROR:parse_failed after a multi-second BLE transfer.
 //
 // Keep the three values aligned: bumping one without the others reintroduces
 // the TASK-240 mismatch (the firmware previously advertised 32 KB on the wire
 // but parsed only ~8 KB).
-#ifndef MAX_CONFIG_BYTES
-#define MAX_CONFIG_BYTES 16384
-#endif
-
-#ifndef JSON_DOC_CAPACITY
-#define JSON_DOC_CAPACITY 49152
-#endif
+constexpr std::size_t kMaxConfigBytes = 16384;
+constexpr std::size_t kJsonDocCapacity = 49152;
 
 /**
  * @class BleConfigReassembler

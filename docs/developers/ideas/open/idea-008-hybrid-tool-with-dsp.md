@@ -1,6 +1,7 @@
 ---
 id: IDEA-008
 title: Hybrid Tool with DSP
+category: hardware
 description: More powerful hardware with DSP and dual audio jacks for guitar pedal effects
 ---
 

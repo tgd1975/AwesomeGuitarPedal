@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# UI/UX design and brand identity
-
 Create the corporate identity, design system, and UX/UI for all user-facing
 surfaces: a full design brief (captured in idea-022_design_brief.md), web
 simulator and configurator implementation, Flutter app implementation, and

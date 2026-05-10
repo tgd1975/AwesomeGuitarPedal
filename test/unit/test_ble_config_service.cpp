@@ -260,13 +260,13 @@ TEST_F(BleConfigServiceTest, OutOfOrderSeq_ErrorBadSequence)
 TEST_F(BleConfigServiceTest, OversizedPayload_ErrorTooLarge)
 {
     auto r = makeReassembler();
-    std::string big(MAX_CONFIG_BYTES + 1, 'x');
+    std::string big(kMaxConfigBytes + 1, 'x');
     auto pkt0 = makePacket(0x0000, big.substr(0, 510));
     r->onChunk(pkt0.data(), pkt0.size(), false);
     // Fill up until over limit
     uint16_t seq = 1;
     size_t total = 510;
-    while (total <= MAX_CONFIG_BYTES)
+    while (total <= kMaxConfigBytes)
     {
         auto pkt = makePacket(seq++, std::string(510, 'x'));
         r->onChunk(pkt.data(), pkt.size(), false);
@@ -276,10 +276,10 @@ TEST_F(BleConfigServiceTest, OversizedPayload_ErrorTooLarge)
     EXPECT_FALSE(r->isApplying());
 }
 
-// Padding the JSON close to MAX_CONFIG_BYTES exercises the parser's working
+// Padding the JSON close to kMaxConfigBytes exercises the parser's working
 // capacity (TASK-240): the firmware previously parsed only ~8 KB even though
-// it accepted up to 32 KB on the wire. Now MAX_CONFIG_BYTES (16 KB) and
-// JSON_DOC_CAPACITY (48 KB) are aligned and a 14 KB upload should succeed.
+// it accepted up to 32 KB on the wire. Now kMaxConfigBytes (16 KB) and
+// kJsonDocCapacity (48 KB) are aligned and a 14 KB upload should succeed.
 TEST_F(BleConfigServiceTest, NearMaxPayload_AcceptedAndParsed)
 {
     // Build a structurally valid profile with one large macro string per
@@ -290,7 +290,7 @@ TEST_F(BleConfigServiceTest, NearMaxPayload_AcceptedAndParsed)
     std::string json = R"({"profiles":[{"name":"big","buttons":{"A":)";
     json += R"({"type":"SendStringAction","value":")" + filler + R"("}}}]})";
     ASSERT_GT(json.size(), 8u * 1024u) << "test must exceed old 8 KB parser ceiling";
-    ASSERT_LT(json.size(), (size_t) MAX_CONFIG_BYTES) << "test must fit under wire ceiling";
+    ASSERT_LT(json.size(), kMaxConfigBytes) << "test must fit under wire ceiling";
 
     auto r = makeReassembler();
     feedChunks(*r, json);

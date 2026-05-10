@@ -1,6 +1,7 @@
 ---
 id: IDEA-027
 title: Circuit-Skill — AI-Assisted Schematic Generation with ERC, BOM, and Netlist Export
+category: tooling
 description: >
   A Claude Code skill that generates Schemdraw-based circuit schematics from a declarative
   YAML circuit description, enforces electrical best practices via a hardware linter (ERC),
@@ -133,7 +134,7 @@ flowchart LR
 ```
 
 The dashed edge marks `ai_placer.py` as v1-only — absent on disk in v0.1 per
-[idea-027-skill-packaging.md](idea-027-skill-packaging.md). Note that
+[idea-027.skill-packaging.md](idea-027.skill-packaging.md). Note that
 `bom_exporter.py` walks `components` directly and never touches `NetGraph`,
 while `netlist_exporter.py` walks `NetGraph` and never reads component
 internals — the two exporters are deliberately decoupled.
@@ -145,7 +146,7 @@ manual schema update.
 
 `layout.py` and the `layout_engine/` package land in Phase 2 alongside `renderer.py`.
 `layout_engine/ai_placer.py` is absent on disk in v0.1 and added in the v1 packaging PR —
-see [idea-027-skill-packaging.md](idea-027-skill-packaging.md) items 1, 2, and 5 for the
+see [idea-027.skill-packaging.md](idea-027.skill-packaging.md) items 1, 2, and 5 for the
 rationale (single entrypoint, distinct package stem, v0.1/v1 split).
 
 `scripts/generate-schematic.py` is refactored to import from
@@ -209,10 +210,10 @@ flowchart LR
 Each stage consumes the previous stage's output and emits a well-defined artifact.
 ERC is **strictly pre-layout**: it fails fast on electrical errors before any
 geometry work happens, so a malformed circuit never reaches the router or
-renderer. See [idea-027-erc-engine.md](idea-027-erc-engine.md) for the
+renderer. See [idea-027.erc-engine.md](idea-027.erc-engine.md) for the
 topology-only framing and the `NetGraph` data model that both `erc_engine.py`
 and `netlist_exporter.py` share; see
-[idea-027-layout-engine-concept.md](idea-027-layout-engine-concept.md) for the
+[idea-027.layout-engine-concept.md](idea-027.layout-engine-concept.md) for the
 kernel, router, and rubric details. The diagram above is duplicated — by
 design — in the ERC engine doc so that file is readable on its own.
 
@@ -226,13 +227,13 @@ them where their topic is first referenced.
 
 | Companion | Covers |
 |---|---|
-| [Skill packaging and documentation](idea-027-skill-packaging.md) | SKILL.md frontmatter, dependencies, file layout, portability, install paths, acceptance-test fixtures, maker-docs integration |
-| [YAML circuit description](idea-027-yaml-format.md) | The three connection forms (`pins`, `path`, `bus`), schema validation, Markdown `` ```circuit `` block and staleness detection |
-| [Layout engine — concept](idea-027-layout-engine-concept.md) (+ [discussion](idea-027-layout-engine-discussion.md) for rationale) | Slot vocabulary, deterministic kernel, incremental placer, AI escalation, rubric, sidecar, CI contract |
-| [ERC engine](idea-027-erc-engine.md) | Three-level configuration, structural + electrical checks, enriched report format |
-| [Rule catalog (knowledge base)](idea-027-rule-catalog.md) | Catalog format, source-of-truth policy and licensing, 30–50-rule scope, authoring workflow, seed backlog |
-| [Components — profiles, pin aliases, authoring](idea-027-components.md) | Pin aliasing, profile format, adding a component via the skill |
-| [Exporters — BOM and netlist](idea-027-exporters.md) | BOM markdown/CSV, KiCad `.net` flattening rules |
+| [Skill packaging and documentation](idea-027.skill-packaging.md) | SKILL.md frontmatter, dependencies, file layout, portability, install paths, acceptance-test fixtures, maker-docs integration |
+| [YAML circuit description](idea-027.yaml-format.md) | The three connection forms (`pins`, `path`, `bus`), schema validation, Markdown `` ```circuit `` block and staleness detection |
+| [Layout engine — concept](idea-027.layout-engine-concept.md) (+ [discussion](idea-027.layout-engine-discussion.md) for rationale) | Slot vocabulary, deterministic kernel, incremental placer, AI escalation, rubric, sidecar, CI contract |
+| [ERC engine](idea-027.erc-engine.md) | Three-level configuration, structural + electrical checks, enriched report format |
+| [Rule catalog (knowledge base)](idea-027.rule-catalog.md) | Catalog format, source-of-truth policy and licensing, 30–50-rule scope, authoring workflow, seed backlog |
+| [Components — profiles, pin aliases, authoring](idea-027.components.md) | Pin aliasing, profile format, adding a component via the skill |
+| [Exporters — BOM and netlist](idea-027.exporters.md) | BOM markdown/CSV, KiCad `.net` flattening rules |
 
 Companion files have no YAML frontmatter by design, so the ideas OVERVIEW generator
 lists only this overview file. The same convention is already used for
@@ -311,11 +312,11 @@ Extract the two existing board definitions from `generate-schematic.py` into ful
 in `.claude/skills/circuit/components/mcus.py`. Write `circuit.schema.json`. Refactor
 `generate-schematic.py` to import from the new library. No behaviour change; both existing
 targets must produce identical SVGs after the refactor. Profile format is specified in
-[idea-027-components.md](idea-027-components.md).
+[idea-027.components.md](idea-027.components.md).
 
 Deliverables: `components/mcus.py` + `passives.py` + `connectors.py` + `sensors.py`
 (the day-one profile library per
-[components.md §Initial library](idea-027-components.md#initial-library), every profile
+[components.md §Initial library](idea-027.components.md#initial-library), every profile
 shipping with `metadata.keywords`), `schema/circuit.schema.json`, refactored
 `generate-schematic.py`. (`schema/layout.schema.json` lands in Phase 2a alongside the
 layout kernel.)
@@ -323,7 +324,7 @@ layout kernel.)
 ### Phase 2 — YAML Renderer (staged per layout §17.1)
 
 Phase 2 tracks the layout-engine staging in
-[idea-027-layout-engine-concept.md §17.1](idea-027-layout-engine-concept.md):
+[idea-027.layout-engine-concept.md §17.1](idea-027.layout-engine-concept.md):
 Phase 2a ships the deterministic kernel (v0.1); Phase 2b adds the AI placer (v1)
 when v0.1 has accumulated concrete kernel-failure modes on real use. Phase 2a is
 a hard prerequisite for Phases 3–7; Phase 2b is not.
@@ -334,13 +335,13 @@ Implement `.claude/skills/circuit/renderer.py`. It reads a `.circuit.yml`, valid
 the schema, runs the v0.1 deterministic kernel (slots, canonical-slot table, incremental placer,
 Manhattan router, structural rubric `overlaps` + `labels_fit` + `wire_crossings`), and produces
 an SVG for the ESP32 and nRF52840 targets. YAML format is specified in
-[idea-027-yaml-format.md](idea-027-yaml-format.md); layout strategy is specified in
-[idea-027-layout-engine-concept.md](idea-027-layout-engine-concept.md) (rationale in
-[idea-027-layout-engine-discussion.md](idea-027-layout-engine-discussion.md)).
+[idea-027.yaml-format.md](idea-027.yaml-format.md); layout strategy is specified in
+[idea-027.layout-engine-concept.md](idea-027.layout-engine-concept.md) (rationale in
+[idea-027.layout-engine-discussion.md](idea-027.layout-engine-discussion.md)).
 
 Acceptance criterion is **rubric-green on both shipped circuits** at the "readable, not pretty"
 bar of TASK-239's third-attempt output (per
-[layout §16.2](idea-027-layout-engine-concept.md#162-layoutyml-bootstrapping--ai-authored-topology-kernel-generated-layout)).
+[layout §16.2](idea-027.layout-engine-concept.md#162-layoutyml-bootstrapping--ai-authored-topology-kernel-generated-layout)).
 Pixel-diff comparison against the legacy generator is **not** the acceptance criterion:
 the cutover intentionally produces different geometric identity (same electrical content,
 same readability bar) per layout §16.2. Structural XML comparison (element count,
@@ -348,7 +349,7 @@ same readability bar) per layout §16.2. Structural XML comparison (element coun
 going forward.
 
 **Cutover is a discrete deliverable inside Phase 2a**, not a sub-step. Per
-[layout §16.1](idea-027-layout-engine-concept.md#161-cutover), the cutover PR
+[layout §16.1](idea-027.layout-engine-concept.md#161-cutover), the cutover PR
 translates `data/config.json` into two `data/*.circuit.yml` files, generates the matching
 `layout.yml` pairs from the placer, commits the resulting SVG / `meta.yml` as the
 `full-pedal` fixture's `expected.*` artifacts, deletes the old generator, retargets the
@@ -382,7 +383,7 @@ token cap + cost accounting, v1 rubric checks, AI-specific reason codes.
 ### Phase 3 — ERC Engine + Rule Catalog
 
 Implement `erc_engine.py` with structural checks S1–S3 and electrical checks E1–E10
-as defined in [idea-027-erc-engine.md](idea-027-erc-engine.md). E6 (decoupling cap),
+as defined in [idea-027.erc-engine.md](idea-027.erc-engine.md). E6 (decoupling cap),
 E7 (I2C pull-up), and E10 (pin conflict) are shipped but dormant on the current
 circuits — they activate as soon as a qualifying component (non-MCU IC, I2C device,
 or a duplicate pin reference) appears. Integrate into the renderer (ERC runs after
@@ -399,14 +400,14 @@ for them too. Each entry declares rule, explanation, heuristic, source link, and
 The ERC report writer looks up catalog entries by check `id` and appends the enriched
 "Why / Senior's tip / Source" block under each non-OK finding. Add `validate_catalog.py`
 and run it in CI. Catalog format, licensing, scope, and authoring workflow are specified
-in [idea-027-rule-catalog.md](idea-027-rule-catalog.md).
+in [idea-027.rule-catalog.md](idea-027.rule-catalog.md).
 
 **Note on E9 and the current circuit:** the ESP32 and nRF52840 `.circuit.yml` files
 generated in Phase 2 do not include polarity protection between the power connector and
 the MCU. **At v0.1, E9 ships as WARNING by default** (per
-[idea-027-erc-engine.md §E9 note](idea-027-erc-engine.md#checks)) because the `diode`
+[idea-027.erc-engine.md §E9 note](idea-027.erc-engine.md#checks)) because the `diode`
 category is backlogged in
-[components.md](idea-027-components.md#backlog--requires-a-new-53-row-first) — without
+[components.md](idea-027.components.md#backlog--requires-a-new-53-row-first) — without
 it, E9 cannot semantically distinguish a protection diode from any other resistor on the
 power net, and every USB-C / barrel-jack circuit would fail by construction. WARNING-level
 findings do not block CI, so Phase 3 requires no circuit change. E9 auto-promotes to
@@ -425,7 +426,7 @@ per-finding explanations, CI gate.
 Implement `bom_exporter.py` and `netlist_exporter.py`. Write `bom.md`, `bom.csv`, and
 `main-circuit.net` alongside the SVG. Embed the BOM table in the build guide. Spot-check
 the `.net` file imports into KiCad without errors. Flattening rules and output formats
-live in [idea-027-exporters.md](idea-027-exporters.md).
+live in [idea-027.exporters.md](idea-027.exporters.md).
 
 Deliverables: `bom_exporter.py`, `netlist_exporter.py`, outputs committed for each target.
 
@@ -449,7 +450,7 @@ formatter (depending on IDEA-022 ordering), updated pre-commit hook.
 
 Write `.claude/skills/circuit/SKILL.md` with the full system prompt. Register in
 `.vibe/config.toml`. Run the five acceptance tests defined in
-[idea-027-skill-packaging.md](idea-027-skill-packaging.md): happy path, ERC error,
+[idea-027.skill-packaging.md](idea-027.skill-packaging.md): happy path, ERC error,
 new component (BME280), controller-swap Raspberry Pi, and incremental layout
 stability (the §8 incremental-placer regression guard — add a sixth LED to the
 happy-path circuit, assert `layout.yml` diff is one added line with kept components'
@@ -553,16 +554,16 @@ opened as a task file under `docs/developers/tasks/open/`.
   `is_strapping` pins).
 - **Write `components/passives.py`** with profiles for: resistor, capacitor, **unified
   `LED` profile** (with `v_forward_by_color` per
-  [components.md variant selection](idea-027-components.md#pattern-component-level-variant-selection)),
+  [components.md variant selection](idea-027.components.md#pattern-component-level-variant-selection)),
   pushbutton, piezo buzzer.
 - **Write `components/connectors.py`** with profiles for: USB-C, DC barrel jack 2.1 mm,
   mono jack 6.35 mm, stereo jack 6.35 mm, pin header 2/3/4/6/8-pin (templated via
-  `make_header(n)` per [components.md initial library](idea-027-components.md#ships-on-day-one)),
+  `make_header(n)` per [components.md initial library](idea-027.components.md#ships-on-day-one)),
   screw terminal 2/3-pin (templated).
 - **Write `components/sensors.py`** with profiles for: BME280 (temperature/humidity/
   pressure over I2C), SSD1306 128×64 I2C OLED display.
 - **Ensure every shipped profile declares `metadata.keywords`** (lowercase NFKC tokens
-  per [components.md §metadata](idea-027-components.md#2-metadata--human-readable-identity-and-electrical-constraints))
+  per [components.md §metadata](idea-027.components.md#2-metadata--human-readable-identity-and-electrical-constraints))
   so Phase 3's `validate_catalog.py` passes on first run — keyword-profile membership is
   a CI-enforced invariant from Phase 3 onward.
 - **Write `schema/circuit.schema.json`** enforcing `meta`, `components`, and `connections`
@@ -580,7 +581,7 @@ opened as a task file under `docs/developers/tasks/open/`.
   connection-form strategies (`pins` → power symbols, `path` → inline chain, `bus` →
   backbone + stubs).
 - **Write `schema/layout.schema.json`** matching the slot vocabulary in
-  [layout-engine-concept §4](idea-027-layout-engine-concept.md) (placements, regions,
+  [layout-engine-concept §4](idea-027.layout-engine-concept.md) (placements, regions,
   capacity overrides, region-anchor overrides, topology fingerprint).
 - **Implement the v0.1 structural rubric** (`overlaps`, `labels_fit`, `wire_crossings`)
   with `wire_crossings` blocking from day one; record advisory numeric checks
@@ -630,7 +631,7 @@ Only opened when the Phase 2b trigger gate fires (see Phase Plan above).
 - **Wire catalog into ERC report writer**: each non-OK finding is followed by a
   "Why / Senior's tip / Source" block pulled from `rules.json` by check id.
 - **Confirm E9 surfaces as WARNING** on both shipped circuits (no action: WARNING is the
-  v0.1 default per [erc-engine §E9 note](idea-027-erc-engine.md#checks)). Document the
+  v0.1 default per [erc-engine §E9 note](idea-027.erc-engine.md#checks)). Document the
   pending `diode`-category promotion path in each target's `erc-report.md` rationale
   block so the warning is not mistaken for a transient diagnostic.
 - **Write `erc-report.md`** output for each target; commit alongside SVG.
@@ -667,7 +668,7 @@ Only opened when the Phase 2b trigger gate fires (see Phase Plan above).
   engineer persona, seven behavioural rules, allowed-tools frontmatter).
 - **Register `circuit` in `.vibe/config.toml`** under `enabled_skills`.
 - **Run acceptance tests** (five cases, per
-  [idea-027-skill-packaging.md](idea-027-skill-packaging.md)): happy path, ERC error,
+  [idea-027.skill-packaging.md](idea-027.skill-packaging.md)): happy path, ERC error,
   new component (BME280 over I2C), controller swap to Raspberry Pi with an analog
   sensor (must surface HW-RPI-01 from the catalog and route the sensor through an
   external ADC, not directly to GPIO), and incremental layout stability (add a sixth
@@ -699,20 +700,20 @@ dependencies: each downstream doc consumes enums, schemas, or contracts
 defined upstream. Draft and review in this order so back-references resolve
 forward, not backward:
 
-1. **[components.md](idea-027-components.md)** — defines the component-category
+1. **[components.md](idea-027.components.md)** — defines the component-category
    and connection-shape enums.
-2. **[yaml-format.md](idea-027-yaml-format.md)** — the `.circuit.yml` schema
+2. **[yaml-format.md](idea-027.yaml-format.md)** — the `.circuit.yml` schema
    consumes those enums.
-3. **[layout-engine-concept.md](idea-027-layout-engine-concept.md)** — the
+3. **[layout-engine-concept.md](idea-027.layout-engine-concept.md)** — the
    canonical-slot table (§5.3) keys off category + shape from (1) and (2).
-4. **[erc-engine.md](idea-027-erc-engine.md)** — ERC runs strictly pre-layout
+4. **[erc-engine.md](idea-027.erc-engine.md)** — ERC runs strictly pre-layout
    and consumes the shared `NetGraph` produced from (2); check wiring
    (`enforced_by`) is finalised here.
-5. **[rule-catalog.md](idea-027-rule-catalog.md)** — rule entries reference
+5. **[rule-catalog.md](idea-027.rule-catalog.md)** — rule entries reference
    checks defined in (4) and shapes defined in (1).
-6. **[exporters.md](idea-027-exporters.md)** — BOM and netlist both consume
+6. **[exporters.md](idea-027.exporters.md)** — BOM and netlist both consume
    the finalised `NetGraph` from (2)/(4).
-7. **[skill-packaging.md](idea-027-skill-packaging.md)** — acceptance-test
+7. **[skill-packaging.md](idea-027.skill-packaging.md)** — acceptance-test
    fixtures and the SKILL.md frontmatter assume every upstream contract is
    settled.
 

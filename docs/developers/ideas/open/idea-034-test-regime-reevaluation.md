@@ -1,10 +1,9 @@
 ---
 id: IDEA-034
 title: Test Regime Reevaluation — minimize human-in-the-loop after IDEA-028
+category: tooling
 description: After the IDEA-028 HAL refactoring lands, do a thorough reevaluation of the entire test regime — close gaps, drop deprecated/duplicate tests, and minimize human-in-the-loop coverage (e.g. BLE is now testable headlessly).
 ---
-
-# Test Regime Reevaluation — minimize human-in-the-loop after IDEA-028
 
 ## Motivation
 

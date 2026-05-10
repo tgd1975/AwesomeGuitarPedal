@@ -1,6 +1,7 @@
 ---
 id: IDEA-021
 title: Task and Idea System Concept for Small Teams
+category: tooling
 description: Target design for the docs-as-code task and idea management system — covering file formats, workflow, generated dashboards, skills, and distribution.
 ---
 

@@ -24,6 +24,14 @@ class BleService extends ChangeNotifier {
   bool get isConnected => _connected;
   String? get lastError => _error;
 
+  /// Human-readable name of the currently connected device (or null if
+  /// no device is connected).
+  String? get deviceName => _device?.platformName;
+
+  /// Stable identifier (Android: MAC, iOS: UUID) of the currently
+  /// connected device, or null if no device is connected.
+  String? get deviceId => _device?.remoteId.str;
+
   Stream<String> get statusStream {
     if (_statusChar == null) return const Stream.empty();
     return _statusChar!.onValueReceived.map((v) => utf8.decode(v));

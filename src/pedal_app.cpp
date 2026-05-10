@@ -47,12 +47,16 @@ void PedalApp::signalLoadError()
         ledPower_->setState(true);
         ledBluetooth_->setState(true);
         for (auto* led : selectLeds_)
+        {
             led->setState(true);
+        }
         delay(BLINK_DURATION);
         ledPower_->setState(false);
         ledBluetooth_->setState(false);
         for (auto* led : selectLeds_)
+        {
             led->setState(false);
+        }
         delay(BLINK_DURATION);
     }
     ledPower_->setState(true);
@@ -91,7 +95,17 @@ void PedalApp::executeActionWithLogging(uint8_t buttonIndex)
     const char* profileName = profileManager_->getProfileName(profileIndex).c_str();
     Serial.printf("Button %s pressed (Profile: %s)\n", btnLabel, profileName);
 
-    if (auto action = profileManager_->getAction(profileIndex, buttonIndex))
+    if (const Profile* independent = profileManager_->getIndependentActions())
+    {
+        if (Action* indAction = independent->getAction(buttonIndex))
+        {
+            const char* actionType = ProfileManager::getActionTypeString(indAction->getType());
+            Serial.printf("  -> Executing independent %s action\n", actionType);
+            indAction->execute();
+        }
+    }
+
+    if (auto* action = profileManager_->getAction(profileIndex, buttonIndex))
     {
         if (action->isInProgress())
         {
@@ -116,6 +130,12 @@ void PedalApp::executeActionWithLogging(uint8_t buttonIndex)
     }
 }
 
+// Cognitive-complexity score (32) reflects the four nested-lambda branches
+// (press/release/long-press/double-press), each with the same defensive shape:
+// dispatch the independent-actions profile if present, then the active
+// profile. Splitting the lambdas into separate helpers would scatter that
+// invariant across the file without simplifying the registration story.
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void PedalApp::setupEventHandlers()
 {
     for (uint8_t i = 0; i < hardwareConfig.numButtons; i++)
@@ -127,8 +147,15 @@ void PedalApp::setupEventHandlers()
             idx,
             [this, idx]()
             {
+                if (const Profile* independent = profileManager_->getIndependentActions())
+                {
+                    if (auto* indAction = independent->getAction(idx))
+                    {
+                        indAction->executeRelease();
+                    }
+                }
                 uint8_t profile = profileManager_->getCurrentProfile();
-                if (auto action = profileManager_->getAction(profile, idx))
+                if (auto* action = profileManager_->getAction(profile, idx))
                 {
                     action->executeRelease();
                 }
@@ -142,8 +169,15 @@ void PedalApp::setupEventHandlers()
             idx,
             [this, idx]()
             {
+                if (const Profile* independent = profileManager_->getIndependentActions())
+                {
+                    if (auto* indAction = independent->getLongPressAction(idx))
+                    {
+                        indAction->execute();
+                    }
+                }
                 uint8_t profile = profileManager_->getCurrentProfile();
-                if (auto action = profileManager_->getProfile(profile)->getLongPressAction(idx))
+                if (auto* action = profileManager_->getProfile(profile)->getLongPressAction(idx))
                 {
                     action->execute();
                 }
@@ -154,8 +188,15 @@ void PedalApp::setupEventHandlers()
             idx,
             [this, idx]()
             {
+                if (const Profile* independent = profileManager_->getIndependentActions())
+                {
+                    if (auto* indAction = independent->getDoublePressAction(idx))
+                    {
+                        indAction->execute();
+                    }
+                }
                 uint8_t profile = profileManager_->getCurrentProfile();
-                if (auto action = profileManager_->getProfile(profile)->getDoublePressAction(idx))
+                if (auto* action = profileManager_->getProfile(profile)->getDoublePressAction(idx))
                 {
                     action->execute();
                 }

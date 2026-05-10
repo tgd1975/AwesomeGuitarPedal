@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Hardware-aware configuration
-
 Add a hardware field to config.json and propagate it through the full stack:
 config schema, firmware boot-time mismatch rejection, CLI upload guard, Flutter
 app hardware-aware editing and upload guard, and configuration builder hardware

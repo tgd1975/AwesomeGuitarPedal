@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Circuit diagrams as code (Schemdraw)
-
 Replace the Fritzing-exported schematic PNGs with Python-generated SVGs using
 Schemdraw. Covers toolchain installation, ESP32 and nRF52840 schematic scripts,
 pre-commit hook, CI staleness guard, builder documentation update, and WireViz

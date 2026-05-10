@@ -1,0 +1,32 @@
+# Hand-maintained icon/glyph overlay merged into the generated
+# kHidUsageDisplay map. Fields here override generated entries
+# (e.g. promote a label to a glyph) but cannot remove entries.
+#
+# Format: { "<page>:<usage_id>": { glyph: <str>, icon: <material-symbols-name>, label: <override> } }
+
+# Keyboard/Keypad page (0x07)
+'0x07:40': { glyph: '⏎' }       # Enter
+'0x07:41': { glyph: '⎋' }       # Esc
+'0x07:42': { glyph: '⌫' }       # Backspace
+'0x07:43': { glyph: '⇥' }       # Tab
+'0x07:44': { glyph: '␣' }       # Space
+'0x07:74': { glyph: '⇱' }       # Home
+'0x07:75': { glyph: '⇞' }       # Page Up
+'0x07:76': { glyph: '⌦' }       # Delete
+'0x07:77': { glyph: '⇲' }       # End
+'0x07:78': { glyph: '⇟' }       # Page Down
+'0x07:79': { glyph: '→' }       # Right
+'0x07:80': { glyph: '←' }       # Left
+'0x07:81': { glyph: '↓' }       # Down
+'0x07:82': { glyph: '↑' }       # Up
+'0x07:225': { glyph: '⇧' }      # Shift
+'0x07:229': { glyph: '⇧' }      # Right Shift
+
+# Consumer page (0x0C)
+'0x0C:205': { icon: play_arrow } # Play/Pause
+'0x0C:181': { icon: skip_next }
+'0x0C:182': { icon: skip_previous }
+'0x0C:183': { icon: stop }
+'0x0C:226': { icon: volume_off }
+'0x0C:233': { icon: volume_up }
+'0x0C:234': { icon: volume_down }

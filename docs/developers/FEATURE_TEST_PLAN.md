@@ -56,6 +56,13 @@ configuration on the test device, in this order of preference:
 Restore the original timeout after the run (e.g.
 `settings put system screen_off_timeout 60000` for 1 min).
 
+### Recording the device + OS context
+
+Before closing the task or PR a test run was for, append a row to
+[ANDROID_TEST_MATRIX.md](ANDROID_TEST_MATRIX.md) with the date, Android
+version, app version, and any notes. The matrix is what makes "did we
+test this on the same OS as the regression?" a one-glance question.
+
 ---
 
 ## Part 1 — Python CLI Tool

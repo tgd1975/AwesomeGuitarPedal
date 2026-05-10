@@ -1,6 +1,7 @@
 ---
 id: IDEA-010
 title: Double Press Event
+category: firmware
 description: Additional functionality triggered by quick successive button presses
 status: closed
 closed: 2026-04-21

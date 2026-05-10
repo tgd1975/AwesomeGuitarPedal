@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# BLE Configuration Service
-
 Implement the end-to-end BLE configuration pipeline: a GATT service on the
 firmware side, a JSON schema for configs and profiles, a Python CLI tool for
 profile upload over BLE, and the supporting host and on-device integration

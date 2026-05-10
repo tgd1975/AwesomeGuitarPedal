@@ -8,8 +8,6 @@ closed:
 assigned:
 ---
 
-# Agent-collaboration skill gaps surfaced by chat-history mining
-
 A scan over 148 Claude Code transcripts in `~/.claude/projects/.../AwesomeStudioPedal/`
 surfaced six recurring patterns where automation is missing or under-used. The
 pattern is consistent: an explicit, runnable skill exists for some work flows

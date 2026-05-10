@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1-low-confidence
 ---
 
-# Coordinated task-system rollout
-
 Sequenced rollout for the burn-up dashboard, post-hoc effort reassessment,
 paused-as-first-class status, and the `awesome-task-system/` source-of-truth
 carve-out — landed in dependency order so each task's data prerequisites are

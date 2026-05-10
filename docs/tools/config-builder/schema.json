@@ -9,6 +9,13 @@
       "minItems": 1,
       "maxItems": 7,
       "items": { "$ref": "#/definitions/profile" }
+    },
+    "independentActions": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Z]$": { "$ref": "#/definitions/buttonAction" }
+      },
+      "additionalProperties": false
     }
   },
   "definitions": {

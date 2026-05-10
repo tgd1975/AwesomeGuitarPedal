@@ -10,8 +10,6 @@ effort_actual: XS (<30m)
 effort_actual_source: heuristic-v1
 ---
 
-# Community profiles repository
-
 Build the community profiles feature: a curated folder of ready-to-use
 profiles, a CI-validated index, schema validation, a generate-profiles-index
 script, and surfacing profiles in the web configurators and the Flutter app.

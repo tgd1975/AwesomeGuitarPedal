@@ -1,6 +1,7 @@
 ---
 id: IDEA-001
 title: Mobile App Configuration
+category: apps
 description: Android/iOS app to configure profiles and settings via Bluetooth
 ---
 

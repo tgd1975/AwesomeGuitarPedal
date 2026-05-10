@@ -74,6 +74,12 @@ let profiles = [];
 let activeIndex = 0;
 let validateFn = null;
 
+// Independent actions — top-level block in profiles.json that fires on every
+// button event regardless of which profile is active. Stored as a slot-keyed
+// object of action editor states. Empty slots are not serialised; if every
+// slot is empty the whole block is omitted from the output JSON.
+let independentActions = Object.fromEntries(BUTTON_SLOTS.map(s => [s, emptyAction()]));
+
 function emptyAction() {
   return { type: '', name: '', value: '', delayMs: 1000, pin: 0, action: null, longPress: null, doublePress: null };
 }
@@ -122,6 +128,7 @@ function showExampleNotice(visible) {
 function renderAll() {
   renderTabs();
   renderProfileForm();
+  renderIndependentActions();
   updatePreview();
 }
 
@@ -246,6 +253,83 @@ function renderProfileForm() {
   }
 }
 
+function renderIndependentActions() {
+  const host = document.getElementById('independent-actions-section');
+  if (!host) return;
+  host.innerHTML = '';
+
+  const details = document.createElement('details');
+  details.className = 'independent-actions';
+  if (hasAnyIndependentAction()) details.open = true;
+
+  const summary = document.createElement('summary');
+  summary.className = 'independent-actions-summary';
+  summary.innerHTML =
+    '★ Independent actions ' +
+    '<span class="ind-help">(fire on every button event regardless of profile)</span>';
+  details.appendChild(summary);
+
+  const grid = document.createElement('div');
+  grid.className = 'buttons-grid';
+
+  for (const slot of BUTTON_SLOTS) {
+    const row = document.createElement('div');
+    row.className = 'button-row';
+
+    const lbl = document.createElement('span');
+    lbl.className = 'button-label';
+    lbl.textContent = `Button ${slot}`;
+
+    const actionDiv = document.createElement('div');
+    actionDiv.className = 'action-container';
+
+    renderActionFields(
+      actionDiv,
+      () => independentActions[slot],
+      (v) => { independentActions[slot] = v; updatePreview(); }
+    );
+
+    actionDiv.appendChild(makeSubActionDetails(
+      '⏳ Long Press',
+      () => independentActions[slot].longPress,
+      (v) => { independentActions[slot] = { ...independentActions[slot], longPress: v }; updatePreview(); }
+    ));
+
+    actionDiv.appendChild(makeSubActionDetails(
+      '2× Double Press',
+      () => independentActions[slot].doublePress,
+      (v) => { independentActions[slot] = { ...independentActions[slot], doublePress: v }; updatePreview(); }
+    ));
+
+    row.appendChild(lbl);
+    row.appendChild(actionDiv);
+    grid.appendChild(row);
+  }
+
+  details.appendChild(grid);
+
+  if (hasAnyIndependentAction()) {
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'btn-danger';
+    clearBtn.textContent = 'Remove all independent actions';
+    clearBtn.onclick = () => {
+      independentActions = Object.fromEntries(BUTTON_SLOTS.map(s => [s, emptyAction()]));
+      renderAll();
+    };
+    details.appendChild(clearBtn);
+  }
+
+  host.appendChild(details);
+}
+
+function hasAnyIndependentAction() {
+  for (const slot of BUTTON_SLOTS) {
+    const a = independentActions[slot];
+    if (a && a.type) return true;
+  }
+  return false;
+}
+
 function makeField(labelText, input) {
   const row = document.createElement('div');
   row.className = 'field-row';
@@ -361,10 +445,23 @@ function renderActionFields(container, getAct, onUpdate, nested = false) {
 }
 
 function buildJson() {
-  return {
+  const out = {
     _doc: 'Key reference: docs/builders/KEY_REFERENCE.md',
     profiles: profiles.map(profileToJson),
   };
+  // Independent actions: omit key entirely when no slot is set, never write {}.
+  const ind = independentActionsToJson();
+  if (ind) out.independentActions = ind;
+  return out;
+}
+
+function independentActionsToJson() {
+  const r = {};
+  for (const slot of BUTTON_SLOTS) {
+    const a = independentActions[slot];
+    if (a && a.type) r[slot] = actionToJson(a);
+  }
+  return Object.keys(r).length === 0 ? null : r;
 }
 
 function profileToJson(p) {
@@ -448,6 +545,14 @@ function populateForm(json) {
       ])
     ),
   }));
+  independentActions = Object.fromEntries(
+    BUTTON_SLOTS.map(slot => [
+      slot,
+      json.independentActions && json.independentActions[slot]
+        ? actionFromJson(json.independentActions[slot])
+        : emptyAction(),
+    ])
+  );
   activeIndex = 0;
   renderAll();
   showValidationResult(true, []);
@@ -535,3 +640,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   init();
 });
+
+// Test-only hook: exposes the closure-scoped state setters/getters so the
+// hand-rolled VM test in scripts/test-config-builder-independent-actions.js
+// can verify state without a real DOM. Browsers ignore this.
+if (typeof globalThis !== 'undefined') {
+  globalThis.__cb_test = {
+    getIndependentActions: () => independentActions,
+    setIndependentActionSlot: (slot, action) => { independentActions[slot] = action; },
+    resetIndependentActions: () => {
+      independentActions = Object.fromEntries(BUTTON_SLOTS.map(s => [s, emptyAction()]));
+    },
+    hasAnyIndependentAction,
+    independentActionsToJson,
+  };
+}

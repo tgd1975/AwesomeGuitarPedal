@@ -8,8 +8,6 @@ closed: 2026-04-29
 assigned:
 ---
 
-# HAL Refactor — replace #ifdef soup with platform class hierarchy
-
 Seeded by IDEA-028 (Hardware Abstraction Layer — replace #ifdef soup with a platform class hierarchy).
 
 `src/main.cpp` and the shared `PedalLogic` sources are riddled with

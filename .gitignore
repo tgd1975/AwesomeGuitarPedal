@@ -103,3 +103,14 @@ app/ios/.symlinks/
 app/ios/Flutter/flutter_export_environment.sh
 app/ios/Flutter/Generated.xcconfig
 app/android/local.properties
+
+# Security review of incoming pulls (scripts/security_review_changes.py)
+.claude/security-review-latest.md
+
+# Automated post-session transcript recap (scripts/claude_recap.py)
+.claude-recap.md
+.claude-recap.log
+.claude-recap.lock
+
+# Housekeep single-instance lock (TASK-328)
+.housekeep.lock

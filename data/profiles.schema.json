@@ -36,6 +36,10 @@
           }
         }
       }
+    },
+    "independentActions": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/actionObject" }
     }
   },
   "$defs": {

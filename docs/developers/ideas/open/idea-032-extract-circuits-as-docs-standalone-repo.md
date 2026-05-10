@@ -1,6 +1,7 @@
 ---
 id: IDEA-032
 title: Extract the circuits-as-docs system into a standalone public GitHub repository
+category: tooling
 description: Lift the Schemdraw-based schematic generator, pre-commit staleness hook, and docs-as-code wiring pattern into a standalone public repo so other hardware projects can document their circuits the same way.
 related: IDEA-019, IDEA-027
 ---

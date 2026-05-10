@@ -12,14 +12,64 @@ nothing. Pass `--apply` to actually move files and write overviews.
 Usage:
     python scripts/housekeep.py            # dry-run — print plan only
     python scripts/housekeep.py --apply    # execute moves and regen
+
+Concurrency
+-----------
+`--apply` (and `--init` / `--fix-order`, which also write to disk)
+acquires an exclusive lock on `<repo-root>/.housekeep.lock` before
+doing any work. If another instance already holds the lock, the
+second invocation **waits up to LOCK_WAIT_SECONDS for the lock**, then
+exits non-zero with a message naming the holder's PID.
+
+Rationale: housekeep is invoked from many independent paths
+(pre-commit hook, /housekeep skill, /ts-task-* skills, manual runs)
+and parallel Claude Code sessions are common in this repo, so two
+runs can race and produce a half-correct index where the last writer
+wins. Wait-then-fail-loud was picked because (a) the pre-commit hook
+must not swallow regen failures, (b) silent skips desynchronise the
+index from the moved file, and (c) the common case — a second run
+triggered *after* the first finishes — "just works" via the wait.
+
+The lock is acquired with `fcntl.flock` on POSIX and
+`msvcrt.locking` on Windows, both of which release automatically when
+the process exits. This means a stale lockfile on disk (from a
+killed process) does not wedge future runs — do not "fix" this by
+deleting the file at startup. Dry-run (no flag) does not acquire the
+lock; it is a pure read.
+
+Sibling-script audit (TASK-328)
+-------------------------------
+- `sync_task_system.py`: idempotent file copy from
+  `awesome-task-system/` → live. Concurrent `--apply` runs copy the
+  same source bytes to the same destination paths via `shutil.copy2`;
+  last-writer-wins is benign because both writers produce identical
+  bytes. **Safe — no lock needed.** `--check` is read-only.
+- `update_task_overview.py`: regenerate `OVERVIEW.md` from task
+  frontmatter. Only called by `housekeep.py` (the deprecated public
+  path is documented in its docstring). Serialised by its caller, so
+  it inherits housekeep's lock. **Safe — no lock needed.**
+- `update_idea_overview.py`: regenerate ideas `OVERVIEW.md` from
+  frontmatter. Called both by `housekeep.py` and directly by
+  `scripts/pre-commit`, so it does **not** inherit housekeep's lock
+  on the pre-commit path. The output is a pure function of the
+  on-disk idea files: two parallel runs reading the same tree write
+  byte-identical bytes to the same path, so a last-writer-wins race
+  is benign. **Safe — no lock needed.** Re-evaluate if the script
+  ever takes input from a non-deterministic source (clock, env,
+  random ordering).
+- `organize_closed_tasks.py`: explicit release-time archival
+  (`v0.X.Y` argument), invoked by hand at release. No trigger
+  fan-out. **Safe — no lock needed.**
 """
 from __future__ import annotations
 
 import argparse
+import contextlib
 import os
 import re
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -47,6 +97,116 @@ def _status_folders(active_enabled: bool, paused_enabled: bool) -> tuple[str, ..
 
 TASK_STATUS_FOLDERS = _status_folders(_ACTIVE_ENABLED, _PAUSED_ENABLED)
 ARCHIVE_FOLDER = "archive"
+
+LOCK_FILENAME = ".housekeep.lock"
+LOCK_WAIT_SECONDS = 30
+LOCK_POLL_SECONDS = 0.2
+
+
+def _lock_path() -> Path:
+    """Return the path to the lock file at the repo root.
+
+    The lock lives at the repo root (next to .git) rather than under
+    /tmp so that runs against unrelated checkouts do not falsely
+    serialise each other.
+    """
+    return Path.cwd() / LOCK_FILENAME
+
+
+@contextlib.contextmanager
+def acquire_lock(wait_seconds: float | None = None):
+    """Acquire an exclusive process-wide lock for housekeep --apply.
+
+    Waits up to `wait_seconds` (defaulting to module-level
+    `LOCK_WAIT_SECONDS`, resolved at call time so tests can patch it)
+    for the lock to become available. If the wait times out, raises
+    SystemExit(2) with a message naming the PID of the current
+    holder (best-effort — the file may have been released between
+    the check and the message).
+
+    The lock is held by an OS-level advisory lock on the file
+    descriptor (`fcntl.flock` on POSIX, `msvcrt.locking` on Windows),
+    which the kernel releases automatically when the process exits —
+    so a stale lockfile on disk does not wedge future runs.
+    """
+    if wait_seconds is None:
+        wait_seconds = LOCK_WAIT_SECONDS
+    lock_path = _lock_path()
+    fd = os.open(str(lock_path), os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        deadline = time.monotonic() + wait_seconds
+        acquired = False
+        while True:
+            try:
+                _platform_lock(fd)
+                acquired = True
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    holder = _read_holder_pid(lock_path)
+                    msg = (f"housekeep: another instance is running "
+                           f"(holder PID={holder or 'unknown'}); "
+                           f"timed out after {wait_seconds:g}s waiting "
+                           f"for {lock_path}.")
+                    print(msg, file=sys.stderr)
+                    raise SystemExit(2)
+                time.sleep(LOCK_POLL_SECONDS)
+        # Record our PID in the lockfile so other waiters can name us
+        # in their timeout message. Best-effort; a failure here does
+        # not invalidate the lock.
+        try:
+            os.lseek(fd, 0, os.SEEK_SET)
+            os.ftruncate(fd, 0)
+            os.write(fd, f"{os.getpid()}\n".encode("ascii"))
+        except OSError:
+            pass
+        try:
+            yield
+        finally:
+            if acquired:
+                _platform_unlock(fd)
+    finally:
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+
+
+def _read_holder_pid(lock_path: Path) -> str | None:
+    try:
+        text = lock_path.read_text(encoding="ascii").strip()
+        return text or None
+    except OSError:
+        return None
+
+
+if sys.platform == "win32":  # pragma: no cover — exercised on Windows only
+    import msvcrt
+
+    def _platform_lock(fd: int) -> None:
+        try:
+            msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        except OSError as exc:
+            raise BlockingIOError(str(exc)) from exc
+
+    def _platform_unlock(fd: int) -> None:
+        try:
+            os.lseek(fd, 0, os.SEEK_SET)
+            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        except OSError:
+            pass
+else:
+    import fcntl
+
+    def _platform_lock(fd: int) -> None:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+    def _platform_unlock(fd: int) -> None:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        except OSError:
+            pass
+
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
 FIELD_RE = re.compile(r"^(\w[\w-]*):\s*(.+)$", re.MULTILINE)
@@ -216,6 +376,25 @@ def build_plan(tasks_dir: Path = TASKS_DIR,
 # ---------------------------------------------------------------------------
 
 STATUS_ICON = {"open": "⚪", "active": "🔵", "closed": "🟢", "paused": "🟡"}
+
+
+def _md_cell(text: str) -> str:
+    """Escape free-text frontmatter fields for safe rendering in a markdown table cell.
+
+    Markdownlint rules guarded:
+      MD033 (no-inline-html) — `<word>` placeholders in titles like
+        `archive/<version>/` would otherwise be parsed as raw HTML.
+        Replace `<` / `>` with HTML entities so the rendered glyph is
+        identical but the linter sees no tag.
+      Table column separators — escape `|` so a stray pipe in a title
+        does not split the cell.
+    """
+    return (
+        str(text)
+        .replace("|", "\\|")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
 
 def _progress_bar(pct: int, width: int = 10) -> str:
@@ -459,9 +638,9 @@ def _flat_list_section(tasks: list[dict]) -> list[str]:
     ]
     for t in sorted(tasks, key=_flat_list_sort_key):
         tid = t.get("id", "?")
-        title = t.get("title", "?")
+        title = _md_cell(t.get("title", "?"))
         status = t.get("status", "open")
-        effort = t.get("effort", "?")
+        effort = _md_cell(t.get("effort", "?"))
         fname = Path(str(t.get("_path", tid))).name
         folder = {"closed": "closed", "active": "active",
                   "paused": "paused"}.get(status, "open")
@@ -554,10 +733,11 @@ def generate_epics_md(tasks_dir: Path = TASKS_DIR,
         for epic_name in sorted(by_epic.keys(), key=_epic_sort_key):
             meta = epic_meta.get(epic_name, {})
             epic_id = meta.get("id", epic_name)
-            epic_title = meta.get("title", epic_name)
+            epic_title_raw = meta.get("title", epic_name)
+            epic_title = _md_cell(epic_title_raw)
             epic_status = derive_epic_status(epic_name, tasks)
             badge = _status_badge(epic_status)
-            anchor = re.sub(r"[^a-z0-9 _-]", "", f"{epic_id}-{epic_title}".lower()).replace(" ", "-")
+            anchor = re.sub(r"[^a-z0-9 _-]", "", f"{epic_id}-{epic_title_raw}".lower()).replace(" ", "-")
             n_open, n_active, n_paused, n_closed, pct = _task_counts(epic_name)
             bar = _progress_bar(pct)
             paused_cell = f" {n_paused} |" if show_paused_col else ""
@@ -639,7 +819,7 @@ def generate_epics_md(tasks_dir: Path = TASKS_DIR,
         for epic_name in sorted(by_epic.keys(), key=_epic_sort_key):
             meta = epic_meta.get(epic_name, {})
             epic_id = meta.get("id", epic_name)
-            epic_title = meta.get("title", epic_name)
+            epic_title = _md_cell(meta.get("title", epic_name))
             epic_status = derive_epic_status(epic_name, tasks)
             assigned = meta.get("assigned", "")
             assigned_str = f" — @{assigned}" if assigned else ""
@@ -697,6 +877,8 @@ def generate_epics_md(tasks_dir: Path = TASKS_DIR,
             lines += _flat_list_section(unepiced)
             lines.append("")
 
+    while lines and lines[-1] == "":
+        lines.pop()
     out_path = tasks_dir / "EPICS.md"
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -806,7 +988,13 @@ def generate_kanban_md(tasks_dir: Path = TASKS_DIR,
         title = t.get("title", tid)
         assigned = t.get("assigned", "")
         label = f"{title} @{assigned}" if assigned else title
-        label = label.replace('"', "")  # only " breaks quoted label syntax
+        # Mermaid kanban: `"` ends the quoted label; a leading `` ` `` after `["`
+        # switches mermaid into markdown-string mode and breaks parsing on
+        # subsequent backticks (CI failure mode in TASK-321 — task titles like
+        # ``/ts-task-active` nags…``). Strip both. Angle brackets are also
+        # stripped — inside a fenced ```mermaid block markdownlint does not flag
+        # them, but Mermaid itself can mis-parse `<` in labels in some renderers.
+        label = label.replace('"', "").replace("`", "").replace("<", "").replace(">", "")
         return f'    {_node_id(tid)}["{label}"]'
 
     columns: list[tuple[str, str]] = [("open", "Open")]
@@ -843,7 +1031,10 @@ def generate_kanban_md(tasks_dir: Path = TASKS_DIR,
         return f"_{' · '.join(parts)}_"
 
     # Build index
-    index_entries = [f"[{e}](#{e.lower().replace(' ', '-')})" for e in active_epics]
+    index_entries = [
+        f"[{_md_cell(e)}](#{e.lower().replace(' ', '-')})"
+        for e in active_epics
+    ]
     if _has_unfinished(no_epic):
         index_entries.append("[Other](#other)")
 
@@ -858,7 +1049,7 @@ def generate_kanban_md(tasks_dir: Path = TASKS_DIR,
 
     for epic in active_epics:
         buckets = by_epic[epic]
-        out.append(f"## {epic}")
+        out.append(f"## {_md_cell(epic)}")
         out.append("")
         out.append(stats(buckets))
         out.append("")
@@ -873,6 +1064,8 @@ def generate_kanban_md(tasks_dir: Path = TASKS_DIR,
         out.extend(kanban_block(no_epic))
         out.append("")
 
+    while out and out[-1] == "":
+        out.pop()
     out_path = tasks_dir / "KANBAN.md"
     out_path.write_text("\n".join(out) + "\n", encoding="utf-8")
 
@@ -1117,18 +1310,20 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.init:
-        return run_init(_CFG)
+        with acquire_lock():
+            return run_init(_CFG)
 
     if args.fix_order:
-        tasks = scan_task_items_only(scan_tasks())
-        changes = fix_order_fields(tasks)
-        if not changes:
-            print("housekeep --fix-order: order: fields already contiguous.")
-        else:
-            for path, n in changes:
-                print(f"housekeep --fix-order: {path} -> order: {n}")
-            print(f"housekeep --fix-order: rewrote {len(changes)} file(s).")
-        return 0
+        with acquire_lock():
+            tasks = scan_task_items_only(scan_tasks())
+            changes = fix_order_fields(tasks)
+            if not changes:
+                print("housekeep --fix-order: order: fields already contiguous.")
+            else:
+                for path, n in changes:
+                    print(f"housekeep --fix-order: {path} -> order: {n}")
+                print(f"housekeep --fix-order: rewrote {len(changes)} file(s).")
+            return 0
 
     if _EPICS_ENABLED:
         tasks_for_validation = scan_task_items_only(scan_tasks())
@@ -1142,12 +1337,15 @@ def main(argv: list[str] | None = None) -> int:
                   "contiguously per epic.", file=sys.stderr)
             return 1
 
-    plan = build_plan(epics_enabled=_EPICS_ENABLED)
-    print_plan(plan)
     if args.apply:
-        apply_plan(plan)
-        print("housekeep: applied.")
+        with acquire_lock():
+            plan = build_plan(epics_enabled=_EPICS_ENABLED)
+            print_plan(plan)
+            apply_plan(plan)
+            print("housekeep: applied.")
     else:
+        plan = build_plan(epics_enabled=_EPICS_ENABLED)
+        print_plan(plan)
         print("housekeep: dry-run — pass --apply to execute.")
     return 0
 

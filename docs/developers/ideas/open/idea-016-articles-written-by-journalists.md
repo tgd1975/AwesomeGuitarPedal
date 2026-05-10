@@ -1,6 +1,7 @@
 ---
 id: IDEA-016
 title: Articles Written by Journalists
+category: outreach
 description: Write one article for each persona
 ---
 

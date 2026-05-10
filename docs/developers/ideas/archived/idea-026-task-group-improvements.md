@@ -1,6 +1,7 @@
 ---
 id: IDEA-026
 title: Task Group Improvements
+category: tooling
 description: Enhance task group organization and visibility in OVERVIEW.md
 ---
 

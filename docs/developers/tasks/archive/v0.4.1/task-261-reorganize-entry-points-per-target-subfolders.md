@@ -53,10 +53,12 @@ continues to handle hardware-library selection — orthogonal to
 No new tests — this is a build-system reorganization with no logic change.
 
 **Host tests** (`make test-host`):
+
 - Verify the existing suite still passes. Host build does not use
   `build_src_filter`, so this is mostly a sanity check.
 
 **On-device verification** (manual, both targets):
+
 - `pio run -e nodemcu-32s` and `pio run -e feather-nrf52840` build
   successfully.
 - Flash each target and confirm baseline behaviour: BLE advertises,

@@ -1,10 +1,9 @@
 ---
 id: IDEA-048
 title: Off-the-shelf pedalboard build — 2 pedals from mostly stock components
+category: hardware
 description: A 2-pedal board assembled from as many off-the-shelf parts as possible (enclosure, switches, jacks, hardware) — minimise custom fabrication.
 ---
-
-# Off-the-shelf pedalboard build — 2 pedals from mostly stock components
 
 ## Motivation
 

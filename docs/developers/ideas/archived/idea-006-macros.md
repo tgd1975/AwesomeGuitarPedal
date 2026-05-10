@@ -1,6 +1,7 @@
 ---
 id: IDEA-006
 title: Macros
+category: firmware
 description: Support for macros — sequences or parallel groups of actions triggered with a single button press
 ---
 

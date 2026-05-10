@@ -224,3 +224,37 @@ Priority: double press is detected first. If confirmed, the single-press action 
 
 Both keys are optional. The nested action object uses the same format as any primary action.
 The long-press threshold (500 ms) and double-press window (300 ms) are fixed in firmware.
+
+---
+
+## Profile-Independent Actions
+
+`profiles.json` may contain an optional top-level `independentActions` block.
+Its actions fire on every button event **alongside** the active profile's actions —
+regardless of which profile is selected. Switching profiles never affects this block.
+
+The block uses the same shape as a profile's `buttons` block. A missing entry for a
+button is a no-op; an entirely missing block leaves behaviour identical to today.
+
+When both an independent action and a profile action exist for the same button event,
+the independent action fires first.
+
+```json
+{
+  "profiles": [
+    {
+      "name": "Studio",
+      "buttons": {
+        "A": { "type": "SendCharAction", "value": "KEY_F1", "name": "Play" }
+      }
+    }
+  ],
+  "independentActions": {
+    "A": { "type": "PinHighWhilePressedAction", "pin": 5, "name": "Tally Light" }
+  }
+}
+```
+
+In this example, button A always drives pin 5 high while held — even if you switch to
+a different profile that maps A to something else. The profile's per-button action
+still fires on top.

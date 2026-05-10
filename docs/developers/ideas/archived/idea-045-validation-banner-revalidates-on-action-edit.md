@@ -1,14 +1,13 @@
 ---
 id: IDEA-045
 title: Validation banner revalidates when an action is edited (not only when profile count changes)
+category: apps
 description: The Profile List validation banner currently only re-runs validation when the number of profiles changes. Editing a button's action value (e.g. fixing a typo) does not refresh the banner — it stays red until the user navigates away and back. Trigger revalidation on any ProfilesState change.
 ---
 
 ## Archive Reason
 
 2026-04-28 — Converted to TASK-281.
-
-# Validation banner revalidates when an action is edited
 
 ## The Idea in One Sentence
 

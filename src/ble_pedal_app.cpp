@@ -12,6 +12,12 @@
 #include "pedal_config.h"
 #include "platform.h"
 
+// attachInterrupt() takes a free function pointer (not a member function),
+// so each ISR stub forwards through this global to the live BlePedalApp
+// instance. Const-ifying it would defeat the constructor's `g_blePedalApp =
+// this;` registration (and the destructor's nullptr clear). One process,
+// one app — but the symbol must be mutable.
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 BlePedalApp* g_blePedalApp = nullptr;
 
 namespace
@@ -24,137 +30,191 @@ namespace
     void IRAM_ATTR isr_btn0()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(0);
+        }
     }
     void IRAM_ATTR isr_btn1()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(1);
+        }
     }
     void IRAM_ATTR isr_btn2()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(2);
+        }
     }
     void IRAM_ATTR isr_btn3()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(3);
+        }
     }
     void IRAM_ATTR isr_btn4()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(4);
+        }
     }
     void IRAM_ATTR isr_btn5()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(5);
+        }
     }
     void IRAM_ATTR isr_btn6()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(6);
+        }
     }
     void IRAM_ATTR isr_btn7()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(7);
+        }
     }
     void IRAM_ATTR isr_btn8()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(8);
+        }
     }
     void IRAM_ATTR isr_btn9()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(9);
+        }
     }
     void IRAM_ATTR isr_btn10()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(10);
+        }
     }
     void IRAM_ATTR isr_btn11()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(11);
+        }
     }
     void IRAM_ATTR isr_btn12()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(12);
+        }
     }
     void IRAM_ATTR isr_btn13()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(13);
+        }
     }
     void IRAM_ATTR isr_btn14()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(14);
+        }
     }
     void IRAM_ATTR isr_btn15()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(15);
+        }
     }
     void IRAM_ATTR isr_btn16()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(16);
+        }
     }
     void IRAM_ATTR isr_btn17()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(17);
+        }
     }
     void IRAM_ATTR isr_btn18()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(18);
+        }
     }
     void IRAM_ATTR isr_btn19()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(19);
+        }
     }
     void IRAM_ATTR isr_btn20()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(20);
+        }
     }
     void IRAM_ATTR isr_btn21()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(21);
+        }
     }
     void IRAM_ATTR isr_btn22()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(22);
+        }
     }
     void IRAM_ATTR isr_btn23()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(23);
+        }
     }
     void IRAM_ATTR isr_btn24()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(24);
+        }
     }
     void IRAM_ATTR isr_btn25()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onActionButtonInterrupt(25);
+        }
     }
     void IRAM_ATTR isr_select()
     {
         if (g_blePedalApp)
+        {
             g_blePedalApp->onSelectButtonInterrupt();
+        }
     }
 
     using IsrFunc = void (*)();
@@ -174,19 +234,25 @@ BlePedalApp::BlePedalApp(IBleKeyboard* bleKeyboard) : bleKeyboard_(bleKeyboard)
 BlePedalApp::~BlePedalApp()
 {
     if (g_blePedalApp == this)
+    {
         g_blePedalApp = nullptr;
+    }
 }
 
 void BlePedalApp::onActionButtonInterrupt(uint8_t index)
 {
     if (index < Btn::MAX && actionButtonObjects()[index])
+    {
         actionButtonObjects()[index]->isr();
+    }
 }
 
 void BlePedalApp::onSelectButtonInterrupt()
 {
     if (buttonSelect())
+    {
         buttonSelect()->isr();
+    }
 }
 
 void BlePedalApp::attachInterrupts()
@@ -216,7 +282,9 @@ void BlePedalApp::processEvents()
     for (uint8_t i = 0; i < hardwareConfig.numButtons; i++)
     {
         if (! actionButtonObjects()[i])
+        {
             continue;
+        }
 
         if (actionButtonObjects()[i]->doublePressEvent())
         {
@@ -281,7 +349,7 @@ void BlePedalApp::loop()
         {
             Serial.println("connected");
             attachInterrupts();
-            ledBluetooth()->setState(1);
+            ledBluetooth()->setState(true);
             connected_ = true;
         }
     }
@@ -292,13 +360,13 @@ void BlePedalApp::loop()
             Serial.println("disconnected");
             connected_ = false;
             detachInterrupts();
-            ledBluetooth()->setState(0);
+            ledBluetooth()->setState(false);
         }
     }
     processEvents();
     platformLoop();
 
-    uint32_t now = static_cast<uint32_t>(millis());
+    auto now = static_cast<uint32_t>(millis());
 
     {
         uint8_t profile = profileManager()->getCurrentProfile();
@@ -308,10 +376,13 @@ void BlePedalApp::loop()
             if (action && action->isInProgress())
             {
                 action->execute();
-                if (auto* macro = (action->getType() == Action::Type::Macro)
-                                      ? static_cast<MacroAction*>(action)
-                                      : nullptr)
+                // Type tag is checked first; static_cast is the RTTI-free
+                // downcast pattern used throughout the codebase (Arduino
+                // RTTI is disabled by default to save flash).
+                if (action->getType() == Action::Type::Macro)
                 {
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
+                    auto* macro = static_cast<MacroAction*>(action);
                     macro->update();
                 }
             }
@@ -321,7 +392,9 @@ void BlePedalApp::loop()
     ledPower()->update(now);
     ledBluetooth()->update(now);
     for (auto* led : selectLeds())
+    {
         led->update(now);
+    }
 
     profileManager()->update(now);
 

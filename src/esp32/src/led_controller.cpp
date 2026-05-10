@@ -23,10 +23,15 @@ void LEDController::toggle() { setState(! currentState); }
 void LEDController::startBlink(uint32_t intervalMs, int16_t count)
 {
     if (blinking)
+    {
         return; // already blinking — caller must stopBlink() first
+    }
     stateBeforeBlink = currentState;
     blinkInterval = intervalMs;
-    // count is full on/off cycles; we track half-cycles internally
+    // count is full on/off cycles; we track half-cycles internally. Bounded
+    // by callers (count fits comfortably in int16_t before doubling), so the
+    // narrowing back from int*int promotion is intentional.
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
     blinkRemaining = (count < 0) ? -1 : static_cast<int16_t>(count * 2);
     blinking = true;
     lastToggleTime = 0; // will be set on first update() call
@@ -35,7 +40,9 @@ void LEDController::startBlink(uint32_t intervalMs, int16_t count)
 void LEDController::stopBlink()
 {
     if (! blinking)
+    {
         return;
+    }
     blinking = false;
     setState(stateBeforeBlink);
 }
@@ -43,7 +50,9 @@ void LEDController::stopBlink()
 void LEDController::update(uint32_t now)
 {
     if (! blinking)
+    {
         return;
+    }
 
     // Initialise lastToggleTime on the first update after startBlink
     if (lastToggleTime == 0)
@@ -54,7 +63,9 @@ void LEDController::update(uint32_t now)
     }
 
     if (now - lastToggleTime < blinkInterval)
+    {
         return;
+    }
 
     lastToggleTime = now;
     toggle();

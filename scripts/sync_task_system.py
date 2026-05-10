@@ -60,6 +60,8 @@ MIRRORS: list[tuple[str, str]] = [
      "scripts/tests/test_release_snapshot.py"),
     ("awesome-task-system/scripts/tests/test_housekeep.py",
      "scripts/tests/test_housekeep.py"),
+    ("awesome-task-system/scripts/tests/test_housekeep_concurrency.py",
+     "scripts/tests/test_housekeep_concurrency.py"),
     ("awesome-task-system/scripts/tests/test_task_system_config.py",
      "scripts/tests/test_task_system_config.py"),
     ("awesome-task-system/scripts/tests/test_update_idea_overview.py",

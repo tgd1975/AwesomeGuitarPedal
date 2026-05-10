@@ -1,6 +1,7 @@
 ---
 id: IDEA-013
 title: Bus System
+category: hardware
 description: Daisy-chain bus for connecting multiple pedals instead of direct controller wiring
 ---
 
