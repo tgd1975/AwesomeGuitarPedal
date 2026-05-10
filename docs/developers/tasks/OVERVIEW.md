@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 19** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 0** | **Total: 26** | ░░░░░░░░░░ 0%
+⚪ **Open: 20** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 0** | **Total: 27** | ░░░░░░░░░░ 0%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -15,44 +15,9 @@
 
 <a id="burn-up"></a>
 
-## Burn-up since v0.4.1
+## Burn-up since v0.5.0
 
-<table><tr><td>
-
-```mermaid
-xychart-beta
-    title "Cumulative tasks closed"
-    x-axis ["05-08", "05-10"]
-    line [2, 62]
-```
-
-</td><td>
-
-```mermaid
-xychart-beta
-    title "Cumulative epics closed"
-    x-axis ["05-08", "05-10"]
-    line [0, 5]
-```
-
-</td><td>
-
-```mermaid
-xychart-beta
-    title "Cumulative effort hours — green: estimate, blue: actual"
-    x-axis ["05-08", "05-10"]
-    line [0, 0]
-    line [0, 0]
-```
-
-</td></tr></table>
-
-_Legend: green line = estimate (midpoint hours from `effort:`); blue line = actual (midpoint hours from `effort_actual:`)._
-
-| Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
-|------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-08 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 2026-05-10 | 60 | 62 | 0 | 0 | 0 | 0 | 5 | 5 |
+_No tasks or epics closed since v0.5.0 yet._
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -96,6 +61,7 @@ _No active tasks._
 | [TASK-367](open/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-368](open/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
 
 ## Closed Tasks
 
