@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 26** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 8** | **Total: 41** | ██░░░░░░░░ 20%
+⚪ **Open: 25** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 9** | **Total: 41** | ██░░░░░░░░ 22%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [7]
+    line [8]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [15]
-    line [23]
+    line [16]
+    line [24]
 ```
 
 </td></tr></table>
@@ -51,7 +51,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 7 | 7 | 15 | 15 | 23 | 23 | 2 | 2 |
+| 2026-05-11 | 8 | 8 | 16 | 16 | 24 | 24 | 2 | 2 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -92,7 +92,6 @@ _No active tasks._
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
-| [TASK-378](open/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-379](open/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-380](open/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-381](open/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) | Medium | ⚪ open |
@@ -114,6 +113,7 @@ _No active tasks._
 | [TASK-375](closed/task-375-add-debouncems-to-hardware-config-schema-and-model.md) | Add debounceMs to hardware-config schema, example JSON, and Dart model | Small (&lt;2h) |
 | [TASK-376](closed/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) |
 | [TASK-377](closed/task-377-define-v1-standard-pin-name-set.md) | Define the v1 standard pin-name set and pick its canonical home | Small (&lt;2h) |
+| [TASK-378](closed/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) |
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 
 ## Archived Releases

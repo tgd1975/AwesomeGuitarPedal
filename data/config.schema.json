@@ -59,6 +59,14 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 1000
+    },
+    "pinNames": {
+      "description": "Optional vocabulary translation layer (EPIC-029 / TASK-378). Maps physical pin identifiers (stringified GPIO number, e.g. \"13\") to a standard role name from data/pin-names.schema.json. Builders use this to declare what each pin does on their board so profiles can reference roles symbolically (\"button_a\") instead of hardware pins (\"D13\"). The mapping is optional: configs without it work unchanged, and configs that map some pins but not others are valid (per-pin opt-in). Values are constrained to the v1 standard name set via $ref; unknown names are schema errors. Keys must be stringified non-negative integers (\"0\"–\"39\") matching the GPIO range used elsewhere in this schema.",
+      "type": "object",
+      "patternProperties": {
+        "^(?:[0-9]|[1-2][0-9]|3[0-9])$": { "$ref": "pin-names.schema.json" }
+      },
+      "additionalProperties": false
     }
   }
 }
