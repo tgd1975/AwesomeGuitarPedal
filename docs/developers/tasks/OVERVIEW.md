@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 31** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 2** | **Total: 40** | ░░░░░░░░░░ 5%
+⚪ **Open: 30** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 3** | **Total: 40** | █░░░░░░░░░ 8%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [1]
+    line [2]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [1]
-    line [1]
+    line [6]
+    line [6]
 ```
 
 </td></tr></table>
@@ -51,7 +51,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
+| 2026-05-11 | 2 | 2 | 6 | 6 | 6 | 6 | 0 | 0 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -90,7 +90,6 @@ _No active tasks._
 | [TASK-354](open/task-354-firmware-version-read-characteristic.md) | Firmware — expose firmware-version read characteristic (+ DIS 0x180A decision) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-355](open/task-355-firmware-config-readback.md) | Firmware — config readback (option chosen in TASK-353) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-367](open/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-368](open/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
@@ -114,6 +113,7 @@ _No active tasks._
 |----|-------|--------|
 | [TASK-365](closed/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) |
 | [TASK-366](closed/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) |
+| [TASK-367](closed/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) |
 
 ## Archived Releases
 

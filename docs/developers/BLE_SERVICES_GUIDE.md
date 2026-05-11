@@ -7,7 +7,7 @@ This is the first thing you should read when adding or changing a BLE service or
 - [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md) — authoritative byte-level wire format for the chunked-write protocol. Cited from the *Service catalog* and *Conventions* sections below.
 - [BLE_READBACK_IMPACT.md](BLE_READBACK_IMPACT.md) — frozen-in-time feasibility analysis from [TASK-353](tasks/archive/v0.5.0/task-353-feasibility-firmware-ble-readback-surfaces.md) that gates the EPIC-026 readback cluster (TASK-354 / TASK-355 / TASK-356). Cited from *Service catalog*.
 
-A third historical doc, `BLE_CONFIG_IMPLEMENTATION_NOTES.md`, was folded into the *Conventions* and *Gotchas* sections of this guide ([TASK-367](tasks/closed/task-367-draft-conventions-invariants-gotchas.md)) and deleted.
+A third historical doc, [`BLE_CONFIG_IMPLEMENTATION_NOTES.md`](BLE_CONFIG_IMPLEMENTATION_NOTES.md), was folded into the *Conventions* and *Gotchas* sections of this guide ([TASK-367](tasks/closed/task-367-draft-conventions-invariants-gotchas.md)). Its content now lives here; the original file is preserved as a one-line redirect so the inbound links from [src/esp32/include/ble_keyboard_adapter.h](../../src/esp32/include/ble_keyboard_adapter.h) and historical archive task files (TASK-228 / TASK-229 / TASK-250) continue to resolve. Replacing the file with a redirect rather than `git rm`-ing it keeps EPIC-027 strictly docs-only — updating firmware comments was deemed out of scope.
 
 ## Contents
 
@@ -312,10 +312,12 @@ In order, gated:
 1. `/test` — host tests still pass (no new host tests were added; this is just a regression check).
 2. `make esp32-build` — firmware builds clean.
 3. Raw read with `bluetoothctl`:
+
    ```bash
    bluetoothctl connect $ASP_PEDAL_MAC
    gatttool -b $ASP_PEDAL_MAC --char-read --uuid=516515c5-4b50-447b-8ca3-cbfce3f4d9f8
    ```
+
    Returned bytes decode to the expected version string.
 4. `/test-device esp32-ble-config` — the new Unity test passes against a flashed ESP32.
 5. `/verify-on-device TASK-354 <scenario>` — drive the Pixel app, navigate to the Connected-Pedal page, confirm the Firmware row renders the live string.
@@ -332,15 +334,196 @@ The pre-commit hook gates host tests and formatting. The CI merge gate (see [DEV
 
 ## Conventions
 
-Populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md). Folds in the content of the former `BLE_CONFIG_IMPLEMENTATION_NOTES.md`.
+The durable rules for adding or changing BLE services in this project. Each item is a one-line rule plus a pointer to a worked example or precedent in the codebase.
+
+### UUID assignment
+
+- **Service UUID** is `516515c0-4b50-447b-8ca3-cbfce3f4d9f8` — a randomly generated 128-bit UUID unique to this project. Defined in [src/esp32/src/ble_config_service.cpp:18](../../src/esp32/src/ble_config_service.cpp#L18), mirrored in [app/lib/constants/ble_constants.dart:21](../../app/lib/constants/ble_constants.dart#L21) and [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md#service-uuid). Do not introduce a second service UUID without a reason.
+- **Characteristic UUIDs** increment the last byte of the service UUID: `516515cN-…` where `N` ranges over the characteristic index. Currently `c1`–`c4` are in firmware; `c5`/`c6` are planned in EPIC-026. Next free slot is `c7`. Stay inside this family — do not allocate from a separate UUID space.
+- **Standard services (SIG)** are an exception. HID (`0x1812`) and DIS (`0x180A`) use SIG-assigned 16-bit UUIDs; we do not allocate inside our `516515cN` family for them.
+
+### READ vs WRITE vs NOTIFY decision rule
+
+Pick by *who reads, who writes, and how often*:
+
+| Pattern | Use | Examples |
+|---|---|---|
+| Central reads a static-ish value | `READ` | `HW_IDENTITY` (board name), planned `FIRMWARE_VERSION` |
+| Central pushes data to peripheral, one-shot | `WRITE` \| `WRITE_NR` | `CONFIG_WRITE`, `CONFIG_WRITE_HW` (chunked profile / hardware-config upload) |
+| Peripheral pushes data to central as events occur | `NOTIFY` | `CONFIG_STATUS` (transfer progress / errors), planned `ACTIVE_PROFILE` |
+| Central reads the latest value *and* subscribes for updates | `READ` \| `NOTIFY` | Planned `ACTIVE_PROFILE` (TASK-356) |
+
+**Write characteristics: declare both `WRITE` and `WRITE_NR`.** BlueZ's D-Bus GATT backend uses `AcquireWrite` for write-without-response and `WriteValue` for write-with-response. `AcquireWrite` requires an established L2CAP channel and races MTU negotiation during connection setup; the resulting `org.bluez.Error.Failed: Failed to initiate write` is not recoverable with a post-connect delay. Declaring both properties lets BlueZ use the simpler `WriteValue` path (`response=True` in bleak), which is robust during setup. The extra ACK adds one round-trip per chunk — negligible at our chunk size. Pattern: [ble_config_service.cpp:67](../../src/esp32/src/ble_config_service.cpp#L67). The protocol spec ([BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md)) retains `WRITE_NO_RESPONSE` as the *canonical* property; `WRITE` is an implementation addition for BlueZ compatibility.
+
+### Payload framing
+
+- **Single-shot READ.** Value fits in one ATT response (≤ MTU − 1). String values are wrapped in `std::string(...)` before `setValue()` — see *Gotchas → NimBLE setValue templating* (TASK-235). Examples: `HW_IDENTITY`, planned `FIRMWARE_VERSION`.
+- **NOTIFY.** Single packet per notification (≤ MTU − 3). Status strings are short — `READY` / `RESET` / `PROFILE:<name>` / `ERROR:<reason>` — and fit comfortably. Pattern: [ble_config_service.cpp:74](../../src/esp32/src/ble_config_service.cpp#L74).
+- **Chunked WRITE.** Both `CONFIG_WRITE` and `CONFIG_WRITE_HW` use a single chunked-transfer protocol (`SEQ` / `LEN` / `PAYLOAD` framing) routed through one `BleConfigReassembler` instance. Wire format is authoritative in [BLE_CONFIG_PROTOCOL.md → Chunked Write Protocol](BLE_CONFIG_PROTOCOL.md#chunked-write-protocol). Implementation in [lib/PedalLogic/include/ble_config_reassembler.h](../../lib/PedalLogic/include/ble_config_reassembler.h) and [lib/PedalLogic/src/ble_config_reassembler.cpp](../../lib/PedalLogic/src/ble_config_reassembler.cpp).
+- **Read Long.** Not used today. Any planned READ characteristic whose value exceeds MTU − 1 must either be split across characteristics, framed as chunked NOTIFY, or rely on BlueZ/NimBLE's automatic Read Long segmentation. Add a *Constants* row for the new max size if so.
+
+### Max-size constants
+
+- **`MAX_CONFIG_BYTES` = 16 384** (16 KB). Maximum reassembled JSON payload for `CONFIG_WRITE` and `CONFIG_WRITE_HW`. Defined as `constexpr std::size_t kMaxConfigBytes` in [lib/PedalLogic/include/ble_config_reassembler.h:30](../../lib/PedalLogic/include/ble_config_reassembler.h#L30) — **the header is authoritative**. Any disagreement with the protocol doc or app-side mirror is a bug; see [TASK-357](tasks/archive/v0.5.0/task-357-reconcile-max-config-bytes-doc-vs-code.md) and the *Cross-cutting invariants* table below.
+- **`BLE_MTU` = 512**. ATT MTU; max chunk payload = MTU − 2 = 510 bytes. Documented in [BLE_CONFIG_PROTOCOL.md → Constants](BLE_CONFIG_PROTOCOL.md#constants). Both ESP32 and the app negotiate to this MTU; the iOS / Android client APIs will silently negotiate lower if their stack constrains it — the reassembler accepts any chunk size up to MTU − 2 and is not sensitive to the exact value.
+- **`kJsonDocCapacity` = 49 152** (48 KB). Internal `ArduinoJson` document capacity used by the reassembler to parse `MAX_CONFIG_BYTES` of JSON with headroom. Internal to the parser; does not cross layers. Defined alongside `kMaxConfigBytes`.
+
+### Version handling
+
+There is no per-characteristic version negotiation today. The single project-wide version string is `FIRMWARE_VERSION` in [include/version.h](../../include/version.h) — exposed read-only over BLE on ESP32 when [TASK-354](tasks/open/task-354-firmware-version-read-characteristic.md) lands. Clients that need to feature-detect a new characteristic should attempt the read / discovery and fall back gracefully if the characteristic is absent.
+
+If a wire-format breaking change is ever needed (it has not been), the convention is: allocate a *new* characteristic UUID at the next free `516515cN`, leave the old one in place for one release for backward compatibility, then drop the old in the following release. Do not version a characteristic in-place by reinterpreting its bytes.
+
+### Error semantics
+
+Wire-side errors are reported via the `CONFIG_STATUS` NOTIFY characteristic as `ERROR:<reason>` strings. Defined cases (authoritative in [BLE_CONFIG_PROTOCOL.md → Errors](BLE_CONFIG_PROTOCOL.md)):
+
+| Reason | Trigger |
+|---|---|
+| `ERROR:too_large` | Reassembled payload exceeds `MAX_CONFIG_BYTES` |
+| `ERROR:bad_seq` | Chunk sequence number out of order |
+| `ERROR:parse_failed` | Reassembled bytes are not valid JSON for the expected schema |
+
+When introducing a new error: add a row to the protocol doc, emit the same `ERROR:<reason>` string from the reassembler / handler, and handle the case app-side in `BleService`. Do not invent error codes outside the `ERROR:<reason>` convention.
+
+### Stack choice
+
+ESP32 uses **NimBLE** (via `ESP32-BLE-Keyboard` built with `-DUSE_NIMBLE`). Smaller RAM footprint than the classic Arduino ESP32 BLE stack and more actively maintained. nRF52840 uses **Bluefruit** (Adafruit's nRF52 Arduino BLE library), which is the only first-class option for the Feather nRF52840 hardware.
+
+**Critical NimBLE timing rule.** When `USE_NIMBLE` is defined, `ble_gatts_start()` is called exactly once inside `BleKeyboard::begin()` — it atomically locks in every registered GATT service. Any service added *after* this point is silently ignored. The Config GATT service must be registered *before* HID advertising starts. The current architecture uses `HookableBleKeyboard::onStarted(BLEServer*)`, fired inside `BleKeyboard::begin()` after HID services start but before `adv->start()`. `BleConfigService::begin()` installs its GATT setup as that callback. **Always call `bleConfigService.begin()` before `bleKeyboardAdapter->begin()`** — see [main.cpp](../../src/esp32/src/main.cpp) and *Gotchas → ESP32 NimBLE GATT registration timing*.
+
+### Security model
+
+BLE pairing security is controlled by the `pairing_pin` field in the hardware config (`/config.json` on LittleFS):
+
+- **`pairing_pin` absent or `null`** — no passkey, no encryption required on config characteristics. Any BLE client can connect and write without pairing. Used for development hardware, test fixtures, and the shipping default (rationale below).
+- **`pairing_pin: <number>`** — `NimBLEDevice::setSecurityPasskey(pin)` is called in `HookableBleKeyboard::onStarted()` and passkey-entry auth is enabled. A client must complete the pairing ceremony before writing config data.
+
+The shipping default is **no `pairing_pin`** ([data/config.json](../../data/config.json)). This was changed in the TASK-250 follow-up: the previous default of `12345` enabled DisplayOnly + MITM, but the pedal has no display, so Android/iOS hosts had no usable way to acquire the passkey and the in-app scan flow was unreachable. Builders who want passkey-entry auth opt in by adding `pairing_pin` — see [docs/builders/HARDWARE_CONFIG.md](../builders/HARDWARE_CONFIG.md#ble-pairing-optional).
+
+The integration test fixture [test/test_ble_config_esp32/data/config.json](../../test/test_ble_config_esp32/data/config.json) also sets `"pairing_pin": null` so the automated runner can connect without pairing. The test firmware asserts `pairingEnabled == false` at startup and halts with a clear error if the wrong config was flashed.
+
+### Architecture summary
+
+```
+Production path (src/esp32/src/main.cpp)
+──────────────────────────────────────────
+HookableBleKeyboard ──subclasses──▶ BleKeyboard (HID)
+BleKeyboardAdapter  ──wraps──────▶ HookableBleKeyboard
+BleConfigService::begin(IBleKeyboard*, …)
+  └─ casts to BleKeyboardAdapter
+  └─ installs onStarted callback
+  └─ inside BleKeyboard::begin(): setupGattService(pServer)
+  └─ pairingEnabled → setSecurityPasskey(pin) + passkey auth
+  └─ pairingEnabled == false → open access (test configs)
+```
+
+`BleConfigService` does not inherit from anything BLE-related. It uses composition: it accepts an `IBleKeyboard*` and casts to `BleKeyboardAdapter` to install the `onStarted` hook. Composition was forced by a C++ return-type clash (see *Gotchas → BleKeyboard adapter quirks*).
 
 ## Cross-cutting invariants
 
-Populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md). The table lists, for each project-wide constant that spans layers (`MAX_CONFIG_BYTES`, MTU floor, endianness, version negotiation), the full set of files that must change together when it changes. This section exists specifically to stop the next [TASK-357](tasks/archive/v0.5.0/task-357-reconcile-max-config-bytes-doc-vs-code.md).
+The table lists, for each project-wide constant or convention that spans layers, the full set of files that must change together when it changes. This section exists specifically to stop the next [TASK-357](tasks/archive/v0.5.0/task-357-reconcile-max-config-bytes-doc-vs-code.md)-class miss (doc/code divergence on `MAX_CONFIG_BYTES`).
+
+**Rule when changing any entry below: edit *every* file in the row, in the same commit.** Reviewers should reject a PR that touches one of these constants in fewer files than the row lists.
+
+| Invariant | Authoritative source | Files that must change together |
+|---|---|---|
+| `MAX_CONFIG_BYTES` (reassembly buffer ceiling) | `kMaxConfigBytes` in [lib/PedalLogic/include/ble_config_reassembler.h:30](../../lib/PedalLogic/include/ble_config_reassembler.h#L30) | [lib/PedalLogic/include/ble_config_reassembler.h](../../lib/PedalLogic/include/ble_config_reassembler.h) (`kMaxConfigBytes`, `kJsonDocCapacity`) · [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md#constants) (Constants table + `ERROR:too_large` description) · [app/lib/constants/ble_constants.dart](../../app/lib/constants/ble_constants.dart) (`kMaxConfigBytes`) · existing boundary tests under `test/unit/test_ble_config_*` (the `too_large` assertion mirrors this constant) |
+| `BLE_MTU` / chunk-size ceiling (ATT MTU) | [BLE_CONFIG_PROTOCOL.md → Constants](BLE_CONFIG_PROTOCOL.md#constants) | [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md) (Constants + Chunked Write framing) · [app/lib/services/ble_service.dart](../../app/lib/services/ble_service.dart) (chunk size = MTU − 2 = 510) · [lib/PedalLogic/src/ble_config_reassembler.cpp](../../lib/PedalLogic/src/ble_config_reassembler.cpp) (per-chunk size validation if any) · `test/test_ble_config_esp32/test_main.cpp` (chunked-write tests) |
+| Service UUID (`516515c0-…`) | [src/esp32/src/ble_config_service.cpp:18](../../src/esp32/src/ble_config_service.cpp#L18) | [src/esp32/src/ble_config_service.cpp](../../src/esp32/src/ble_config_service.cpp) (`SERVICE_UUID`) · [app/lib/constants/ble_constants.dart](../../app/lib/constants/ble_constants.dart) (`kServiceUuid`) · [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md#service-uuid) · this guide's *Service catalog* |
+| `FIRMWARE_VERSION` (project-wide version string) | [include/version.h](../../include/version.h) | [include/version.h](../../include/version.h) · root `package.json` (mirrored, bumped by `/release`) · `app/pubspec.yaml` · `awesome-task-system/pyproject.toml` (mirrored by `/release`) · [CHANGELOG.md](../../CHANGELOG.md) (release entry) · *(planned, post-TASK-354)* [src/esp32/src/ble_config_service.cpp](../../src/esp32/src/ble_config_service.cpp) (firmware-version READ char), [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md) (UUID row), [app/lib/constants/ble_constants.dart](../../app/lib/constants/ble_constants.dart) (`kFirmwareVersionUuid`) |
+| `kPedalNamePrefix` (`AwesomeStudio`) — BLE advertised-name match prefix | [app/lib/constants/ble_constants.dart:19](../../app/lib/constants/ble_constants.dart#L19) | [app/lib/constants/ble_constants.dart](../../app/lib/constants/ble_constants.dart) · `src/esp32/src/ble_keyboard_adapter.cpp` (`HookableBleKeyboard("AwesomeStudioPedal", …)`) · [test/test_ble_config_esp32/runner.py](../../test/test_ble_config_esp32/runner.py) (name-prefix discovery — see *Gotchas → BlueZ HID daemon*) |
+| `pairing_pin` semantics (open vs passkey-entry) | [src/esp32/src/ble_config_service.cpp](../../src/esp32/src/ble_config_service.cpp) (`pairingEnabled` derivation) | `src/esp32/src/ble_config_service.cpp` (pairing setup) · `src/esp32/src/ble_keyboard_adapter.cpp` (`HookableBleKeyboard::onStarted` security passkey) · [data/config.json](../../data/config.json) (shipping default — currently `null`) · [test/test_ble_config_esp32/data/config.json](../../test/test_ble_config_esp32/data/config.json) (test fixture — `null`) · [docs/builders/HARDWARE_CONFIG.md](../builders/HARDWARE_CONFIG.md#ble-pairing-optional) (builder-facing docs) |
+
+When adding a new cross-cutting invariant, add a row here as part of the same change. If the constant has fewer than three sites that must agree, it does not need to be in this table.
 
 ## Gotchas
 
-Populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md). Folds in `BLE_CONFIG_IMPLEMENTATION_NOTES.md`'s "Challenge N" sections plus rationale mined from closed BLE tasks ([TASK-235](tasks/archive/v0.3.0/), TASK-357, the EPIC-026 cluster, IDEA-046) and commit messages.
+Platform quirks and hard-earned rationale. Each item starts with the *symptom*, then *cause*, then *resolution* — so a future debugger can grep for the symptom they are seeing.
+
+### ESP32 NimBLE GATT registration timing
+
+**Symptom**: device advertises, but BLE scans find no matching service UUID; characteristics are absent in `bluetoothctl gatt list-attributes`.
+
+**Cause**: `BleConfigService::begin()` was called after `bleKeyboardAdapter->begin()`. NimBLE calls `ble_gatts_start()` once inside `BleKeyboard::begin()` to atomically lock in the GATT table; any service added after this point is silently ignored.
+
+**Resolution**: `HookableBleKeyboard` exposes a virtual `onStarted(BLEServer*)` hook that fires *inside* `begin()`, after HID services start but before `adv->start()`. `BleConfigService::begin()` installs its GATT setup code as that callback. **Always call `bleConfigService.begin()` before `bleKeyboardAdapter->begin()`.** Pattern in [src/esp32/src/main.cpp](../../src/esp32/src/main.cpp).
+
+### BleKeyboard adapter quirks (multiple-inheritance return-type clash)
+
+**Symptom**: compiler rejects `class BleKeyboardAdapter : public BleKeyboard, public IBleKeyboard` with "conflicting return types".
+
+**Cause**: `BleKeyboard` inherits `Print`, whose `write(uint8_t)` returns `size_t`. `IBleKeyboard::write(uint8_t)` returns `void`. C++ disallows changing return type when overriding.
+
+**Resolution**: composition, not inheritance. `HookableBleKeyboard` subclasses only `BleKeyboard` and adds the `onStarted` hook. `BleKeyboardAdapter` implements only `IBleKeyboard` and holds a `HookableBleKeyboard` reference, delegating calls. Pattern in [src/esp32/include/ble_keyboard_adapter.h](../../src/esp32/include/ble_keyboard_adapter.h).
+
+### NimBLE setValue templating (string vs pointer)
+
+**Symptom**: a READ characteristic with a string value returns 4 or 8 bytes that look like garbage; central reads the pointer bytes, not the string contents.
+
+**Cause**: NimBLE's `setValue<T>(const T&)` template, when called with `T = const char*`, stores `sizeof(pointer)` bytes (the address itself) instead of the string contents. The const-char-pointer specialisation does *not* `strlen()` the C string.
+
+**Resolution**: wrap the value in `std::string(...)` before `setValue()` — `std::string` has `c_str()` and `length()`, so it takes the string-specific overload and stores the actual bytes. Established in TASK-235; pattern in [ble_config_service.cpp:83](../../src/esp32/src/ble_config_service.cpp#L83) (HW_IDENTITY). Apply the same wrap to any new READ characteristic returning a string.
+
+### BlueZ HID daemon (historical, resolved)
+
+**Symptom (historical)**: integration test runner connected to the test firmware, BlueZ disconnected immediately with `BLE_ERR_REM_USER_CONN_TERM` (reason code `0x24`) before any GATT op completed.
+
+**Cause**: BlueZ's HID plugin (`bluetoothd` with HID) auto-connects to any device advertising HID UUID (`0x1812`) and tries to read encrypted HID characteristics without pairing. NimBLE returned `Insufficient Authentication`; BlueZ terminated. The issue only surfaced in the test runner, because the test runner used UUID-only discovery filtering on the Config service UUID — production firmware does not advertise the Config UUID (only HID + device name). A separate HID-less test firmware existed to work around this and created the disconnect path.
+
+**Resolution (TASK-236)**: the test runner switched to name-prefix discovery (matching `kPedalNamePrefix`), the same mechanism the app and CLI use. With name-prefix discovery the runner connects to production firmware directly, and BlueZ's HID daemon does not interfere in practice. The HID-less test firmware and all guards were removed.
+
+**Practical rule today**: any new BLE-client code (tests, CLI, in-app) discovers the pedal by name prefix, not by UUID. The Config service UUID is *not* advertised — it is discoverable post-connect via GATT service discovery, but you cannot filter the pre-connect scan on it.
+
+### BlueZ GATT cache stale entries
+
+**Symptom**: after changing the firmware's GATT layout (adding / removing a characteristic), writes / reads to the new layout fail with handle-mapping errors. The cache from the previous firmware version is wrong.
+
+**Resolution**: `bluetoothctl remove <addr>` clears BlueZ's cached device entry. Run this once when the firmware GATT layout changes significantly. The test runner does not need to do this automatically — after the cache is cleared, subsequent runs work without intervention.
+
+### Test-runner serial-line race (PROFILE vs RESET)
+
+**Symptom**: integration test runner expects `[BLE_TEST] RESET` after sending the RESET command; an unrelated `[BLE_TEST] PROFILE:<name>` line arrives first; the assertion fails.
+
+**Cause**: the test firmware prints `[BLE_TEST] PROFILE:<name>` whenever the active-profile index changes. Spontaneous profile changes during the test interleave with the runner's expected response line.
+
+**Resolution**: `read_serial_line` in [test/test_ble_config_esp32/runner.py](../../test/test_ble_config_esp32/runner.py) accepts an optional `keyword` parameter (default `"[BLE_TEST]"`). Callers that expect a specific tag pass the exact string — e.g. `keyword="[BLE_TEST] RESET"` for the reset-acknowledged check, `keyword="[BLE_TEST] PROFILE:"` for the PROFILE? response. Spontaneous lines from other tags are simply skipped.
+
+### Test-runner missing READY line (serial-port-after-boot race)
+
+**Symptom**: the runner times out waiting 30 s for `[BLE_TEST] READY`, but the firmware booted and printed READY long before the runner opened the port.
+
+**Cause**: the Makefile runs `pio upload` then immediately launches `runner.py`. The ESP32 boots in ~2 s and prints READY; the runner sometimes opens the serial port after that line has already been sent.
+
+**Resolution**: `runner.py` pulses DTR low → high after opening the serial port. This triggers an ESP32 hardware reset via the USB-to-UART chip's DTR line, producing a fresh boot with READY visible from the start of the serial stream.
+
+### Test-runner active-profile reporting (PROFILE? on demand)
+
+**Symptom**: after upload, the test runner cannot determine the active profile — the spontaneous `[BLE_TEST] PROFILE:<name>` line fires on the *first* `loop()` tick, long before the upload completes.
+
+**Resolution**: after a successful upload, the runner sends a `PROFILE?` command on the serial line. The firmware handles `PROFILE?` in `loop()` by printing the current profile on demand, making the check deterministic regardless of when the spontaneous line fired.
+
+### Persistence across soft-reset (profiles not loaded on boot)
+
+**Symptom**: after a soft-reset in a persistence test, `getProfile(0)` returns `nullptr` — the profile manager is empty.
+
+**Cause**: the firmware reboots but does not load profiles from LittleFS at boot. If `configureProfiles()` is not called from `setup()`, no profiles are populated.
+
+**Resolution**: `configureProfiles(*pm, nullptr)` is called in `setup()`. This reads `profiles.json` from LittleFS (written by `BleConfigReassembler` during the previous upload). Profile-index persistence across reboot uses ESP32 `Preferences` (NVS).
+
+### Build-system smell — duplicate source paths
+
+**Symptom (open question)**: a session repeatedly copies `ble_config_service.cpp` between locations, alternating with on-device test runs. Suggests the test build is not picking up edits to the canonical source automatically.
+
+**Status**: filed as [IDEA-046](ideas/open/idea-046-ble-config-cpp-copy-loop-investigation.md), root cause not yet diagnosed. Candidates: wrong source root in `platformio.ini`, a stray copy under `test/`, a missing symlink. Do not scaffold a fix until the root cause is identified.
+
+**Practical rule for now**: if you find yourself manually copying a `.cpp` between locations to make the test build pick up your edits, stop and read [IDEA-046](ideas/open/idea-046-ble-config-cpp-copy-loop-investigation.md) — your situation is the one the idea is asking to investigate.
+
+### Parallel-session test interference
+
+**Symptom**: an on-device BLE test passes in isolation but fails when another Claude Code session is also driving BLE in the same workspace. Two sessions can race for the same pedal MAC.
+
+**Resolution**: the pedal MAC is single-resource. Coordinate manually — there is no automated locking. The `$ASP_PEDAL_MAC` env var is the canonical handle; if you suspect interference, run [/ble-reset](../../.claude/skills/ble-reset/SKILL.md) to recover from a flaky pairing state and confirm no other session is actively talking to the device.
 
 ## Tests
 
