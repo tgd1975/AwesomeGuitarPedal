@@ -14,11 +14,11 @@ A third historical doc, [`BLE_CONFIG_IMPLEMENTATION_NOTES.md`](BLE_CONFIG_IMPLEM
 1. [Service catalog](#service-catalog)
 2. [Recipe — add or change a service / characteristic](#recipe--add-or-change-a-service--characteristic)
 3. [Worked example — firmware-version READ (TASK-354)](#worked-example--firmware-version-read-task-354)
-4. [Conventions](#conventions) — populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md)
-5. [Cross-cutting invariants](#cross-cutting-invariants) — populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md)
-6. [Gotchas](#gotchas) — populated by [TASK-367](tasks/open/task-367-draft-conventions-invariants-gotchas.md)
-7. [Tests](#tests) — populated by [TASK-368](tasks/open/task-368-draft-tests-references-and-verify.md)
-8. [References](#references) — populated by [TASK-368](tasks/open/task-368-draft-tests-references-and-verify.md)
+4. [Conventions](#conventions)
+5. [Cross-cutting invariants](#cross-cutting-invariants)
+6. [Gotchas](#gotchas)
+7. [Tests](#tests)
+8. [References](#references)
 
 ## Service catalog
 
@@ -527,8 +527,82 @@ Platform quirks and hard-earned rationale. Each item starts with the *symptom*, 
 
 ## Tests
 
-Populated by [TASK-368](tasks/open/task-368-draft-tests-references-and-verify.md).
+Pointers to BLE-related tests on each layer, with the decision rule for picking the right layer when adding a new test.
+
+### Decision rule — host or on-device?
+
+Per [CLAUDE.md → Testing policy](../../CLAUDE.md#testing-policy): prefer the host layer when the hardware dependency can be shimmed. A BLE-side change is shimmable iff its value or behaviour comes from project-internal state (constants, parsers, formatters, the reassembler) rather than from a live GATT peer.
+
+Worked examples drawn from existing tests:
+
+| Change | Shimmable? | Test layer |
+|---|---|---|
+| Reassembler `MAX_CONFIG_BYTES` boundary (`too_large` error) | Yes — bytes-in / bytes-out, no BLE stack | Host — [test/unit/test_ble_config_service.cpp](../../test/unit/test_ble_config_service.cpp) |
+| Chunk-size chunking on the app side | Yes — purely splits a payload into chunks | App unit — [app/test/unit/ble_service_chunk_size_test.dart](../../app/test/unit/ble_service_chunk_size_test.dart) |
+| Pre-connect scan name-prefix filter | Yes — string match on a mocked scan result | App unit — [app/test/unit/ble_service_scan_filter_test.dart](../../app/test/unit/ble_service_scan_filter_test.dart) |
+| End-to-end upload (chunks → reassembler → profile installed) | No — needs the firmware's BLE stack | On-device — [test/test_ble_config_esp32/](../../test/test_ble_config_esp32/) |
+| Pairing PIN ↔ open-access switching | No — needs NimBLE security manager | On-device — [test/test_ble_pairing_esp32/](../../test/test_ble_pairing_esp32/) |
+| Connected-Pedal page rendering with mocked `BleService` | Yes — Flutter widget tests mock the service | App widget — [app/test/widget/connected_pedal_screen_test.dart](../../app/test/widget/connected_pedal_screen_test.dart) |
+
+### Host layer (no hardware)
+
+- **Location**: [test/unit/](../../test/unit/) — GoogleTest sources guarded by `HOST_TEST_BUILD` and the shims in [test/fakes/arduino_shim.h](../../test/fakes/arduino_shim.h).
+- **BLE-relevant file**: [test/unit/test_ble_config_service.cpp](../../test/unit/test_ble_config_service.cpp) — covers the reassembler bytes-in / bytes-out boundary including `MAX_CONFIG_BYTES`.
+- **Run**: `make test-host` (or `/test`). No hardware required.
+- **CMake registration**: add new sources to the `pedal_tests` target in [test/CMakeLists.txt](../../test/CMakeLists.txt).
+
+### ESP32 on-device layer
+
+- **Location**: [test/test_*_esp32/](../../test/) — PlatformIO + Unity, each folder is an independent test environment with a `test_main.cpp` and (where relevant) a Python `runner.py` that drives a Linux/BlueZ central.
+- **BLE-relevant folders**:
+  - [test/test_ble_config_esp32/](../../test/test_ble_config_esp32/) — end-to-end config-upload tests. `test_main.cpp` is the firmware-side fixture; [runner.py](../../test/test_ble_config_esp32/runner.py) drives reads/writes from the host via BlueZ; [data/config.json](../../test/test_ble_config_esp32/data/config.json) is the LittleFS test fixture (must have `pairing_pin: null`).
+  - [test/test_ble_pairing_esp32/](../../test/test_ble_pairing_esp32/) — pairing-PIN behaviour smoke test.
+- **Run**: `make test-esp32-ble-config` and `make test-esp32-ble-pairing` (or the parameterised `/test-device esp32-ble-config`). Requires a USB-connected ESP32 (`$ASP_ESP32_PORT`) and BlueZ on the host. Set `PORT=` to override the device port.
+- **Recovery tools**: [/ble-reset](../../.claude/skills/ble-reset/SKILL.md) for flaky pairing state, [`bluetoothctl remove <addr>`](#bluez-gatt-cache-stale-entries) for stale GATT cache after firmware-layout changes.
+
+### nRF52840 on-device layer
+
+No BLE-specific test environment today. The nRF52840 BLE surface is HID-only (see *Service catalog → nRF52840*); custom GATT comes with [TASK-358](tasks/paused/task-358-nrf52840-ble-readback-surfaces.md) and a matching test environment will land alongside.
+
+### App-side layer (Flutter)
+
+- **Location**: [app/test/unit/](../../app/test/unit/) (pure unit tests) and [app/test/widget/](../../app/test/widget/) (widget + integration tests with mocked services).
+- **BLE-relevant unit tests**:
+  - [ble_service_upload_test.dart](../../app/test/unit/ble_service_upload_test.dart) — chunked upload path.
+  - [ble_service_upload_catch_test.dart](../../app/test/unit/ble_service_upload_catch_test.dart) — error-handling path.
+  - [ble_service_chunk_size_test.dart](../../app/test/unit/ble_service_chunk_size_test.dart) — chunk-size invariant (MTU − 2 = 510).
+  - [ble_service_scan_filter_test.dart](../../app/test/unit/ble_service_scan_filter_test.dart) — name-prefix scan filter (`kPedalNamePrefix`).
+- **BLE-relevant widget tests**:
+  - [connected_pedal_screen_test.dart](../../app/test/widget/connected_pedal_screen_test.dart) (+ [`.mocks.dart`](../../app/test/widget/connected_pedal_screen_test.mocks.dart)) — Connected-Pedal page rendering with mocked `BleService` reads.
+  - [connection_details_sheet_test.dart](../../app/test/widget/connection_details_sheet_test.dart), [connection_status_strip_test.dart](../../app/test/widget/connection_status_strip_test.dart) — peripheral connection state UI.
+- **Run**: `make test-flutter` (or `cd app && flutter test`). Mocks under `*.mocks.dart` are regenerated with `flutter pub run build_runner build --delete-conflicting-outputs` when you change a service surface.
+
+### Integration / end-to-end (on a real device)
+
+For features that span firmware + app, use [/verify-on-device `<TASK-ID>` `<SCENARIO-ID>`](../../.claude/skills/verify-on-device/SKILL.md) to drive the Pixel-connected app against a real pedal. Scenarios live in the skill's catalog; one example flow exercising a BLE READ surface end-to-end (Connected-Pedal page firmware row) is the planned TASK-354 verification scenario.
 
 ## References
 
-Populated by [TASK-368](tasks/open/task-368-draft-tests-references-and-verify.md).
+External standards and library docs (cite, do not copy):
+
+- **Bluetooth SIG specifications** — <https://www.bluetooth.com/specifications/> for ATT, GATT, GAP, MTU, pairing. Specifically:
+  - HID over GATT (`0x1812`): <https://www.bluetooth.com/specifications/specs/hids-1-0/>
+  - Device Information Service (`0x180A`, planned for nRF52840 via Bluefruit `BLEDis`): <https://www.bluetooth.com/specifications/specs/device-information-service-1-1/>
+- **NimBLE-Arduino** (ESP32 stack) — <https://github.com/h2zero/NimBLE-Arduino>. Reference for `NIMBLE_PROPERTY::*` flags, `NimBLECharacteristic::setValue` overloads, `setSecurityPasskey`, and the `ble_gatts_start()` atomic-locking behaviour cited in *Gotchas*.
+- **ESP32-BLE-Keyboard** (fork used here) — provides `BleKeyboard` and the `HookableBleKeyboard` `onStarted(BLEServer*)` extension this project relies on for late GATT registration.
+- **Adafruit Bluefruit nRF52 Arduino** (nRF52840 stack) — <https://github.com/adafruit/Adafruit_nRF52_Arduino>. Reference for `Bluefruit.begin()`, `BLEService` / `BLECharacteristic`, `BLEDis`. Relevant when [TASK-358](tasks/paused/task-358-nrf52840-ble-readback-surfaces.md) unblocks.
+- **bleak** (Python BLE client used by `runner.py`) — <https://github.com/hbldh/bleak>. Reference for `write_gatt_char(..., response=True/False)` semantics (the `WRITE` vs `WRITE_NR` rule in *Conventions* maps onto bleak's `response` parameter).
+- **BlueZ** — Linux Bluetooth stack used by both `bluetoothctl` and bleak. Reference for the D-Bus GATT interface (`AcquireWrite` vs `WriteValue`) and the HID daemon behaviour cited in *Gotchas*.
+
+Internal project history (the rationale behind specific conventions and gotchas):
+
+- [TASK-235](tasks/archive/v0.3.0/) — NimBLE `setValue<T>` template behaviour with `const char*`; the `std::string(...)` wrap rule.
+- [TASK-236](tasks/archive/v0.4.0/) — BlueZ HID-daemon disconnect; resolution by switching the test runner to name-prefix discovery.
+- [TASK-240](tasks/archive/v0.4.0/task-240-defect-firmware-json-parser-undersized.md) — firmware JSON parser undersized vs `MAX_CONFIG_BYTES`; underwrote the `kJsonDocCapacity` headroom rule.
+- [TASK-250](tasks/archive/v0.4.0/task-250-defect-android-manifest-missing-ble-permissions.md) — `pairing_pin` default change (DisplayOnly+MITM → open access).
+- [TASK-353](tasks/archive/v0.5.0/task-353-feasibility-firmware-ble-readback-surfaces.md) and the EPIC-026 cluster ([TASK-354](tasks/open/task-354-firmware-version-read-characteristic.md), [TASK-355](tasks/open/task-355-firmware-config-readback.md), [TASK-356](tasks/open/task-356-firmware-active-profile-notify.md)) — readback-surfaces feasibility and the ESP32-ships / nRF52840-deferred split.
+- [TASK-357](tasks/archive/v0.5.0/task-357-reconcile-max-config-bytes-doc-vs-code.md) — `MAX_CONFIG_BYTES` doc/code reconciliation; motivated the *Cross-cutting invariants* table.
+- [TASK-358](tasks/paused/task-358-nrf52840-ble-readback-surfaces.md) — bundled nRF52840 readback work, paused on hardware availability.
+- [IDEA-046](ideas/open/idea-046-ble-config-cpp-copy-loop-investigation.md) — open question about the duplicate-source-paths smell on the test build.
+- [BLE_CONFIG_PROTOCOL.md](BLE_CONFIG_PROTOCOL.md) — authoritative wire format for the chunked-write protocol.
+- [BLE_READBACK_IMPACT.md](BLE_READBACK_IMPACT.md) — frozen TASK-353 feasibility analysis with the platform-asymmetry argument.
