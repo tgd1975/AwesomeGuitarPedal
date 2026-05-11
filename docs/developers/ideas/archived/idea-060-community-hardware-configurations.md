@@ -5,6 +5,10 @@ description: Hard-coded 100 ms debounce is a property of the physical switch, no
 category: ⚡ firmware
 ---
 
+## Archive Reason
+
+2026-05-11 — Promoted to EPIC-028 (configurable-debounce) with TASK-375 and TASK-376.
+
 ## Motivation
 
 We already have a hardware config (`data/config.json`, schema in

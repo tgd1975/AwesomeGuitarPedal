@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 32** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 1** | **Total: 40** | ░░░░░░░░░░ 2%
+⚪ **Open: 31** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 1** | **Total: 40** | ░░░░░░░░░░ 2%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -17,14 +17,50 @@
 
 ## Burn-up since v0.5.0
 
-_No tasks or epics closed since v0.5.0 yet._
+<table><tr><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative tasks closed"
+    x-axis ["05-11"]
+    line [1]
+```
+
+</td><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative epics closed"
+    x-axis ["05-11"]
+    line [0]
+```
+
+</td><td>
+
+```mermaid
+xychart-beta
+    title "Cumulative effort hours — green: estimate, blue: actual"
+    x-axis ["05-11"]
+    line [1]
+    line [1]
+```
+
+</td></tr></table>
+
+_Legend: green line = estimate (midpoint hours from `effort:`); blue line = actual (midpoint hours from `effort_actual:`)._
+
+| Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
+|------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
+| 2026-05-11 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-_No active tasks._
+| ID | Title | Effort | Complexity | Status |
+|----|-------|--------|------------|--------|
+| [TASK-366](active/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) | Senior | 🔵 **active** |
 
 ## Paused Tasks
 
@@ -56,7 +92,6 @@ _No active tasks._
 | [TASK-354](open/task-354-firmware-version-read-characteristic.md) | Firmware — expose firmware-version read characteristic (+ DIS 0x180A decision) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-355](open/task-355-firmware-config-readback.md) | Firmware — config readback (option chosen in TASK-353) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-366](open/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-367](open/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-368](open/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |

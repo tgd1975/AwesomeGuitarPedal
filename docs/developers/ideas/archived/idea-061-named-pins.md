@@ -5,6 +5,10 @@ description: Map pin IDs (D23 → pedal_a) to a curated standard vocabulary so p
 category: ⚡ firmware
 ---
 
+## Archive Reason
+
+2026-05-11 — Promoted to EPIC-029 (named-pins) with TASK-377 through TASK-382.
+
 ## Problem
 
 Today profiles reference pins by hardware identifier (e.g. `D23`). That couples a profile to one specific board layout: a profile authored on one builder's wiring is meaningless on another builder's. For shareable profiles to be useful across the community, pins need a portable name.

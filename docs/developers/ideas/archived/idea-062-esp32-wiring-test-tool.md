@@ -5,6 +5,10 @@ description: Interactive `make test-esp32-wiring CONFIG=...` sanity check for bu
 category: 🛠️ tooling
 ---
 
+## Archive Reason
+
+2026-05-11 — Promoted to EPIC-030 (wiring-test-tool) with TASK-383 through TASK-387.
+
 `make test-esp32-wiring CONFIG=<hardware-config.json>` flashes a small interactive firmware to the ESP32 and drives a serial-console UI that lets the builder verify, button by button and LED by LED, that a freshly soldered board is electrically sound — every button reaches firmware, every LED lights, no shorts to neighbouring pins, no dull joints.
 
 ## Motivation
