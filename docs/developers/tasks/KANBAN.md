@@ -47,13 +47,12 @@ kanban
 
 ## named-pins
 
-_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 5 closed · █████░░░░░ 50%_
+_⚪ 4 open · 🔵 0 active · 🟡 0 paused · 🟢 6 closed · ██████░░░░ 60%_
 
 ```mermaid
 kanban
   Open
     TASK_382["Named pins — builder docs and GitHub process for proposing additions"]
-    TASK_389["PinNamesCatalog service — Flutter-side reader of pin-names.schema.json"]
     TASK_390["Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint"]
     TASK_391["Missing-mapping warning surfaces — profile editor + connected-pedal page"]
     TASK_392["JS config-builder — pinNames mapping editor with autocomplete and non-standard validation"]
@@ -65,6 +64,7 @@ kanban
     TASK_379["Profile schema — accept named-pin references alongside direct pin IDs"]
     TASK_380["ESP32 firmware — resolve named-pin references at config load"]
     TASK_381["Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins"]
+    TASK_389["PinNamesCatalog service — Flutter-side reader of pin-names.schema.json"]
 ```
 
 ## nrf52840-blocked
