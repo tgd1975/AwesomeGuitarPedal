@@ -47,14 +47,13 @@ kanban
 
 ## named-pins
 
-_⚪ 2 open · 🔵 0 active · 🟡 0 paused · 🟢 8 closed · ████████░░ 80%_
+_⚪ 0 open · 🔵 1 active · 🟡 0 paused · 🟢 9 closed · █████████░ 90%_
 
 ```mermaid
 kanban
   Open
-    TASK_382["Named pins — builder docs and GitHub process for proposing additions"]
-    TASK_392["JS config-builder — pinNames mapping editor with autocomplete and non-standard validation"]
   Active
+    TASK_382["Named pins — builder docs and GitHub process for proposing additions"]
   Paused
   Closed
     TASK_377["Define the v1 standard pin-name set and pick its canonical home"]
@@ -65,6 +64,7 @@ kanban
     TASK_389["PinNamesCatalog service — Flutter-side reader of pin-names.schema.json"]
     TASK_390["Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint"]
     TASK_391["Missing-mapping warning surfaces — profile editor + connected-pedal page"]
+    TASK_392["JS config-builder — pinNames mapping editor with autocomplete and non-standard validation"]
 ```
 
 ## nrf52840-blocked

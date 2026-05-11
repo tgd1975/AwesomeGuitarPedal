@@ -1,9 +1,11 @@
 ---
 id: TASK-392
 title: JS config-builder — pinNames mapping editor with autocomplete and non-standard validation
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Medium
 human-in-loop: Support
 epic: named-pins
