@@ -1,9 +1,11 @@
 ---
 id: TASK-382
 title: Named pins — builder docs and GitHub process for proposing additions
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Junior
 human-in-loop: Clarification
 epic: named-pins

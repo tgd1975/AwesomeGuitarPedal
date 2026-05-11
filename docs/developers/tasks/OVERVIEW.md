@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 21** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 16** | **Total: 45** | ████░░░░░░ 36%
+⚪ **Open: 21** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 17** | **Total: 45** | ████░░░░░░ 38%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [15]
+    line [16]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [35]
-    line [42.25]
+    line [36]
+    line [43.25]
 ```
 
 </td></tr></table>
@@ -51,16 +51,14 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 15 | 15 | 35 | 35 | 42.2 | 42.2 | 2 | 2 |
+| 2026-05-11 | 16 | 16 | 36 | 36 | 43.2 | 43.2 | 2 | 2 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-382](active/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) | Junior | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -115,6 +113,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-379](closed/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) |
 | [TASK-380](closed/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) |
 | [TASK-381](closed/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) |
+| [TASK-382](closed/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) |
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 | [TASK-389](closed/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) |
 | [TASK-390](closed/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) |

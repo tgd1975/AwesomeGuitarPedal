@@ -164,6 +164,120 @@ configuration loads. Factory defaults are hardcoded in `lib/PedalLogic/src/pedal
 | ESP32 | NodeMCU-32S | Deployed and tested |
 | nRF52840 | Adafruit Feather nRF52840 | Implemented, not tested — use at own risk |
 
+## Named pins — portable profile vocabulary
+
+When you share a profile with another builder whose pedal is wired
+differently, hard-coded GPIO numbers stop being meaningful. EPIC-029
+adds an optional second way to reference pins in profiles: by a
+**role name** drawn from a small, curated set.
+
+### The two reference forms
+
+A pin reference in a profile's `Pin*Action` can be either form, and
+you can mix both forms inside one profile:
+
+| Form | Example | When to use |
+|------|---------|-------------|
+| **Direct** | `"pin": 27` | One-off prototype pins, build-specific extras. Always works on your own pedal. |
+| **Named** | `"pin": "button_a"` | Anything you want to share. Resolves to whatever physical pin your `pinNames` maps `button_a` to. |
+
+A named reference becomes meaningful when your hardware config tells
+the firmware what `button_a` *means on this build*. Without a
+mapping, the firmware drops that action with a warning at boot — the
+rest of the profile still loads, so a community profile that uses
+names you have not mapped is not an error.
+
+### Mapping a pin to a name
+
+Add a `pinNames` block to `data/config.json` keyed by stringified GPIO
+number:
+
+```json
+{
+  ...
+  "buttonPins": [13, 12, 27, 14],
+  "pinNames": {
+    "13": "button_a",
+    "12": "button_b",
+    "21": "button_select",
+    "26": "led_bluetooth"
+  }
+}
+```
+
+The same UI lives in the configurator at
+[`docs/tools/configuration-builder/`](../tools/configuration-builder/index.html):
+the "Named pins" section renders one row per configured pin with
+autocomplete from the v1 standard set.
+
+### Authoring a profile that uses named pins
+
+Inside a profile, a `Pin*Action`'s `"pin"` field accepts either a
+number or one of the standard names:
+
+```json
+{
+  "type": "PinHighAction",
+  "pin": "button_a"
+}
+```
+
+The Flutter app's action editor exposes the same Direct/Named toggle
+with autocomplete; the editor renders the active hardware config's
+mapping inline (e.g. "→ GPIO 13 on this build") so you do not have to
+guess.
+
+### What the warning means
+
+If a profile references a name your hardware config does not map, the
+firmware logs:
+
+```
+PinAction: unresolved named pin 'button_d' — action dropped
+Config load summary: 3 profiles, 11 actions, 1 unresolved named pin refs
+```
+
+The app shows the same condition as a non-blocking banner before you
+upload, listing each unresolved name. It is informational, not an
+error — you may legitimately load a community profile that uses names
+you have not mapped because your build does not have that role wired.
+
+### v1 standard pin-name set
+
+<!-- Hand-copied from data/pin-names.schema.json (TASK-377). When the
+     enum changes, refresh this table. The schema file is the
+     authoritative source. -->
+
+| Category | Names | Role |
+|----------|-------|------|
+| Action buttons | `button_a` … `button_h` | Action button slots 1–8. The default 4-button build uses `button_a`–`button_d`; extended builds add `button_e`–`button_h`. |
+| Profile control | `button_select` | Cycles the active profile. Maps to the firmware's `buttonSelect` pin. |
+| Status LEDs | `led_power` | Firmware-controlled status LED (boot mismatch, DelayedAction countdown, config-load fallback). |
+|  | `led_bluetooth` | BLE connection indicator. |
+| Profile-select LEDs | `led_select_1` … `led_select_6` | Profile-select LED array (one-hot or binary encoding). Builds use a contiguous prefix; the max-6 ceiling matches the 2⁶−1 = 63 profile cap. |
+
+Names are lowercase `snake_case`. Numeric suffixes use `_N`
+(`led_select_1`, not `led_select1`) for one-based indexing.
+
+### Proposing a new name
+
+If your build needs a role that is not in the v1 set, open a GitHub
+issue using the
+[Propose a standard pin name](https://github.com/tgd1975/AwesomeStudioPedal/issues/new?template=named-pin-addition.md)
+template. Required:
+
+- Proposed name (lowercase `snake_case`)
+- One-line role description
+- Why an existing name does not fit
+- A builder context where the role exists
+
+The triage outcome is **Accept** (added to the v1 enum in a follow-up
+PR) or **Decline** (closed with a one-line reason — usually an
+overlap with an existing role). The intent is lightweight, fast
+turnaround; this is the builder-scope friction the project
+deliberately accepted in exchange for keeping the community
+vocabulary curated.
+
 ## BLE pairing (optional)
 
 By default the pedal advertises **no passkey** (BLE "Just Works" pairing,
