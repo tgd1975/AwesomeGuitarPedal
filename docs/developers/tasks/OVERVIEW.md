@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 31** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 1** | **Total: 40** | ░░░░░░░░░░ 2%
+⚪ **Open: 31** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 2** | **Total: 40** | ░░░░░░░░░░ 5%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -58,9 +58,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-366](active/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) | Senior | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -115,6 +113,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | ID | Title | Effort |
 |----|-------|--------|
 | [TASK-365](closed/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) |
+| [TASK-366](closed/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) |
 
 ## Archived Releases
 
