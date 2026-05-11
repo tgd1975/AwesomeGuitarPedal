@@ -1,9 +1,11 @@
 ---
 id: TASK-390
 title: Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Medium (2-8h)
+effort_actual: Medium (2-8h)
 complexity: Medium
 human-in-loop: Support
 epic: named-pins
