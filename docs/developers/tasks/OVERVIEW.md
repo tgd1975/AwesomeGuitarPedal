@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 27** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 6** | **Total: 41** | ██░░░░░░░░ 15%
+⚪ **Open: 27** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 7** | **Total: 41** | ██░░░░░░░░ 17%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -58,9 +58,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-388](active/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) | Junior | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -116,6 +114,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-368](closed/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) |
 | [TASK-375](closed/task-375-add-debouncems-to-hardware-config-schema-and-model.md) | Add debounceMs to hardware-config schema, example JSON, and Dart model | Small (&lt;2h) |
 | [TASK-376](closed/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) |
+| [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 
 ## Archived Releases
 

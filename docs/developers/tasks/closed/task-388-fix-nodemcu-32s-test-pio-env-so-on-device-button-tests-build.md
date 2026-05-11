@@ -1,9 +1,11 @@
 ---
 id: TASK-388
 title: Fix nodemcu-32s-test PlatformIO env so on-device button tests build
-status: active
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Medium (2-8h)
 complexity: Junior
 human-in-loop: No
 ---
