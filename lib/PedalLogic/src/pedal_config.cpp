@@ -13,6 +13,57 @@
 // Forward declaration for platform-specific factory (avoids pulling in full DI headers)
 IFileSystem* createFileSystem();
 
+namespace
+{
+    // Apply the pairing_pin field from the parsed config. Out-of-range or
+    // absent → pairing disabled. Pulled out of loadHardwareConfigFromJson
+    // so the parent stays under clang-tidy's cognitive-complexity threshold.
+    void applyPairingPin(const ArduinoJson::JsonDocument& doc, ILogger* logger)
+    {
+        if (! doc.containsKey("pairing_pin") || doc["pairing_pin"].isNull())
+        {
+            hardwareConfig.pairingEnabled = false;
+            hardwareConfig.pairingPin = 0;
+            return;
+        }
+        uint32_t pin = doc["pairing_pin"].as<uint32_t>();
+        if (pin <= 999999)
+        {
+            hardwareConfig.pairingEnabled = true;
+            hardwareConfig.pairingPin = pin;
+        }
+        else
+        {
+            logger->log(
+                "loadHardwareConfig: pairing_pin out of range (0–999999) — pairing disabled");
+            hardwareConfig.pairingEnabled = false;
+            hardwareConfig.pairingPin = 0;
+        }
+    }
+
+    // Apply the debounceMs field (EPIC-028). Schema bounds are 1..1000;
+    // anything outside that range — or an absent field — falls back to the
+    // 100 ms default.
+    void applyDebounceMs(const ArduinoJson::JsonDocument& doc, ILogger* logger)
+    {
+        if (! doc.containsKey("debounceMs"))
+        {
+            hardwareConfig.debounceMs = 100;
+            return;
+        }
+        uint32_t ms = doc["debounceMs"].as<uint32_t>();
+        if (ms >= 1 && ms <= 1000)
+        {
+            hardwareConfig.debounceMs = ms;
+        }
+        else
+        {
+            logger->log("loadHardwareConfig: debounceMs out of range (1–1000) — defaulting to 100");
+            hardwareConfig.debounceMs = 100;
+        }
+    }
+} // namespace
+
 /**
  * @brief Core parsing and application of hardware config JSON.
  *
@@ -91,49 +142,8 @@ bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
         }
     }
 
-    // pairing_pin: integer 0–999999 enables passkey auth; null or absent = no pairing.
-    if (doc.containsKey("pairing_pin") && ! doc["pairing_pin"].isNull())
-    {
-        uint32_t pin = doc["pairing_pin"].as<uint32_t>();
-        if (pin <= 999999)
-        {
-            hardwareConfig.pairingEnabled = true;
-            hardwareConfig.pairingPin = pin;
-        }
-        else
-        {
-            logger->log(
-                "loadHardwareConfig: pairing_pin out of range (0–999999) — pairing disabled");
-            hardwareConfig.pairingEnabled = false;
-            hardwareConfig.pairingPin = 0;
-        }
-    }
-    else
-    {
-        hardwareConfig.pairingEnabled = false;
-        hardwareConfig.pairingPin = 0;
-    }
-
-    // debounceMs: project-wide button-debounce window (EPIC-028). Schema bounds
-    // are 1..1000; values outside that range fall back to the 100 ms default so
-    // a hand-edited config can never produce a 0 ms or multi-second window.
-    if (doc.containsKey("debounceMs"))
-    {
-        uint32_t ms = doc["debounceMs"].as<uint32_t>();
-        if (ms >= 1 && ms <= 1000)
-        {
-            hardwareConfig.debounceMs = ms;
-        }
-        else
-        {
-            logger->log("loadHardwareConfig: debounceMs out of range (1–1000) — defaulting to 100");
-            hardwareConfig.debounceMs = 100;
-        }
-    }
-    else
-    {
-        hardwareConfig.debounceMs = 100;
-    }
+    applyPairingPin(doc, logger);
+    applyDebounceMs(doc, logger);
 
     logger->log("loadHardwareConfig: overrides applied from /config.json");
     return true;

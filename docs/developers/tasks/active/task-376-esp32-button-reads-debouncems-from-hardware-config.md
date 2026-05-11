@@ -1,7 +1,7 @@
 ---
 id: TASK-376
 title: ESP32 — Button reads debounceMs from the loaded hardware config
-status: open
+status: active
 opened: 2026-05-11
 effort: Small (<2h)
 complexity: Medium

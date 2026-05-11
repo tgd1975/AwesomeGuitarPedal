@@ -78,11 +78,12 @@ void PedalApp::setupHardware()
 
     for (uint8_t i = 0; i < hardwareConfig.numButtons; i++)
     {
-        actionButtonObjects_[i] = new Button(hardwareConfig.buttonPins[i]);
+        actionButtonObjects_[i] =
+            new Button(hardwareConfig.buttonPins[i], hardwareConfig.debounceMs);
         actionButtonObjects_[i]->setup();
     }
 
-    buttonSelect_ = new Button(hardwareConfig.buttonSelect);
+    buttonSelect_ = new Button(hardwareConfig.buttonSelect, hardwareConfig.debounceMs);
     buttonSelect_->setup();
 }
 

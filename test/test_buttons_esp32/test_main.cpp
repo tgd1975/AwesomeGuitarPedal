@@ -176,6 +176,38 @@ void test_two_buttons_sequential()
     TEST_ASSERT_EQUAL_MESSAGE(1, nb, "Button B: expected 1 event");
 }
 
+// --- EPIC-028 / TASK-376: configurable debounce ---------------------------
+
+// Local fixture constructed with the 2-arg constructor so the debounce window
+// is locked in before attachInterrupt. The same as the hardware-config path:
+// Button(pin, hardwareConfig.debounceMs) → setup → attachInterrupt.
+static Button btnA_slow(GPIO_NUM_13, 250);
+static void isr_handler_a_slow() { btnA_slow.isr(); }
+
+void test_configurable_debounce_250ms_suppresses_fast_double_press()
+{
+    btnA_slow.setup();
+    btnA_slow.reset();
+    attachInterrupt(GPIO_NUM_13, isr_handler_a_slow, CHANGE);
+    prompt("ACTION: Press button A TWICE quickly — within 250ms (one tap)", 5);
+    int n = count_events(btnA_slow, 500);
+    detachInterrupt(GPIO_NUM_13);
+    TEST_ASSERT_EQUAL_MESSAGE(
+        1, n, "Two presses inside the 250ms debounce window must register as one");
+}
+
+void test_configurable_debounce_250ms_accepts_slow_double_press()
+{
+    btnA_slow.setup();
+    btnA_slow.reset();
+    attachInterrupt(GPIO_NUM_13, isr_handler_a_slow, CHANGE);
+    prompt("ACTION: Press button A TWICE — press, wait ~1s, press again", 7);
+    int n = count_events(btnA_slow, 500);
+    detachInterrupt(GPIO_NUM_13);
+    TEST_ASSERT_EQUAL_MESSAGE(
+        2, n, "Two presses >1s apart must register as two events even with 250ms debounce");
+}
+
 // --- Entry point ------------------------------------------------------------
 
 void setup()
@@ -199,6 +231,8 @@ void setup()
     TEST_MESSAGE("   9. Press button D ONCE              (3s)");
     TEST_MESSAGE("  10. Press SELECT ONCE                (3s)");
     TEST_MESSAGE("  11. Press A then B, ~1s apart        (6s)");
+    TEST_MESSAGE("  12. [250ms debounce] Press A FAST    (5s)");
+    TEST_MESSAGE("  13. [250ms debounce] Press A, wait,A (7s)");
     TEST_MESSAGE("==================================================");
     TEST_MESSAGE("  Starting in 5 seconds...");
     TEST_MESSAGE("==================================================");
@@ -215,6 +249,8 @@ void setup()
     RUN_TEST(test_button_d_single_press);
     RUN_TEST(test_button_select_single_press);
     RUN_TEST(test_two_buttons_sequential);
+    RUN_TEST(test_configurable_debounce_250ms_suppresses_fast_double_press);
+    RUN_TEST(test_configurable_debounce_250ms_accepts_slow_double_press);
 
     UNITY_END();
 }
