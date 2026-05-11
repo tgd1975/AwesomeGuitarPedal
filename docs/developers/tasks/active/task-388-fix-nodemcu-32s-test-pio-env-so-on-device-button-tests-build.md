@@ -1,7 +1,7 @@
 ---
 id: TASK-388
 title: Fix nodemcu-32s-test PlatformIO env so on-device button tests build
-status: open
+status: active
 opened: 2026-05-11
 effort: Small (<2h)
 complexity: Junior
@@ -128,3 +128,53 @@ the build step):
   hardware — just run the build step. Use
   `pio test -e nodemcu-32s-test -f test_buttons_esp32 --without-uploading --without-testing`
   to iterate on the fix without an ESP32 connected.
+
+## Resolution
+
+Fix applied:
+
+1. **Dropped `-Itest/fakes`** from the five ESP32 on-device test envs
+   (`nodemcu-32s-test`, `-multipress-test`, `-serial-test`,
+   `-profilemanager-test`, `-pin-io-test`). This eliminates the
+   `FakeSerial` shadowing of `HardwareSerial` in `unity_config.cpp`.
+2. **Split `test/fakes/` into `test/fakes/` (host-only) and `test/stubs/`
+   (portable).** Moved `null_led_controller.h` and `null_logger.h` to
+   `test/stubs/`. These are pure interface implementations safe to compile
+   on-device. Added `-Itest/stubs` to on-device test envs and updated
+   `test/CMakeLists.txt` to keep the host build seeing both directories.
+3. **Added `-Ilib/PedalLogic/include`** to ESP32 on-device test envs so
+   `i_button.h` resolves without relying on LDF for transitively-included
+   headers inside `src/`.
+4. **Added `test_build_src = yes` and excluded `src/esp32/main.cpp`** from
+   `build_src_filter` for the four `pio test`-based envs. Without
+   `test_build_src`, `pio test` doesn't compile project sources; without
+   excluding `main.cpp`, the framework `setup()`/`loop()` collide with
+   Unity's `test_main.cpp` definitions.
+5. **Tightened `nodemcu-32s-pin-io-test` build_src_filter** to `-<*>`
+   because its lib_deps intentionally exclude BLE; pulling in
+   `src/esp32/src/ble_keyboard_adapter.cpp` would fail to find
+   `BleKeyboard.h`. The test only needs `pin_action.cpp` from
+   `lib/PedalLogic/` which LDF resolves.
+
+Verification (on this branch, ESP32 connected on `/dev/ttyUSB0`):
+
+| Env | Build | Notes |
+|---|---|---|
+| `nodemcu-32s` (production) | PASS | Unchanged behaviour |
+| `nodemcu-32s-test` | PASS | Flashed + ran 13 scenarios end-to-end |
+| `nodemcu-32s-multipress-test` | PASS | Build only |
+| `nodemcu-32s-serial-test` | PASS | Build only |
+| `nodemcu-32s-profilemanager-test` | PASS | Build only |
+| `nodemcu-32s-pin-io-test` | PASS | Build only |
+| `nodemcu-32s-leds-test` | PASS | Build only |
+| `nodemcu-32s-gpio2-probe` | PASS | Build only |
+| `nodemcu-32s-ble-config-test` | PASS | Build only |
+| Host (`make test-host`) | PASS | 312/312 |
+
+`make test-esp32-button` ran 13 Unity scenarios on device. The 3
+non-interactive scenarios (no-press) passed; the 10 interactive
+scenarios (e.g. "Press button A ONCE") failed because no human was
+present to drive the prompts — these are not build/infra failures.
+The two EPIC-028 debounce scenarios
+(`test_configurable_debounce_250ms_*`) were compiled, flashed, and
+prompted on device — they just need a human button-presser to pass.

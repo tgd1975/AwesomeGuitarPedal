@@ -52,6 +52,7 @@ target_include_directories(pedal_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/host/include
     ${CMAKE_SOURCE_DIR}/test/mocks
     ${CMAKE_SOURCE_DIR}/test/fakes
+    ${CMAKE_SOURCE_DIR}/test/stubs
     ${arduinojson_SOURCE_DIR}/src
 )
 
