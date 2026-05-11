@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 23** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 11** | **Total: 41** | ███░░░░░░░ 27%
+⚪ **Open: 26** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 12** | **Total: 45** | ███░░░░░░░ 27%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [10]
+    line [11]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [18]
-    line [30]
+    line [23]
+    line [35]
 ```
 
 </td></tr></table>
@@ -51,7 +51,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 10 | 10 | 18 | 18 | 30 | 30 | 2 | 2 |
+| 2026-05-11 | 11 | 11 | 23 | 23 | 35 | 35 | 2 | 2 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -92,13 +92,16 @@ _No active tasks._
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
-| [TASK-381](open/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-382](open/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) | Junior | ⚪ open |
 | [TASK-383](open/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-384](open/task-384-wiring-test-tool-button-mode.md) | Wiring test tool — button press logging, counters, and status display | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-385](open/task-385-wiring-test-tool-led-group-modes.md) | Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-386](open/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-387](open/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-389](open/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) | Junior | ⚪ open |
+| [TASK-390](open/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) | Medium | ⚪ open |
+| [TASK-391](open/task-391-missing-mapping-warning-surfaces.md) | Missing-mapping warning surfaces — profile editor + connected-pedal page | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-392](open/task-392-js-config-builder-pinnames-ux.md) | JS config-builder — pinNames mapping editor with autocomplete and non-standard validation | Small (&lt;2h) | Medium | ⚪ open |
 
 ## Closed Tasks
 
@@ -114,6 +117,7 @@ _No active tasks._
 | [TASK-378](closed/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) |
 | [TASK-379](closed/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) |
 | [TASK-380](closed/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) |
+| [TASK-381](closed/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) |
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 
 ## Archived Releases

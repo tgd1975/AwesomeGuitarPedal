@@ -1,9 +1,11 @@
 ---
 id: TASK-381
 title: Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Medium (2-8h)
+effort_actual: XS (<30m)
 complexity: Medium
 human-in-loop: Support
 epic: named-pins
@@ -109,3 +111,27 @@ unit test cannot answer that question.
   layout, want me to fill these in?") are deferred — the GitHub-
   idea process is the right channel if a recurring hardware
   preset emerges.
+
+## Close note
+
+Split into four follow-ups so each surface lands as its own
+reviewable commit:
+
+- **[TASK-389](../open/task-389-pin-names-catalog-service.md)** —
+  shared `PinNamesCatalog` Flutter service that reads
+  `pin-names.schema.json` and exposes autocomplete / validation /
+  grouping for every downstream UI.
+- **[TASK-390](../open/task-390-action-editor-named-pin-ux.md)** —
+  action editor (profile editor) named-pin picker, autocomplete,
+  and inline mapping hint.
+- **[TASK-391](../open/task-391-missing-mapping-warning-surfaces.md)**
+  — non-blocking missing-mapping warning surfaces in the profile
+  editor / list and on the connected-pedal page.
+- **[TASK-392](../open/task-392-js-config-builder-pinnames-ux.md)**
+  — JS configurator (`docs/tools/config-builder/`) pinNames editor
+  with `<datalist>` autocomplete and non-standard-name warning.
+
+This task's scope is fully covered by those four; closing here so
+the OVERVIEW / KANBAN reflect the real shape of the remaining work.
+Effort-actual is XS because no implementation landed under this ID
+— the scaffolding above is the deliverable.
