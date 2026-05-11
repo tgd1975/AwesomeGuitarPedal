@@ -6,7 +6,7 @@ status: open
 opened: 2026-05-02
 closed:
 assigned:
-branch: feature/ble-services-developer-guide
+branch: feature/firmware
 ---
 
 Seeded by IDEA-056 (BLE services developer guide — authoritative doc for implementing/changing BLE services).

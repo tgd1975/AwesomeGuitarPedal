@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 20** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 0** | **Total: 27** | ░░░░░░░░░░ 0%
+⚪ **Open: 32** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 1** | **Total: 40** | ░░░░░░░░░░ 2%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -56,17 +56,30 @@ _No active tasks._
 | [TASK-354](open/task-354-firmware-version-read-characteristic.md) | Firmware — expose firmware-version read characteristic (+ DIS 0x180A decision) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-355](open/task-355-firmware-config-readback.md) | Firmware — config readback (option chosen in TASK-353) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-365](open/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-366](open/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-367](open/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-368](open/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
+| [TASK-375](open/task-375-add-debouncems-to-hardware-config-schema-and-model.md) | Add debounceMs to hardware-config schema, example JSON, and Dart model | Small (&lt;2h) | Junior | ⚪ open |
+| [TASK-376](open/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-377](open/task-377-define-v1-standard-pin-name-set.md) | Define the v1 standard pin-name set and pick its canonical home | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-378](open/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-379](open/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-380](open/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) | Senior | ⚪ open |
+| [TASK-381](open/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) | Medium | ⚪ open |
+| [TASK-382](open/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) | Junior | ⚪ open |
+| [TASK-383](open/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) | Medium | ⚪ open |
+| [TASK-384](open/task-384-wiring-test-tool-button-mode.md) | Wiring test tool — button press logging, counters, and status display | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-385](open/task-385-wiring-test-tool-led-group-modes.md) | Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all) | Medium (2-8h) | Medium | ⚪ open |
+| [TASK-386](open/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) | Medium | ⚪ open |
+| [TASK-387](open/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) | Medium | ⚪ open |
 
 ## Closed Tasks
 
 | ID | Title | Effort |
 |----|-------|--------|
+| [TASK-365](closed/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) |
 
 ## Archived Releases
 
