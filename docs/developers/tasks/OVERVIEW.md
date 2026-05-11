@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 28** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 5** | **Total: 40** | █░░░░░░░░░ 12%
+⚪ **Open: 27** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 5** | **Total: 40** | █░░░░░░░░░ 12%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [4]
+    line [5]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [12]
-    line [12]
+    line [13]
+    line [13]
 ```
 
 </td></tr></table>
@@ -51,14 +51,16 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 4 | 4 | 12 | 12 | 12 | 12 | 1 | 1 |
+| 2026-05-11 | 5 | 5 | 13 | 13 | 13 | 13 | 1 | 1 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-_No active tasks._
+| ID | Title | Effort | Complexity | Status |
+|----|-------|--------|------------|--------|
+| [TASK-376](active/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) | Medium | 🔵 **active** |
 
 ## Paused Tasks
 
@@ -92,7 +94,6 @@ _No active tasks._
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-374](open/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | ⚪ open |
-| [TASK-376](open/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-377](open/task-377-define-v1-standard-pin-name-set.md) | Define the v1 standard pin-name set and pick its canonical home | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-378](open/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-379](open/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) | Medium | ⚪ open |
