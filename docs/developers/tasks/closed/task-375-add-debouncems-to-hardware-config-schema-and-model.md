@@ -1,9 +1,11 @@
 ---
 id: TASK-375
 title: Add debounceMs to hardware-config schema, example JSON, and Dart model
-status: active
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Junior
 human-in-loop: No
 epic: configurable-debounce
