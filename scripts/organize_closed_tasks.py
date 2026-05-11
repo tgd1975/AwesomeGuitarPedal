@@ -38,6 +38,10 @@ def main():
 
     target_dir = os.path.join(ARCHIVE_DIR, args.version)
 
+    if not os.path.isdir(CLOSED_DIR):
+        print(f"{CLOSED_DIR} does not exist — nothing to archive.")
+        return
+
     md_files = [
         f for f in sorted(os.listdir(CLOSED_DIR))
         if f.endswith(".md") and os.path.isfile(os.path.join(CLOSED_DIR, f))

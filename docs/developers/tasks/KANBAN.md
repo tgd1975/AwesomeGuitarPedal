@@ -97,24 +97,24 @@ kanban
 
 ## wiring-test-tool
 
-_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 4 open · 🔵 1 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
 
 ```mermaid
 kanban
   Open
-    TASK_383["Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32)"]
     TASK_384["Wiring test tool — button press logging, counters, and status display"]
     TASK_385["Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all)"]
     TASK_386["Wiring test tool — LED individual mode (selection, on/off, all-toggle)"]
     TASK_387["Wiring test tool — final key bindings, ? help legend, builder doc, close epic"]
   Active
+    TASK_383["Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32)"]
   Paused
   Closed
 ```
 
 ## Other
 
-_⚪ 4 open · 🔵 0 active · 🟡 0 paused · 🟢 1 closed · ██░░░░░░░░ 20%_
+_⚪ 3 open · 🔵 1 active · 🟡 0 paused · 🟢 1 closed · ██░░░░░░░░ 20%_
 
 ```mermaid
 kanban
@@ -122,8 +122,8 @@ kanban
     TASK_148["Reorganise Developer Documentation"]
     TASK_352["Investigate pre-commit hook latency — reorganize, parallelize, or skip irrelevant checks"]
     TASK_370["Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass"]
-    TASK_374["Make release.yml tolerate locally-archived closed tasks"]
   Active
+    TASK_374["Make release.yml tolerate locally-archived closed tasks"]
   Paused
   Closed
     TASK_388["Fix nodemcu-32s-test PlatformIO env so on-device button tests build"]

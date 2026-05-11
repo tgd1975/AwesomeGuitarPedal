@@ -235,6 +235,10 @@ jobs:
         with:
           name: app-android
 
+      # Note: closed-task archiving is done locally by the /release skill
+      # (Phase 4 step 6) before the tag is pushed. By the time this workflow
+      # runs, closed/ is empty, so no workflow-side archive step is needed.
+      # See TASK-374.
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -249,17 +253,3 @@ jobs:
             awesome-studio-pedal-*.apk
           draft: false
           prerelease: false
-
-      - name: Archive closed tasks for this release
-        run: |
-          python scripts/organize_closed_tasks.py ${{ steps.tag.outputs.value }}
-
-      - name: Commit archived tasks if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet HEAD; then
-            git add docs/developers/tasks/
-            git commit -m "chore: archive closed tasks for ${{ steps.tag.outputs.value }}"
-            git push
-          fi
