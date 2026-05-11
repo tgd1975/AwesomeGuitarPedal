@@ -147,7 +147,26 @@ def _validate_against_schema(json_path: pathlib.Path,
         return 1, [f"ERROR: JSON parse error in {json_path}: {exc}"]
 
     error_lines: list[str] = []
-    validator = jsonschema.Draft7Validator(schema)
+    # EPIC-029 / TASK-378 — register sibling schemas so $refs like
+    # "pin-names.schema.json" resolve from data/ without a network fetch.
+    try:
+        from referencing import Registry, Resource
+        from referencing.jsonschema import DRAFT7
+        registry = Registry()
+        for sibling in schema_path.parent.glob("*.schema.json"):
+            if sibling == schema_path:
+                continue
+            try:
+                sibling_doc = json.loads(sibling.read_text())
+            except json.JSONDecodeError:
+                continue
+            resource = Resource(contents=sibling_doc, specification=DRAFT7)
+            registry = registry.with_resource(uri=sibling.name, resource=resource)
+        validator = jsonschema.Draft7Validator(schema, registry=registry)
+    except ImportError:
+        # Older jsonschema (<4.18) used RefResolver instead of referencing.
+        validator = jsonschema.Draft7Validator(schema)
+
     for err in validator.iter_errors(data):
         path = " > ".join(str(p) for p in err.absolute_path) or "(root)"
         error_lines.append(f"  {path}: {err.message}")

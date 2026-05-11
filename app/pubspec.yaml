@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/profiles.schema.json
     - assets/config.schema.json
+    - assets/pin-names.schema.json
     - assets/branding/asp-mark-512.png
     - assets/branding/asp-mark-1024.png
   fonts:

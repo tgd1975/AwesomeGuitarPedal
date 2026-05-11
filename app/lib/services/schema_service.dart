@@ -39,8 +39,25 @@ class SchemaService {
     final profilesRaw =
         await rootBundle.loadString('assets/profiles.schema.json');
     final configRaw = await rootBundle.loadString('assets/config.schema.json');
-    _profilesSchema = JsonSchema.create(jsonDecode(profilesRaw));
-    _configSchema = JsonSchema.create(jsonDecode(configRaw));
+    final pinNamesRaw =
+        await rootBundle.loadString('assets/pin-names.schema.json');
+
+    // EPIC-029 / TASK-378: pre-register pin-names.schema.json as a sync
+    // ref so JsonSchema.create() resolves "pin-names.schema.json" $refs
+    // from the bundled asset instead of attempting a network fetch.
+    final pinNames = jsonDecode(pinNamesRaw) as Map<String, dynamic>;
+    final refProvider = RefProvider.sync((String ref) {
+      if (ref == 'pin-names.schema.json' ||
+          ref.endsWith('/pin-names.schema.json')) {
+        return pinNames;
+      }
+      return null;
+    });
+
+    _profilesSchema =
+        JsonSchema.create(jsonDecode(profilesRaw), refProvider: refProvider);
+    _configSchema =
+        JsonSchema.create(jsonDecode(configRaw), refProvider: refProvider);
   }
 
   Future<ValidationResult> validateProfiles(Map<String, dynamic> json) async {

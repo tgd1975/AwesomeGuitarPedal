@@ -200,6 +200,59 @@ class TestCmdValidate(unittest.TestCase):
         result = pedal_config.cmd_validate(self._make_args(path))
         self.assertEqual(result, 1)
 
+    def test_config_pinnames_valid_mapping_returns_0(self):
+        # EPIC-029 / TASK-378 — physical pin → standard role name.
+        cfg = dict(VALID_CONFIG)
+        cfg["pinNames"] = {"13": "button_a", "12": "button_b"}
+        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+            json.dump(cfg, f)
+            path = f.name
+        result = pedal_config.cmd_validate(self._make_args(path, hw=True))
+        self.assertEqual(result, 0)
+
+    def test_config_pinnames_absent_is_valid(self):
+        # Absence is the default; no behavioural regression for existing
+        # configs (TASK-378 acceptance criterion).
+        cfg = dict(VALID_CONFIG)
+        cfg.pop("pinNames", None)
+        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+            json.dump(cfg, f)
+            path = f.name
+        result = pedal_config.cmd_validate(self._make_args(path, hw=True))
+        self.assertEqual(result, 0)
+
+    def test_config_pinnames_unknown_name_returns_1(self):
+        # Values must be a member of the v1 standard set
+        # (data/pin-names.schema.json). Unknown names are rejected.
+        cfg = dict(VALID_CONFIG)
+        cfg["pinNames"] = {"13": "not_a_real_role_name"}
+        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+            json.dump(cfg, f)
+            path = f.name
+        result = pedal_config.cmd_validate(self._make_args(path, hw=True))
+        self.assertEqual(result, 1)
+
+    def test_config_pinnames_partial_mapping_is_valid(self):
+        # Builders may map some pins and not others — per-pin opt-in.
+        cfg = dict(VALID_CONFIG)
+        cfg["pinNames"] = {"13": "button_a"}  # buttonPins[1]=12 not mapped
+        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+            json.dump(cfg, f)
+            path = f.name
+        result = pedal_config.cmd_validate(self._make_args(path, hw=True))
+        self.assertEqual(result, 0)
+
+    def test_config_pinnames_non_pin_key_returns_1(self):
+        # Keys must be stringified GPIO numbers in 0..39. Non-numeric or
+        # out-of-range keys are schema errors.
+        cfg = dict(VALID_CONFIG)
+        cfg["pinNames"] = {"D13": "button_a"}
+        with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
+            json.dump(cfg, f)
+            path = f.name
+        result = pedal_config.cmd_validate(self._make_args(path, hw=True))
+        self.assertEqual(result, 1)
+
     def test_invalid_action_type_string_returns_1(self):
         bad = {
             "profiles": [{

@@ -1,9 +1,11 @@
 ---
 id: TASK-378
 title: Hardware config — pinNames mapping (physical pin → standard name)
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Medium (2-8h)
 complexity: Medium
 human-in-loop: No
 epic: named-pins
@@ -104,3 +106,11 @@ add coverage for `nameOf` / `pinOf` and round-trip.
   (`"23"`) rather than numeric keys, because JSON objects key on
   strings anyway. Be explicit in the schema description so future
   readers do not assume numeric keys are valid.
+
+## Close note
+
+**Duplicate target name (one-to-many) — warning, not schema error.** JSON Schema's `patternProperties` cannot natively express value-uniqueness, and a custom schema keyword would couple the data contract to a single validator implementation. The Dart `HardwareConfig` model surfaces duplicates via `duplicatePinNames` (a `Set<String>`); UX layers in TASK-381 turn that into a warning banner. `pinOf(name)` returns the lowest-numbered pin deterministically when duplicates exist. The reasoning: a schema error would block legitimate local experimentation (a builder hand-editing `pinNames` while debugging a wiring change), and the broader policy — unknown names at profile-load time, missing mappings at config-time — already lands warnings instead of hard errors. Keep the rule consistent.
+
+**Schema-resolution mechanics.** Python `_validate_against_schema` registers every sibling `*.schema.json` in `data/` into a `referencing.Registry` so `$ref: pin-names.schema.json` resolves without a network fetch. The Dart `SchemaService` does the same via `RefProvider.sync`, pre-loading `assets/pin-names.schema.json` and intercepting refs to that filename. The JS configurator (TASK-381) will need the same wiring.
+
+**Mirror discipline.** `data/*.schema.json` is the source of truth; `app/assets/*.schema.json` is a hand-maintained mirror (matching the prior `debounceMs` work — see commit `cbc162f`). When editing one, edit the other; the pre-commit hook's JSON-schema linter validates both copies. A future task could automate the sync (existing `sync_task_system.py` is the natural model) but that is out of scope here.
