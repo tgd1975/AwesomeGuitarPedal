@@ -1,6 +1,6 @@
 # Ideas Overview
 
-**Open: 35** | **Archived: 23**
+**Open: 37** | **Archived: 23**
 
 Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until they are either converted into structured tasks or archived. Archived ideas are kept for history in [`archived/`](archived/). See [README.md](README.md) for the file-naming convention (one row per IDEA, sub-notes use the `idea-NNN.<sub-slug>.md` form).
 
@@ -43,6 +43,8 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-058](open/idea-058-detect-task-folder-status-drift.md) | 🛠️ tooling | Detect and repair inconsistent task-folder/status states left by parallel sessions | When a parallel session lands a task file in one folder but with a status that says it should live elsewhere, the next agent silently papers over it. Decide where to detect this and what to do about it. |
 | [IDEA-059](open/idea-059-reduced-expert-views-for-profiles.md) | 📱 apps | Reduced and expert views for profile screens — app and web configurator | Default to a reduced view of profile screens that hides expert-only knobs; full view is opt-in. Config editor is unaffected — editing implies expert. |
 | [IDEA-060](open/idea-060-community-hardware-configurations.md) | 📱 apps | Add debounce time to hardware config — and make hardware configs community-shareable | Add per-build debounce time to the existing hardware config, then mirror the community-profiles flow so builders can share known-good hardware configs. |
+| [IDEA-061](open/idea-061-named-pins.md) | ⚡ firmware | Named pins — portable pin vocabulary for shareable profiles | Map pin IDs (D23 → pedal_a) to a curated standard vocabulary so profiles are portable across builds; no free-form names. |
+| [IDEA-062](open/idea-062-esp32-wiring-test-tool.md) | 🛠️ tooling | Interactive ESP32 wiring/solder test tool | Interactive `make test-esp32-wiring CONFIG=...` sanity check for buttons and LEDs after soldering — uses hardware config only, profile-free. |
 
 ## Archived Ideas
 
