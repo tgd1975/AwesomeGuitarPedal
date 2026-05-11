@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 23** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 14** | **Total: 45** | ███░░░░░░░ 31%
+⚪ **Open: 23** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 15** | **Total: 45** | ███░░░░░░░ 33%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [13]
+    line [14]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [29]
-    line [36.25]
+    line [34]
+    line [41.25]
 ```
 
 </td></tr></table>
@@ -51,16 +51,14 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 13 | 13 | 29 | 29 | 36.2 | 36.2 | 2 | 2 |
+| 2026-05-11 | 14 | 14 | 34 | 34 | 41.2 | 41.2 | 2 | 2 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-391](active/task-391-missing-mapping-warning-surfaces.md) | Missing-mapping warning surfaces — profile editor + connected-pedal page | Small (&lt;2h) | Medium | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -120,6 +118,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 | [TASK-389](closed/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) |
 | [TASK-390](closed/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) |
+| [TASK-391](closed/task-391-missing-mapping-warning-surfaces.md) | Missing-mapping warning surfaces — profile editor + connected-pedal page | Small (&lt;2h) |
 
 ## Archived Releases
 

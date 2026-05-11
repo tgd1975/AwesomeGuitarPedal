@@ -6,6 +6,7 @@ import '../models/profile.dart';
 import '../models/profiles_state.dart';
 import '../services/file_service.dart';
 import '../services/schema_service.dart';
+import '../widgets/unresolved_pins_banner.dart';
 import '../widgets/validation_banner.dart';
 
 class ProfileListScreen extends StatelessWidget {
@@ -67,6 +68,7 @@ class ProfileListScreen extends StatelessWidget {
       body: Column(
         children: [
           const ValidationBanner(),
+          const UnresolvedPinsBanner(),
           Expanded(
             child: state.profiles.isEmpty
                 ? const Center(

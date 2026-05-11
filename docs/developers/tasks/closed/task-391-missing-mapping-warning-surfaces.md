@@ -1,9 +1,11 @@
 ---
 id: TASK-391
 title: Missing-mapping warning surfaces — profile editor + connected-pedal page
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Medium
 human-in-loop: Support
 epic: named-pins
