@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 27** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 6** | **Total: 40** | ██░░░░░░░░ 15%
+⚪ **Open: 28** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 6** | **Total: 41** | ██░░░░░░░░ 15%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [5]
+    line [6]
 ```
 
 </td><td>
@@ -32,7 +32,7 @@ xychart-beta
 xychart-beta
     title "Cumulative epics closed"
     x-axis ["05-11"]
-    line [1]
+    line [2]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [13]
-    line [13]
+    line [14]
+    line [18]
 ```
 
 </td></tr></table>
@@ -51,7 +51,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 5 | 5 | 13 | 13 | 13 | 13 | 1 | 1 |
+| 2026-05-11 | 6 | 6 | 14 | 14 | 18 | 18 | 2 | 2 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -103,6 +103,7 @@ _No active tasks._
 | [TASK-385](open/task-385-wiring-test-tool-led-group-modes.md) | Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-386](open/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) | Medium | ⚪ open |
 | [TASK-387](open/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) | Medium | ⚪ open |
+| [TASK-388](open/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) | Junior | ⚪ open |
 
 ## Closed Tasks
 

@@ -132,7 +132,7 @@ kanban
 
 ## Other
 
-_⚪ 4 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
 
 ```mermaid
 kanban
@@ -141,6 +141,7 @@ kanban
     TASK_352["Investigate pre-commit hook latency — reorganize, parallelize, or skip irrelevant checks"]
     TASK_370["Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass"]
     TASK_374["Make release.yml tolerate locally-archived closed tasks"]
+    TASK_388["Fix nodemcu-32s-test PlatformIO env so on-device button tests build"]
   Active
   Paused
   Closed
