@@ -4,6 +4,7 @@
 #include "mock_led_controller.h"
 #include "null_logger.h"
 #include "pin_action.h"
+#include "pin_name_table.h"
 #include "profile_manager.h"
 #include "send_action.h"
 #include "serial_action.h"
@@ -365,36 +366,43 @@ TEST_F(ConfigLoaderUnitTest, PinActionMissingPinFieldReturnsNullptr)
     EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
 }
 
-// EPIC-029 / TASK-379. A named pin reference in the JSON (e.g.
-// `"pin": "button_a"`) is valid per profiles.schema.json but the
-// firmware does not yet know how to resolve it to a physical GPIO
-// (resolution lands in TASK-380). For TASK-379 the requirement is
-// that the parser handles the named form gracefully — load succeeds,
-// the rest of the profile parses, and only the unresolved Pin* action
-// is dropped (matching the same "drop and log" behaviour the parser
-// already uses for malformed pin fields). When TASK-380 wires
-// resolution, this test should flip to expect a non-null PinAction.
-TEST_F(ConfigLoaderUnitTest, PinActionWithNamedRefIsDroppedForNowButLoadSucceeds)
+// ---------------------------------------------------------------------------
+// EPIC-029 / TASK-380. Named-pin resolution against g_pinNameTable.
+// The fixture below isolates each test with a clean lookup table.
+// ---------------------------------------------------------------------------
+
+class ConfigLoaderNamedPinsTest : public ConfigLoaderUnitTest
 {
+protected:
+    void SetUp() override { g_pinNameTable.clear(); }
+    void TearDown() override { g_pinNameTable.clear(); }
+};
+
+TEST_F(ConfigLoaderNamedPinsTest, NamedPinResolvesAgainstPinNameTable)
+{
+    // Hardware config maps GPIO 27 to "button_a"; a profile that
+    // references "button_a" should fire pin 27.
+    g_pinNameTable.insert("button_a", 27);
+
     std::string json = R"json({
         "profiles": [{
             "name": "Test",
             "buttons": {
-                "A": {"type": "PinHighAction", "pin": "button_a"},
-                "B": {"type": "SendStringAction", "value": "ok"}
+                "A": {"type": "PinHighAction", "pin": "button_a"}
             }
         }]
     })json";
 
     EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
-    EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
-    // Sibling actions inside the same profile still parse — the
-    // named-pin failure is per-action, not per-profile.
-    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
+    Action* a = profileManager.getAction(0, Btn::A);
+    ASSERT_NE(a, nullptr);
+    EXPECT_EQ(a->getType(), Action::Type::PinHigh);
 }
 
-TEST_F(ConfigLoaderUnitTest, MixedDirectAndNamedPinsInOneProfileLoads)
+TEST_F(ConfigLoaderNamedPinsTest, MixedDirectAndNamedPinsBothResolve)
 {
+    g_pinNameTable.insert("led_power", 2);
+
     std::string json = R"json({
         "profiles": [{
             "name": "Test",
@@ -407,8 +415,74 @@ TEST_F(ConfigLoaderUnitTest, MixedDirectAndNamedPinsInOneProfileLoads)
 
     EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
     EXPECT_NE(profileManager.getAction(0, Btn::A), nullptr);
-    // Named-pin action drops for now (TASK-380 will resolve it).
-    EXPECT_EQ(profileManager.getAction(0, Btn::B), nullptr);
+    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
+}
+
+TEST_F(ConfigLoaderNamedPinsTest, UnresolvedNamedPinDropsActionButLoadContinues)
+{
+    // No entry for "button_a" in the table — the named action drops.
+    g_pinNameTable.insert("led_power", 2);
+
+    std::string json = R"json({
+        "profiles": [{
+            "name": "Test",
+            "buttons": {
+                "A": {"type": "PinHighAction",  "pin": "button_a"},
+                "B": {"type": "PinLowAction",   "pin": "led_power"},
+                "C": {"type": "SendStringAction", "value": "ok"}
+            }
+        }]
+    })json";
+
+    EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
+    EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
+    // Sibling actions inside the same profile still bind.
+    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
+    EXPECT_NE(profileManager.getAction(0, Btn::C), nullptr);
+}
+
+TEST_F(ConfigLoaderNamedPinsTest, AllDirectProfileWithEmptyPinNameTableStillLoads)
+{
+    // No pinNames mapping in the hardware config — pre-EPIC-029
+    // builders' all-direct profiles must continue to work unchanged.
+    g_pinNameTable.clear();
+
+    std::string json = R"json({
+        "profiles": [{
+            "name": "Test",
+            "buttons": {
+                "A": {"type": "PinHighAction", "pin": 27},
+                "B": {"type": "PinLowAction",  "pin": 14}
+            }
+        }]
+    })json";
+
+    EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
+    EXPECT_NE(profileManager.getAction(0, Btn::A), nullptr);
+    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
+}
+
+TEST_F(ConfigLoaderNamedPinsTest, TypoedNameDropsOnlyBadActionWithinProfile)
+{
+    // The builder typoed "buton_a" (missing letter). Only that action
+    // drops; the rest of the profile, including the correctly-named
+    // sibling, still resolves.
+    g_pinNameTable.insert("button_a", 13);
+    g_pinNameTable.insert("button_b", 12);
+
+    std::string json = R"json({
+        "profiles": [{
+            "name": "Test",
+            "buttons": {
+                "A": {"type": "PinHighAction", "pin": "buton_a"},
+                "B": {"type": "PinLowAction",  "pin": "button_b"}
+            }
+        }]
+    })json";
+
+    EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
+    EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
+    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
 }
 
 TEST_F(ConfigLoaderUnitTest, DelayedActionMissingInnerActionReturnsNullptr)

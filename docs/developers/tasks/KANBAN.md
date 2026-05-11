@@ -47,12 +47,11 @@ kanban
 
 ## named-pins
 
-_⚪ 3 open · 🔵 0 active · 🟡 0 paused · 🟢 3 closed · █████░░░░░ 50%_
+_⚪ 2 open · 🔵 0 active · 🟡 0 paused · 🟢 4 closed · ███████░░░ 67%_
 
 ```mermaid
 kanban
   Open
-    TASK_380["ESP32 firmware — resolve named-pin references at config load"]
     TASK_381["Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins"]
     TASK_382["Named pins — builder docs and GitHub process for proposing additions"]
   Active
@@ -61,6 +60,7 @@ kanban
     TASK_377["Define the v1 standard pin-name set and pick its canonical home"]
     TASK_378["Hardware config — pinNames mapping (physical pin → standard name)"]
     TASK_379["Profile schema — accept named-pin references alongside direct pin IDs"]
+    TASK_380["ESP32 firmware — resolve named-pin references at config load"]
 ```
 
 ## nrf52840-blocked

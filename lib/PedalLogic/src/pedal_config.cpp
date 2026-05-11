@@ -3,12 +3,19 @@
 #include "button_constants.h"
 #include "config.h"
 #include "config_loader.h"
+#include "pin_name_table.h"
 #include "profile.h"
 #include "send_action.h"
 #include "serial_action.h"
 #include <ArduinoJson.h>
 #include <memory>
 #include <string>
+
+// EPIC-029 / TASK-380. Global pin-name lookup table. Populated from
+// the hardware config's pinNames map at boot; consumed by ConfigLoader
+// when resolving named pin references inside profile Pin*Actions.
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+PinNameTable g_pinNameTable;
 
 // Forward declaration for platform-specific factory (avoids pulling in full DI headers)
 IFileSystem* createFileSystem();
@@ -38,6 +45,46 @@ namespace
                 "loadHardwareConfig: pairing_pin out of range (0–999999) — pairing disabled");
             hardwareConfig.pairingEnabled = false;
             hardwareConfig.pairingPin = 0;
+        }
+    }
+
+    // Apply the pinNames mapping (EPIC-029 / TASK-380). Rebuilds the
+    // global g_pinNameTable from the on-disk pin → name map (inverted
+    // to name → pin for lookup speed). Out-of-range pins and over-long
+    // names are skipped with a warning. Absent or empty map leaves the
+    // table empty, which is the only behaviour pre-EPIC-029 configs
+    // observed.
+    void applyPinNames(const ArduinoJson::JsonDocument& doc, ILogger* logger)
+    {
+        g_pinNameTable.clear();
+        if (! doc.containsKey("pinNames"))
+        {
+            return;
+        }
+        ArduinoJson::JsonObjectConst obj = doc["pinNames"].as<ArduinoJson::JsonObjectConst>();
+        for (ArduinoJson::JsonPairConst entry : obj)
+        {
+            const char* pinKey = entry.key().c_str();
+            const char* roleName = entry.value().as<const char*>();
+            char* end = nullptr;
+            unsigned long pin = std::strtoul(pinKey, &end, 10);
+            if (end == pinKey || *end != '\0' || pin > 39)
+            {
+                std::string msg = std::string("loadHardwareConfig: pinNames pin '") + pinKey +
+                                  "' is not 0..39 — skipped";
+                logger->log(msg.c_str());
+                continue;
+            }
+            if (roleName == nullptr || roleName[0] == '\0')
+            {
+                continue;
+            }
+            if (! g_pinNameTable.insert(roleName, static_cast<uint8_t>(pin)))
+            {
+                std::string msg = std::string("loadHardwareConfig: pinNames entry '") + pinKey +
+                                  " -> " + roleName + "' rejected (table full or name too long)";
+                logger->log(msg.c_str());
+            }
         }
     }
 
@@ -72,7 +119,11 @@ namespace
  */
 bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
 {
-    ArduinoJson::DynamicJsonDocument doc(1024);
+    // Doc capacity grew from 1024 → 2048 in EPIC-029 / TASK-380 to make
+    // room for the pinNames object on top of the existing scalar fields.
+    // A fully-populated 16-pin pinNames adds ~400 bytes; 2 KB leaves
+    // comfortable headroom and is still small in ESP32 RAM terms.
+    ArduinoJson::DynamicJsonDocument doc(2048);
     auto err = ArduinoJson::deserializeJson(doc, content);
     if (err)
     {
@@ -144,6 +195,7 @@ bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
 
     applyPairingPin(doc, logger);
     applyDebounceMs(doc, logger);
+    applyPinNames(doc, logger);
 
     logger->log("loadHardwareConfig: overrides applied from /config.json");
     return true;

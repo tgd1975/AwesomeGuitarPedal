@@ -1,5 +1,8 @@
 #include "button.h"
 #include "config.h"
+#include "null_logger.h"
+#include "pedal_config.h"
+#include "pin_name_table.h"
 #include <Arduino.h>
 #include <unity.h>
 
@@ -208,6 +211,47 @@ void test_configurable_debounce_250ms_accepts_slow_double_press()
         2, n, "Two presses >1s apart must register as two events even with 250ms debounce");
 }
 
+// --- EPIC-029 / TASK-380: named-pin resolution on real ESP32 RAM ----------
+//
+// Non-interactive — exercises ArduinoJson + the g_pinNameTable build path
+// on the actual device rather than the host shim. Confirms that a
+// hardware config with a pinNames object populates the table and a
+// looked-up named pin returns the right physical GPIO.
+
+void test_pin_names_resolve_on_device()
+{
+    NullLogger logger;
+    g_pinNameTable.clear();
+
+    const char* configJson = R"json({
+        "hardware": "esp32",
+        "numProfiles": 3,
+        "numSelectLeds": 2,
+        "numButtons": 4,
+        "ledBluetooth": 26,
+        "ledPower": 25,
+        "ledSelect": [5, 18],
+        "buttonSelect": 21,
+        "buttonPins": [13, 12, 27, 14],
+        "pinNames": {
+            "13": "button_a",
+            "12": "button_b",
+            "26": "led_bluetooth"
+        }
+    })json";
+
+    bool ok = loadHardwareConfigFromJson(configJson, &logger);
+    TEST_ASSERT_TRUE_MESSAGE(
+        ok, "loadHardwareConfigFromJson should accept a valid config with pinNames");
+    TEST_ASSERT_EQUAL_UINT8(13, g_pinNameTable.lookup("button_a"));
+    TEST_ASSERT_EQUAL_UINT8(12, g_pinNameTable.lookup("button_b"));
+    TEST_ASSERT_EQUAL_UINT8(26, g_pinNameTable.lookup("led_bluetooth"));
+    TEST_ASSERT_EQUAL_UINT8(static_cast<uint8_t>(PinNameTable::kUnresolved),
+                            g_pinNameTable.lookup("button_z"));
+
+    g_pinNameTable.clear();
+}
+
 // --- Entry point ------------------------------------------------------------
 
 void setup()
@@ -251,6 +295,7 @@ void setup()
     RUN_TEST(test_two_buttons_sequential);
     RUN_TEST(test_configurable_debounce_250ms_suppresses_fast_double_press);
     RUN_TEST(test_configurable_debounce_250ms_accepts_slow_double_press);
+    RUN_TEST(test_pin_names_resolve_on_device);
 
     UNITY_END();
 }

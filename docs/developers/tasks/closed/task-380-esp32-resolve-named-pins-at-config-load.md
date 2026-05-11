@@ -1,9 +1,11 @@
 ---
 id: TASK-380
 title: ESP32 firmware — resolve named-pin references at config load
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Medium (2-8h)
+effort_actual: Medium (2-8h)
 complexity: Senior
 human-in-loop: No
 epic: named-pins

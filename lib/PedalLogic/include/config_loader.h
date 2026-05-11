@@ -54,10 +54,23 @@ private:
     IFileSystem* fileSystem_;
     ILogger* logger_;
 
+    /// EPIC-029 / TASK-380. Number of named-pin references in profile
+    /// actions that failed to resolve against g_pinNameTable during the
+    /// most recent loadFromString() call. Reset at the start of each
+    /// load and reported via the post-load summary line.
+    uint16_t unresolvedNamedPinRefs_ = 0;
+
     std::unique_ptr<Action> createActionFromJson(const ArduinoJson::JsonObject& actionJson,
                                                  IBleKeyboard* keyboard);
     std::unique_ptr<Action> createSendCharActionFromJson(const ArduinoJson::JsonObject& actionJson,
                                                          IBleKeyboard* keyboard);
+    /// EPIC-029 / TASK-380. Pull the Pin*Action branch out of
+    /// createActionFromJson so its cognitive complexity stays under
+    /// the clang-tidy threshold. Resolves named-pin refs against
+    /// g_pinNameTable; an unresolved name bumps unresolvedNamedPinRefs_
+    /// and returns nullptr.
+    std::unique_ptr<Action> createPinActionFromJson(const ArduinoJson::JsonObject& actionJson,
+                                                    Action::Type type);
     void populateProfileFromJson(Profile& profile,
                                  ArduinoJson::JsonObject buttons,
                                  IBleKeyboard* keyboard);

@@ -34,6 +34,8 @@ add_executable(pedal_tests
     unit/test_action_parsing.cpp
     unit/test_non_keyboard_actions.cpp
     unit/test_pin_action.cpp
+    unit/test_pin_name_table.cpp
+    unit/test_pin_names_load.cpp
     unit/test_independent_actions.cpp
     unit/test_ble_config_service.cpp
     unit/test_hardware_mismatch.cpp
