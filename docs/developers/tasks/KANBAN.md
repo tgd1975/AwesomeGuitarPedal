@@ -47,12 +47,11 @@ kanban
 
 ## named-pins
 
-_⚪ 6 open · 🔵 0 active · 🟡 0 paused · 🟢 0 closed · ░░░░░░░░░░ 0%_
+_⚪ 5 open · 🔵 0 active · 🟡 0 paused · 🟢 1 closed · ██░░░░░░░░ 17%_
 
 ```mermaid
 kanban
   Open
-    TASK_377["Define the v1 standard pin-name set and pick its canonical home"]
     TASK_378["Hardware config — pinNames mapping (physical pin → standard name)"]
     TASK_379["Profile schema — accept named-pin references alongside direct pin IDs"]
     TASK_380["ESP32 firmware — resolve named-pin references at config load"]
@@ -61,6 +60,7 @@ kanban
   Active
   Paused
   Closed
+    TASK_377["Define the v1 standard pin-name set and pick its canonical home"]
 ```
 
 ## nrf52840-blocked

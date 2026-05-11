@@ -6,7 +6,7 @@ status: open
 opened: 2026-05-11
 closed:
 assigned:
-branch: feature/named-pins
+branch: feature/firmware
 ---
 
 Seeded by IDEA-061 (Named pins — portable pin vocabulary for shareable profiles).

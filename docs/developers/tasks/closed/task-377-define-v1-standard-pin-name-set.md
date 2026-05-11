@@ -1,9 +1,11 @@
 ---
 id: TASK-377
 title: Define the v1 standard pin-name set and pick its canonical home
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Medium
 human-in-loop: Clarification
 epic: named-pins
@@ -98,3 +100,37 @@ accidentally empties the list.
   TASK-379 (profile schema) consume this file. TASK-382 documents
   the addition process. Keep the inventory note tight; the full
   builder-facing doc is TASK-382's job.
+
+## Decisions
+
+**Canonical home:** [data/pin-names.schema.json](../../../../data/pin-names.schema.json). Single JSON Schema file with a `type: string` + `enum` of the v1 names, plus an `x-categories` metadata block (grouped names + human-readable role descriptions) and an `x-decisions` block (inventory + rationale, mirroring this section). Both `data/config.schema.json` (TASK-378) and `data/profiles.schema.json` (TASK-379) reference it via `$ref`. Firmware (TASK-380) and the configurator/app (TASK-381) read the same JSON to drive validation and autocomplete. JSON Schema is the right shape because it gives downstream schemas enum-validation for free; the `x-*` extensions ride along through `$ref` for UI tooling without affecting validation.
+
+**Alternatives considered:**
+
+- *Enum inlined into both schemas.* Rejected — duplication, easy to drift.
+- *Plain JSON or YAML data file under `data/`.* Rejected — loses schema-validator integration. Downstream schemas would have to manually duplicate the enum or write custom validation.
+- *Code-side constant (Dart / C++) generated from a data file.* Effectively this is what TASK-380/381 will do — generate or read from `pin-names.schema.json`. The schema is still the source of truth.
+
+**Inventory sources (artifact → role evidence):**
+
+- `data/config.json` and `data/config.schema.json` — fields `ledBluetooth`, `ledPower`, `ledSelect[]`, `buttonSelect`, `buttonPins[]`.
+- `data/profiles.json` + `profiles/{1,2,3,4}-button/*.json` — button keys `A`, `B`, `C`, `D`; DelayedAction references to the power-LED blink behaviour.
+- `docs/builders/HARDWARE_CONFIG.md` — `ledPower` semantics, `ledSelect` one-hot / binary encoding modes (max 6 LEDs → up to 63 profiles).
+- `docs/builders/BUILD_GUIDE.md` — default wiring table labels: "Button: A/B/C/D", "LED: Profile select 1/2/3", "LED: Bluetooth status", "LED: Status".
+
+**v1 set (17 names, 4 categories):**
+
+- Action buttons (8): `button_a` … `button_h`. Covers the default 4-button build and headroom for extended desk-pedal builds. Firmware tops at 26 but no shipping profile uses more than `D`.
+- Profile control (1): `button_select`.
+- Status LEDs (2): `led_power`, `led_bluetooth`.
+- Profile-select LEDs (6): `led_select_1` … `led_select_6` (matches the encoding ceiling at 2⁶ − 1 = 63 profiles).
+
+**Not in v1 (deliberately):**
+
+- `pedal_a`, `pedal_b`, …  — IDEA-061 prose distinguished "pedal" from "button", but no shipping artifact treats them as separate roles. Collapsed into `button_a` for v1.
+- `expression_1`, `expression_2` — no analog/expression-pedal support in the firmware. Add when the feature ships.
+- `bank_up`, `bank_down` — no bank-switching feature exists; `button_select` cycles linearly. Add when banks ship.
+
+These all stay open for the TASK-382 addition process — they are valid future names, just not load-bearing today.
+
+**Addition process (forward reference):** Unknown names produce a warning at validation time, not a hard error (per AC for TASK-380 / TASK-381). The curated path for adding a name is a GitHub idea, documented in TASK-382. Local experimentation works without curation; community sharing waits for the addition to land in this enum.
