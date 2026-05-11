@@ -1,9 +1,11 @@
 ---
 id: TASK-379
 title: Profile schema — accept named-pin references alongside direct pin IDs
-status: open
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Medium
 human-in-loop: No
 epic: named-pins

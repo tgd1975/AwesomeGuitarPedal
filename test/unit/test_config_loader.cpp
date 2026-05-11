@@ -365,6 +365,52 @@ TEST_F(ConfigLoaderUnitTest, PinActionMissingPinFieldReturnsNullptr)
     EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
 }
 
+// EPIC-029 / TASK-379. A named pin reference in the JSON (e.g.
+// `"pin": "button_a"`) is valid per profiles.schema.json but the
+// firmware does not yet know how to resolve it to a physical GPIO
+// (resolution lands in TASK-380). For TASK-379 the requirement is
+// that the parser handles the named form gracefully — load succeeds,
+// the rest of the profile parses, and only the unresolved Pin* action
+// is dropped (matching the same "drop and log" behaviour the parser
+// already uses for malformed pin fields). When TASK-380 wires
+// resolution, this test should flip to expect a non-null PinAction.
+TEST_F(ConfigLoaderUnitTest, PinActionWithNamedRefIsDroppedForNowButLoadSucceeds)
+{
+    std::string json = R"json({
+        "profiles": [{
+            "name": "Test",
+            "buttons": {
+                "A": {"type": "PinHighAction", "pin": "button_a"},
+                "B": {"type": "SendStringAction", "value": "ok"}
+            }
+        }]
+    })json";
+
+    EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
+    EXPECT_EQ(profileManager.getAction(0, Btn::A), nullptr);
+    // Sibling actions inside the same profile still parse — the
+    // named-pin failure is per-action, not per-profile.
+    EXPECT_NE(profileManager.getAction(0, Btn::B), nullptr);
+}
+
+TEST_F(ConfigLoaderUnitTest, MixedDirectAndNamedPinsInOneProfileLoads)
+{
+    std::string json = R"json({
+        "profiles": [{
+            "name": "Test",
+            "buttons": {
+                "A": {"type": "PinHighAction", "pin": 27},
+                "B": {"type": "PinLowAction",  "pin": "led_power"}
+            }
+        }]
+    })json";
+
+    EXPECT_TRUE(configLoader.loadFromString(profileManager, &keyboard, json));
+    EXPECT_NE(profileManager.getAction(0, Btn::A), nullptr);
+    // Named-pin action drops for now (TASK-380 will resolve it).
+    EXPECT_EQ(profileManager.getAction(0, Btn::B), nullptr);
+}
+
 TEST_F(ConfigLoaderUnitTest, DelayedActionMissingInnerActionReturnsNullptr)
 {
     std::string json = R"json({
