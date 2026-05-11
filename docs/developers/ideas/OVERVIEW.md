@@ -1,6 +1,6 @@
 # Ideas Overview
 
-**Open: 36** | **Archived: 26**
+**Open: 36** | **Archived: 27**
 
 Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until they are either converted into structured tasks or archived. Archived ideas are kept for history in [`archived/`](archived/). See [README.md](README.md) for the file-naming convention (one row per IDEA, sub-notes use the `idea-NNN.<sub-slug>.md` form).
 
@@ -75,3 +75,4 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-060](archived/idea-060-community-hardware-configurations.md) | ⚡ firmware | Add debounce time to the hardware config |
 | [IDEA-061](archived/idea-061-named-pins.md) | ⚡ firmware | Named pins — portable pin vocabulary for shareable profiles |
 | [IDEA-062](archived/idea-062-esp32-wiring-test-tool.md) | 🛠️ tooling | Interactive ESP32 wiring/solder test tool |
+| [IDEA-065](archived/idea-065-raspi-zero-w-support.md) | 🔧 hardware | Raspberry Pi Zero W support |

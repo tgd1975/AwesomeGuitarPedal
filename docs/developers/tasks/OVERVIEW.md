@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11"]
-    line [17]
+    line [18]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11"]
-    line [37]
-    line [44.25]
+    line [37.25]
+    line [44.5]
 ```
 
 </td></tr></table>
@@ -51,7 +51,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-11 | 17 | 17 | 37 | 37 | 44.2 | 44.2 | 3 | 3 |
+| 2026-05-11 | 18 | 18 | 37.2 | 37.2 | 44.5 | 44.5 | 3 | 3 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
