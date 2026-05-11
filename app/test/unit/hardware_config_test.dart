@@ -28,8 +28,10 @@ void main() {
     test('full round-trip preserves all fields', () {
       final cfg = HardwareConfig.fromJson(kBase);
       final json = cfg.toJson();
-      // pairing_pin is always emitted (null when absent in source)
-      expect(json, equals({...kBase, 'pairing_pin': null}));
+      // pairing_pin is always emitted (null when absent in source).
+      // debounceMs is always emitted with its default (100) when absent
+      // in source (EPIC-028).
+      expect(json, equals({...kBase, 'pairing_pin': null, 'debounceMs': 100}));
     });
 
     test('nrf52840 round-trip', () {
@@ -97,6 +99,42 @@ void main() {
       final json = Map<String, dynamic>.from(kBase)..['pairing_pin'] = 999999;
       final cfg = HardwareConfig.fromJson(json);
       expect(cfg.pairingPin, 999999);
+    });
+  });
+
+  group('debounceMs', () {
+    final kBase = {
+      'hardware': 'esp32',
+      'numButtons': 2,
+      'numProfiles': 4,
+      'numSelectLeds': 2,
+      'ledBluetooth': 26,
+      'ledPower': 25,
+      'ledSelect': [5, 18],
+      'buttonSelect': 21,
+      'buttonPins': [13, 12],
+    };
+
+    test('absent debounceMs defaults to 100', () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.debounceMs, 100);
+    });
+
+    test('integer debounceMs is parsed', () {
+      final json = Map<String, dynamic>.from(kBase)..['debounceMs'] = 50;
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.debounceMs, 50);
+    });
+
+    test('debounceMs round-trips through toJson', () {
+      final json = Map<String, dynamic>.from(kBase)..['debounceMs'] = 250;
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.toJson()['debounceMs'], 250);
+    });
+
+    test('default debounceMs round-trips as 100 in toJson', () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.toJson()['debounceMs'], 100);
     });
   });
 

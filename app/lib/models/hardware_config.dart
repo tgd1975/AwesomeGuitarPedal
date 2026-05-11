@@ -19,6 +19,7 @@ class HardwareConfig {
     required this.buttonSelect,
     required this.buttonPins,
     this.pairingPin,
+    this.debounceMs = 100,
   });
 
   final String hardware;
@@ -34,12 +35,20 @@ class HardwareConfig {
   /// BLE pairing passkey (0–999999). Null means no pairing required.
   final int? pairingPin;
 
+  /// Project-wide button-debounce window in milliseconds (EPIC-028).
+  /// Defaults to 100 ms when absent from the loaded config.
+  final int debounceMs;
+
   BoardTarget get boardTarget => boardTargetFromString(hardware);
 
   factory HardwareConfig.fromJson(Map<String, dynamic> json) {
     final rawPin = json['pairing_pin'];
     final int? pairingPin =
         (rawPin != null && rawPin is num) ? rawPin.toInt() : null;
+
+    final rawDebounce = json['debounceMs'];
+    final int debounceMs =
+        (rawDebounce is num) ? rawDebounce.toInt() : 100;
 
     return HardwareConfig(
       hardware: json['hardware'] as String? ?? 'esp32',
@@ -56,6 +65,7 @@ class HardwareConfig {
           .map((e) => (e as num).toInt())
           .toList(),
       pairingPin: pairingPin,
+      debounceMs: debounceMs,
     );
   }
 
@@ -71,6 +81,7 @@ class HardwareConfig {
         'buttonPins': buttonPins,
         'pairing_pin':
             pairingPin, // null serialises as JSON null — disables pairing
+        'debounceMs': debounceMs,
       };
 
   List<String> get buttonSlots {

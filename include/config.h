@@ -40,6 +40,13 @@ struct HardwareConfig
     bool pairingEnabled; /**< true if a passkey is configured; false = open access */
     // "That's the stupidest combination I've ever heard in my life!" — Spaceballs (1987)
     uint32_t pairingPin; /**< 6-digit BLE passkey (0–999999); only used when pairingEnabled */
+
+    // Project-wide button-debounce window. Loaded from config.json at runtime;
+    // defaults to 100 when the field is absent. Bounds 1..1000 are enforced by
+    // the JSON schema (data/config.schema.json), so firmware trusts the
+    // contract — values outside that range from a hand-edited config get
+    // rejected at config-load time, not at use.
+    uint32_t debounceMs; /**< Button-debounce window in milliseconds (1..1000, default 100) */
 };
 
 /**

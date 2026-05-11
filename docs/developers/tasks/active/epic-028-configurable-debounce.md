@@ -6,7 +6,7 @@ status: open
 opened: 2026-05-11
 closed:
 assigned:
-branch: feature/configurable-debounce
+branch: feature/firmware
 ---
 
 Seeded by IDEA-060 (Add debounce time to the hardware config).

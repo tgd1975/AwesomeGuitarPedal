@@ -53,6 +53,12 @@
       "type": ["integer", "null"],
       "minimum": 0,
       "maximum": 999999
+    },
+    "debounceMs": {
+      "description": "Project-wide button-debounce window in milliseconds (EPIC-028). Applied uniformly to every configured button — buttonPins[] action buttons and buttonSelect alike. Absent = default to 100 ms.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
     }
   }
 }

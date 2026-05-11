@@ -114,6 +114,27 @@ bool loadHardwareConfigFromJson(const std::string& content, ILogger* logger)
         hardwareConfig.pairingPin = 0;
     }
 
+    // debounceMs: project-wide button-debounce window (EPIC-028). Schema bounds
+    // are 1..1000; values outside that range fall back to the 100 ms default so
+    // a hand-edited config can never produce a 0 ms or multi-second window.
+    if (doc.containsKey("debounceMs"))
+    {
+        uint32_t ms = doc["debounceMs"].as<uint32_t>();
+        if (ms >= 1 && ms <= 1000)
+        {
+            hardwareConfig.debounceMs = ms;
+        }
+        else
+        {
+            logger->log("loadHardwareConfig: debounceMs out of range (1–1000) — defaulting to 100");
+            hardwareConfig.debounceMs = 100;
+        }
+    }
+    else
+    {
+        hardwareConfig.debounceMs = 100;
+    }
+
     logger->log("loadHardwareConfig: overrides applied from /config.json");
     return true;
 }
