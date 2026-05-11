@@ -237,7 +237,7 @@ format: ## Format all C++ files with clang-format
 	@echo "All C++ files formatted successfully"
 
 lint-markdown: ## Fix markdown linting issues (requires markdownlint-cli2)
-	npx markdownlint-cli2 --fix "**/*.md" "#node_modules" "#.pio" "#build" "#.vscode"
+	npx markdownlint-cli2 --fix "**/*.md" "#node_modules" "#.pio" "#build" "#.vscode" "#.claude/security-review-latest.md"
 	@echo "Markdown linting complete"
 
 ##@ Maintenance

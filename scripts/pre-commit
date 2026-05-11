@@ -170,7 +170,7 @@ if [ -z "$MARKDOWNLINT" ]; then
 fi
 
 if [ -n "$MARKDOWNLINT" ]; then
-    "$MARKDOWNLINT" "**/*.md" "#node_modules" "#.pio" "#build" "#.vscode" 2>&1
+    "$MARKDOWNLINT" "**/*.md" "#node_modules" "#.pio" "#build" "#.vscode" "#.claude/security-review-latest.md" 2>&1
     if [ $? -ne 0 ]; then
         echo -e "${RED}Markdown lint failed. Commit aborted.${NC}"
         exit 1
