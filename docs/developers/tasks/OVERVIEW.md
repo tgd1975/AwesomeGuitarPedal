@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 19** | 🔵 **Active: 2** | 🟡 **Paused: 7** | 🟢 **Closed: 17** | **Total: 45** | ████░░░░░░ 38%
+⚪ **Open: 19** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 18** | **Total: 45** | ████░░░░░░ 40%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -60,7 +60,6 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | ID | Title | Effort | Complexity | Status |
 |----|-------|--------|------------|--------|
-| [TASK-374](active/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) | Junior | 🔵 **active** |
 | [TASK-383](active/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) | Medium | 🔵 **active** |
 
 ## Paused Tasks
@@ -107,6 +106,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-366](closed/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) |
 | [TASK-367](closed/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) |
 | [TASK-368](closed/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) |
+| [TASK-374](closed/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) |
 | [TASK-375](closed/task-375-add-debouncems-to-hardware-config-schema-and-model.md) | Add debounceMs to hardware-config schema, example JSON, and Dart model | Small (&lt;2h) |
 | [TASK-376](closed/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) |
 | [TASK-377](closed/task-377-define-v1-standard-pin-name-set.md) | Define the v1 standard pin-name set and pick its canonical home | Small (&lt;2h) |

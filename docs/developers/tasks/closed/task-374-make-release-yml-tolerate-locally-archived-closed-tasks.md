@@ -1,9 +1,11 @@
 ---
 id: TASK-374
 title: Make release.yml tolerate locally-archived closed tasks
-status: active
+status: closed
+closed: 2026-05-11
 opened: 2026-05-11
 effort: XS (<30m)
+effort_actual: XS (<30m)
 complexity: Junior
 human-in-loop: No
 ---
