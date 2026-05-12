@@ -11,6 +11,10 @@ status: open
 related: IDEA-011, IDEA-018, IDEA-019, IDEA-022
 ---
 
+## Archive Reason
+
+2026-05-12 — Superseded by upstream project [`gdt1975/circuitsmith`](https://github.com/gdt1975/circuitsmith), which targets the same problem space (declarative YAML → schematic + ERC + BOM + netlist) as an independent, general-purpose tool. Rather than re-implement this in `.claude/skills/circuit/`, AwesomeStudioPedal will adopt circuitsmith once it stabilises — tracked in [IDEA-066](idea-066-adopt-circuitsmith-when-ready.md). The companion design docs (`idea-027.*.md`) are preserved alongside this file as reference material; they remain useful as a checklist of capabilities to evaluate circuitsmith against (ERC checks, layout engine, rule catalog, BOM/netlist exporters, Markdown integration).
+
 ## Context and Status of IDEA-019
 
 IDEA-019 (Wiring-as-Code) is **fully implemented** as of 2026-04-22 (TASK-200–207).
