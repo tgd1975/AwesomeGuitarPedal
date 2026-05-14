@@ -3,6 +3,8 @@
 
 Button::Button(uint8_t PIN) : PIN(PIN) {}
 
+Button::Button(uint8_t PIN, unsigned long debounceMs) : PIN(PIN), debounceDelay(debounceMs) {}
+
 void Button::setup() { pinMode(PIN, INPUT_PULLUP); }
 
 bool Button::isDebounced(unsigned long now) const

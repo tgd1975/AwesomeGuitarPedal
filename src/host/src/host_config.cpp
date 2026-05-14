@@ -25,5 +25,6 @@ HardwareConfig hardwareConfig = {
      0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0}, // buttonPins
     "esp32",                                     // hardware
     false,                                       // pairingEnabled
-    0                                            // pairingPin
+    0,                                           // pairingPin
+    100                                          // debounceMs
 };

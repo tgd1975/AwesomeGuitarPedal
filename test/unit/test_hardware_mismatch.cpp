@@ -136,3 +136,57 @@ TEST_F(HardwareMismatchTest, PairingPinOutOfRangeDisablesPairing)
     EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
     EXPECT_FALSE(hardwareConfig.pairingEnabled);
 }
+
+// ---------------------------------------------------------------------------
+// debounceMs tests (EPIC-028 / TASK-375)
+// ---------------------------------------------------------------------------
+
+TEST_F(HardwareMismatchTest, DebounceMsPresentAppliesValue)
+{
+    std::string json = makeJson("esp32");
+    json.insert(json.size() - 1, R"(, "debounceMs": 50)");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 50u);
+}
+
+TEST_F(HardwareMismatchTest, DebounceMsAbsentDefaultsTo100)
+{
+    std::string json = makeJson("esp32");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 100u);
+}
+
+TEST_F(HardwareMismatchTest, DebounceMsBelowMinDefaultsTo100)
+{
+    // Schema rejects values < 1; this guards against a hand-edited config that
+    // bypassed schema validation. Out-of-range falls back to 100, same shape
+    // as the pairing_pin contract.
+    std::string json = makeJson("esp32");
+    json.insert(json.size() - 1, R"(, "debounceMs": 0)");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 100u);
+}
+
+TEST_F(HardwareMismatchTest, DebounceMsAboveMaxDefaultsTo100)
+{
+    std::string json = makeJson("esp32");
+    json.insert(json.size() - 1, R"(, "debounceMs": 2000)");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 100u);
+}
+
+TEST_F(HardwareMismatchTest, DebounceMsAtMinBoundaryApplies)
+{
+    std::string json = makeJson("esp32");
+    json.insert(json.size() - 1, R"(, "debounceMs": 1)");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 1u);
+}
+
+TEST_F(HardwareMismatchTest, DebounceMsAtMaxBoundaryApplies)
+{
+    std::string json = makeJson("esp32");
+    json.insert(json.size() - 1, R"(, "debounceMs": 1000)");
+    EXPECT_TRUE(loadHardwareConfigFromJson(json, &logger));
+    EXPECT_EQ(hardwareConfig.debounceMs, 1000u);
+}

@@ -423,3 +423,92 @@ TEST_F(ButtonTest, DoublePressEvent_BothQueuedPressesSuppressed)
     EXPECT_FALSE(btn.event());
     EXPECT_FALSE(btn.event());
 }
+
+// ---------------------------------------------------------------------------
+// Configurable debounce window (EPIC-028 / TASK-376)
+// ---------------------------------------------------------------------------
+
+TEST_F(ButtonTest, ConstructorWithExplicitDebounceSetsField)
+{
+    Button btn(5, 50);
+    EXPECT_EQ(btn.debounceDelay, 50u);
+}
+
+TEST_F(ButtonTest, ConstructorWithDefault100ms)
+{
+    Button btn(5);
+    EXPECT_EQ(btn.debounceDelay, 100u);
+}
+
+TEST_F(ButtonTest, ExplicitDebounce50ms_BounceJustOutsideWindowIsAccepted)
+{
+    // Two presses 60 ms apart: with default 100 ms debounce both would not
+    // accept the second (60 < 100); with 50 ms debounce the second clears
+    // the window and is accepted. Acceptance manifests as a double-press
+    // since both edges fall inside the 300 ms double-press window.
+    Button btn(5, 50);
+    fake_time::value = 200;
+    press(btn); // first press accepted, lastDebounceTime=200
+    fake_time::value = 260;
+    release(btn); // 60ms past press, debounce passed (60>50) — release accepted
+    fake_time::value = 320;
+    press(btn); // 60ms past lastDebounceTime=260, accepted under 50ms window
+    EXPECT_FALSE(btn.event());
+    EXPECT_TRUE(btn.doublePressEvent());
+}
+
+TEST_F(ButtonTest, DefaultDebounce100ms_BounceAtSameTimingIsRejected)
+{
+    // Same timings as the 50 ms test above, but with the default 100 ms
+    // window the release at 260 ms (60ms past press) is filtered, so the
+    // ISR never transitions to awaitingRelease=false. The second "press"
+    // edge at 320 ms is dropped because awaitingRelease is still true.
+    Button btn(5); // default 100 ms
+    fake_time::value = 200;
+    press(btn);
+    fake_time::value = 260;
+    release(btn); // 60ms < 100ms debounce — release rejected, awaitingRelease stays true
+    fake_time::value = 320;
+    press(btn); // awaitingRelease==true blocks this — not counted
+    fake_time::value = 700;
+    EXPECT_TRUE(btn.event()); // only the first press registered
+    EXPECT_FALSE(btn.doublePressEvent());
+}
+
+TEST_F(ButtonTest, ExplicitDebounce250ms_BounceInsideWindowRejected)
+{
+    // Press → release 300 ms later (release accepted, 300>250). Then a
+    // bounce 200 ms after the release (still inside the 250 ms window) is
+    // filtered and never reaches event(). The initial press needs to be
+    // past lastDebounceTime=0 by more than 250 ms.
+    Button btn(5, 250);
+    fake_time::value = 400;
+    press(btn);             // accepted (400>250), lastDebounceTime=400
+    fake_time::value = 700; // 300ms past press, debounce elapsed
+    release(btn);           // release accepted, lastDebounceTime=700
+    fake_time::value = 900; // 200ms past release — inside 250ms window
+    press(btn);             // bounce filtered by debounce
+    fake_time::value = 1500;
+    EXPECT_TRUE(btn.event());  // first press only
+    EXPECT_FALSE(btn.event()); // bounce was rejected
+    EXPECT_FALSE(btn.doublePressEvent());
+}
+
+TEST_F(ButtonTest, ExplicitDebounce250ms_PressOutsideWindowAccepted)
+{
+    // Same setup but the second press lands 350 ms past the release-edge
+    // debounce stamp — outside the 250 ms window so it is accepted. Also
+    // outside the 300 ms double-press window from the first press, so it
+    // counts as a separate single press.
+    Button btn(5, 250);
+    fake_time::value = 400;
+    press(btn);
+    fake_time::value = 700;
+    release(btn); // lastDebounceTime=700
+    fake_time::value = 1050;
+    press(btn); // 350ms past lastDebounceTime, accepted. 650ms past first
+                // press, outside the 300ms double-press window.
+    fake_time::value = 1800;
+    EXPECT_TRUE(btn.event()); // first press
+    EXPECT_TRUE(btn.event()); // second press, accepted as separate single
+}

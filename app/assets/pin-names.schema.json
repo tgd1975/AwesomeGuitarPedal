@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pin-names.schema.json",
+  "title": "AwesomeStudioPedal Standard Pin Names (v1)",
+  "description": "Curated vocabulary of role-based pin names used by hardware-config and profile schemas. EPIC-029 / TASK-377. Single source of truth — schemas reference this file via $ref; firmware / app / docs read from this JSON. Lowercase snake_case, ≤30 names for v1. Additions go through the GitHub-idea process (TASK-382).",
+  "type": "string",
+  "enum": [
+    "button_a",
+    "button_b",
+    "button_c",
+    "button_d",
+    "button_e",
+    "button_f",
+    "button_g",
+    "button_h",
+    "button_select",
+    "led_power",
+    "led_bluetooth",
+    "led_select_1",
+    "led_select_2",
+    "led_select_3",
+    "led_select_4",
+    "led_select_5",
+    "led_select_6"
+  ],
+  "x-categories": {
+    "action_buttons": {
+      "description": "Momentary action buttons. The default build wires four (button_a … button_d). Builds with fewer buttons leave the unused names unmapped; builds with more wire button_e … button_h. Firmware currently supports up to 26 buttons; the v1 standard set covers the first eight (the practical maximum for a desk pedal).",
+      "names": [
+        { "name": "button_a", "role": "Primary action button (slot 1)." },
+        { "name": "button_b", "role": "Action button slot 2." },
+        { "name": "button_c", "role": "Action button slot 3." },
+        { "name": "button_d", "role": "Action button slot 4." },
+        { "name": "button_e", "role": "Action button slot 5 (extended builds)." },
+        { "name": "button_f", "role": "Action button slot 6 (extended builds)." },
+        { "name": "button_g", "role": "Action button slot 7 (extended builds)." },
+        { "name": "button_h", "role": "Action button slot 8 (extended builds)." }
+      ]
+    },
+    "profile_controls": {
+      "description": "Buttons that change which profile is active.",
+      "names": [
+        { "name": "button_select", "role": "Cycles the active profile. Maps to the firmware buttonSelect pin." }
+      ]
+    },
+    "status_leds": {
+      "description": "Single-pin status indicators driven by the firmware.",
+      "names": [
+        { "name": "led_power", "role": "Firmware-controlled status LED: boot mismatch, DelayedAction countdown, config-load-error fallback. Maps to the firmware ledPower pin." },
+        { "name": "led_bluetooth", "role": "BLE connection indicator. Maps to the firmware ledBluetooth pin." }
+      ]
+    },
+    "profile_select_leds": {
+      "description": "Profile-select LED array (one-hot or binary encoding, depending on numProfiles vs. numSelectLeds). Builds use a contiguous prefix of these names; firmware supports up to six. Maps to ledSelect[index-1] (one-based naming for builder readability).",
+      "names": [
+        { "name": "led_select_1", "role": "Profile-select LED #1 (LSB in binary mode, profile 1 in one-hot mode)." },
+        { "name": "led_select_2", "role": "Profile-select LED #2." },
+        { "name": "led_select_3", "role": "Profile-select LED #3." },
+        { "name": "led_select_4", "role": "Profile-select LED #4." },
+        { "name": "led_select_5", "role": "Profile-select LED #5." },
+        { "name": "led_select_6", "role": "Profile-select LED #6 (max — encoding ceiling at 2^6 − 1 = 63 profiles)."}
+      ]
+    }
+  },
+  "x-decisions": {
+    "inventory": "Roles inventoried from: data/config.json (ledBluetooth, ledPower, ledSelect[], buttonSelect, buttonPins[]); data/config.schema.json; data/profiles.json + profiles/{1,2,3,4}-button/*.json (button keys A/B/C/D and DelayedAction power-LED blink references); docs/builders/HARDWARE_CONFIG.md (ledPower semantics, ledSelect encoding modes); docs/builders/BUILD_GUIDE.md (default wiring table — 'Button: A/B/C/D', 'LED: Profile select 1/2/3', 'LED: Bluetooth status', 'LED: Status').",
+    "rejected_names": "Names from IDEA-061 prose that are NOT in the v1 set: 'pedal_a' (not currently distinguished from action buttons — collapsed into button_a), 'expression_1' (no analog/expression-pedal support in firmware today), 'bank_up' / 'bank_down' (no bank-switching feature exists; button_select cycles profiles linearly). These can be added later via the TASK-382 process when the underlying feature ships.",
+    "home": "Single JSON Schema file at data/pin-names.schema.json with enum + x-categories metadata. Chosen over (a) inlining enum into both schemas (duplication), (b) plain JSON/YAML data file (loses schema-validator integration). Downstream consumers: data/config.schema.json (TASK-378) references via $ref for the pinNames mapping values; data/profiles.schema.json (TASK-379) references via $ref for named-pin references inside actions; firmware (TASK-380), Flutter app + JS configurator (TASK-381) read the same JSON to drive autocomplete/validation. The x-categories block is metadata (JSON Schema ignores x-* keys) — UI tooling parses it for grouped autocomplete and human-readable descriptions.",
+    "naming_convention": "Lowercase snake_case. Underscore separates role tokens (button_select, led_power). Numeric suffixes use _N (led_select_1, not led_select1) for one-based human-friendly indexing in the UI.",
+    "addition_process": "Builders who need a role not in this v1 set file a GitHub idea proposing the addition (see docs/builders/HARDWARE_CONFIG.md once TASK-382 lands). Unknown names produce a warning, not a schema-validation error — local experimentation works; community sharing waits for the addition to land."
+  }
+}

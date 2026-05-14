@@ -93,6 +93,19 @@
 
     <div id="button-pins" class="pins-table"></div>
 
+    <p class="section-header">Named pins <span style="opacity:.7;font-weight:normal;">(optional — EPIC-029)</span></p>
+    <p style="font-size:.85rem;opacity:.8;margin:4px 0 8px;">
+      Map physical pins to standard role names so profiles can reference
+      roles symbolically (<code>button_a</code>) instead of GPIO numbers.
+      Names autocomplete from the v1 standard set. Leave blank to skip
+      a pin; the field is omitted from the exported config when no
+      mapping is set. See the
+      <a href="../../builders/HARDWARE_CONFIG.md#named-pins-portable-profile-vocabulary" target="_blank" rel="noopener">named-pins doc</a>
+      for the standard set and the GitHub-addition process.
+    </p>
+    <div id="pin-names-rows" class="pins-table"></div>
+    <datalist id="pin-name-options"></datalist>
+
     <p class="section-header">Pinout reference</p>
     <div id="pinout"></div>
 
@@ -278,7 +291,7 @@ function renderLedSelectPins() {
       </div>`;
     container.appendChild(row);
     const input = container.querySelector(`#pin-led-select-${i}`);
-    input.addEventListener('input', () => { warnIfInvalid(input); updatePreview(); });
+    input.addEventListener('input', () => { warnIfInvalid(input); renderPinNamesRows(); updatePreview(); });
   }
 }
 
@@ -303,13 +316,163 @@ function renderButtonPins() {
       </div>`;
     container.appendChild(row);
     const input = container.querySelector(`#pin-button-${i}`);
-    input.addEventListener('input', () => { warnIfInvalid(input); updatePreview(); });
+    input.addEventListener('input', () => { warnIfInvalid(input); renderPinNamesRows(); updatePreview(); });
   }
 }
 
 function updateStaticPinConstraints() {
   const pinMax = getPinMax();
   document.querySelectorAll('input.pin-static').forEach(el => { el.max = pinMax; });
+}
+
+// ---------------------------------------------------------------------------
+// Pin-names catalog (EPIC-029 / TASK-392)
+// ---------------------------------------------------------------------------
+//
+// Loads ../../../data/pin-names.schema.json over HTTP and uses its enum
+// to populate the autocomplete datalist + drive the non-standard-name
+// warning. Falls back gracefully if the fetch fails (e.g. the page is
+// opened over file:// or the schema is not deployed yet) — the rows
+// still render, just without autocomplete suggestions.
+
+let PIN_NAMES_V1 = [];  // populated by loadPinNamesCatalog()
+
+async function loadPinNamesCatalog() {
+  const candidates = [
+    '../../../data/pin-names.schema.json',  // local dev (page served from docs/tools/configuration-builder/)
+    'pin-names.schema.json',                 // co-located fallback for static hosting
+  ];
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const doc = await res.json();
+      if (Array.isArray(doc.enum)) {
+        PIN_NAMES_V1 = doc.enum;
+        populatePinNameDatalist();
+        renderPinNamesRows();  // refresh validation after catalog loads
+        return;
+      }
+    } catch (err) {
+      // try next candidate
+    }
+  }
+  // Schema unreachable — leave PIN_NAMES_V1 empty; rows still render
+  // but autocomplete is empty and non-standard validation is bypassed.
+  console.warn('pin-names.schema.json not reachable — autocomplete disabled');
+}
+
+function populatePinNameDatalist() {
+  const list = document.getElementById('pin-name-options');
+  list.innerHTML = '';
+  for (const name of PIN_NAMES_V1) {
+    const opt = document.createElement('option');
+    opt.value = name;
+    list.appendChild(opt);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Named pins (EPIC-029 / TASK-392)
+// ---------------------------------------------------------------------------
+//
+// One row per configured pin (power LED, BT LED, select LEDs, action
+// buttons, SELECT button). The row's input is backed by the v1
+// autocomplete datalist. A name not in PIN_NAMES_V1 triggers an
+// inline warning; the row still saves (the schema rejects unknown
+// names downstream — the warning is an earlier signal).
+
+// Persistent map: pin-number → typed name, survives renders so a
+// numButtons / numSelectLeds change doesn't wipe the builder's work.
+const PIN_NAME_STATE = new Map();
+
+function getConfiguredPinRows() {
+  // Returns [{pin, label}] in the order they appear in the form.
+  const numSel = getNumSelectLeds();
+  const numBtn = getNumButtons();
+  const rows = [];
+  const add = (pinId, label) => {
+    const el = document.getElementById(pinId);
+    if (!el) return;
+    const pin = parseInt(el.value);
+    if (!isNaN(pin) && pin > 0) rows.push({ pin, label });
+  };
+  add('pin-led-power', 'Power LED');
+  add('pin-led-bluetooth', 'Bluetooth LED');
+  for (let i = 0; i < numSel; i++) add(`pin-led-select-${i}`, `Select LED ${i + 1}`);
+  add('pin-button-select', 'SELECT button');
+  for (let i = 0; i < numBtn; i++) add(`pin-button-${i}`, `Button ${SLOT_NAMES[i]}`);
+  return rows;
+}
+
+function renderPinNamesRows() {
+  const container = document.getElementById('pin-names-rows');
+  if (!container) return;
+  const rows = getConfiguredPinRows();
+  container.innerHTML = '';
+  const seenPins = new Set();
+  for (const { pin, label } of rows) {
+    if (seenPins.has(pin)) continue;  // skip duplicate pins (e.g. accidental aliasing)
+    seenPins.add(pin);
+    const row = document.createElement('div');
+    row.className = 'pin-row';
+    const cur = PIN_NAME_STATE.get(pin) ?? '';
+    row.innerHTML = `
+      <span class="pin-label">${label} (GPIO ${pin})</span>
+      <div class="pin-input-cell">
+        <input type="text" class="pin-name-input" data-pin="${pin}"
+               list="pin-name-options" value="${cur}"
+               placeholder="e.g. button_a">
+      </div>`;
+    container.appendChild(row);
+    const input = row.querySelector('input');
+    input.addEventListener('input', () => {
+      const v = input.value.trim();
+      if (v) PIN_NAME_STATE.set(pin, v); else PIN_NAME_STATE.delete(pin);
+      warnIfNonStandardName(input);
+      updatePreview();
+    });
+    warnIfNonStandardName(input);
+  }
+  // Prune stale entries: anything in PIN_NAME_STATE that isn't a
+  // currently-configured pin gets dropped so the exported pinNames
+  // only contains live pins.
+  for (const pin of Array.from(PIN_NAME_STATE.keys())) {
+    if (!seenPins.has(pin)) PIN_NAME_STATE.delete(pin);
+  }
+}
+
+function warnIfNonStandardName(input) {
+  const cell = input.closest('.pin-input-cell');
+  if (!cell) return;
+  let warn = cell.querySelector('.pin-warn');
+  const v = input.value.trim();
+  if (v && PIN_NAMES_V1.length > 0 && !PIN_NAMES_V1.includes(v)) {
+    if (!warn) {
+      warn = document.createElement('div');
+      warn.className = 'pin-warn';
+      cell.appendChild(warn);
+    }
+    warn.innerHTML =
+      `"${v}" is not in the v1 standard set. ` +
+      `<a href="https://github.com/tgd1975/AwesomeStudioPedal/issues/new?template=named-pin-addition.md" target="_blank" rel="noopener">Propose an addition</a> ` +
+      `via the GitHub idea process (TASK-382).`;
+  } else if (warn) {
+    warn.remove();
+  }
+}
+
+function buildPinNames() {
+  // Emit the JSON-shape: { "<pin>": "<name>" }, keys stringified per
+  // schema. Only non-empty mappings are included; absent map means
+  // pinNames is omitted from the exported config entirely.
+  const out = {};
+  const liveRows = getConfiguredPinRows();
+  const livePins = new Set(liveRows.map(r => r.pin));
+  for (const [pin, name] of PIN_NAME_STATE.entries()) {
+    if (livePins.has(pin) && name) out[String(pin)] = name;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -333,7 +496,7 @@ function buildConfig() {
     buttonPins.push(el ? (parseInt(el.value) || 0) : 0);
   }
 
-  return {
+  const config = {
     hardware: getBoard(),
     numProfiles,
     numSelectLeds,
@@ -344,6 +507,13 @@ function buildConfig() {
     buttonSelect: parseInt(document.getElementById('pin-button-select').value)  || 0,
     buttonPins,
   };
+  // EPIC-029 / TASK-392 — only emit pinNames when at least one row
+  // is mapped, so existing all-direct configs round-trip unchanged.
+  const pinNames = buildPinNames();
+  if (Object.keys(pinNames).length > 0) {
+    config.pinNames = pinNames;
+  }
+  return config;
 }
 
 function updatePreview() {
@@ -489,6 +659,19 @@ function populateForm(cfg, hideNotice) {
     if (notice) notice.style.display = 'none';
   }
 
+  // EPIC-029 / TASK-392 — rehydrate the named-pin map from the
+  // loaded config. Stringified-int keys per the schema.
+  PIN_NAME_STATE.clear();
+  if (cfg.pinNames && typeof cfg.pinNames === 'object') {
+    for (const [pinStr, name] of Object.entries(cfg.pinNames)) {
+      const pin = parseInt(pinStr);
+      if (!isNaN(pin) && typeof name === 'string' && name) {
+        PIN_NAME_STATE.set(pin, name);
+      }
+    }
+  }
+  renderPinNamesRows();
+
   revalidateAllPins();
   checkProfilesWarning();
   updatePreview();
@@ -526,12 +709,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Count inputs
   document.getElementById('num-select-leds').addEventListener('input', () => {
     renderLedSelectPins();
+    renderPinNamesRows();
     checkProfilesWarning();
     updatePreview();
   });
 
   document.getElementById('num-buttons').addEventListener('input', () => {
     renderButtonPins();
+    renderPinNamesRows();
     updatePreview();
   });
 
@@ -543,7 +728,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Static pin inputs
   for (const id of ['pin-led-power', 'pin-led-bluetooth', 'pin-button-select']) {
     const el = document.getElementById(id);
-    el.addEventListener('input', () => { warnIfInvalid(el); updatePreview(); });
+    el.addEventListener('input', () => {
+      warnIfInvalid(el);
+      renderPinNamesRows();
+      updatePreview();
+    });
   }
 
   // Toolbar buttons
@@ -575,6 +764,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto-load ESP32 defaults on startup
   populateForm(BOARD_DEFAULTS.esp32);
+
+  // EPIC-029 / TASK-392 — kick off async catalog load for named-pin
+  // autocomplete and validation. populateForm() above already rendered
+  // empty rows; the load callback re-renders them with autocomplete.
+  loadPinNamesCatalog();
 });
 </script>
 

@@ -6,6 +6,8 @@
 
 Button::Button(uint8_t PIN) : PIN(PIN) {}
 
+Button::Button(uint8_t PIN, unsigned long debounceMs) : PIN(PIN), debounceDelay(debounceMs) {}
+
 void Button::setup()
 {
     gpio_pad_select_gpio(static_cast<gpio_num_t>(PIN));

@@ -1,6 +1,6 @@
 # Ideas Overview
 
-**Open: 35** | **Archived: 23**
+**Open: 37** | **Archived: 28**
 
 Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until they are either converted into structured tasks or archived. Archived ideas are kept for history in [`archived/`](archived/). See [README.md](README.md) for the file-naming convention (one row per IDEA, sub-notes use the `idea-NNN.<sub-slug>.md` form).
 
@@ -22,7 +22,6 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-020](open/idea-020-mbse-sysmlv2.md) | 📖 docs | MBSE System Documentation with SysML v2 | Retroactively document the system using SysML v2 textual notation — stakeholder needs, derived requirements, structural architecture, behavioural models, and interface contracts — all as committed text files with CI validation and rendered output. |
 | [IDEA-022](open/idea-022-mkdocs-documentation-site.md) | 📖 docs | MkDocs Documentation Site | Introduce MkDocs as a unified documentation platform for both developer-facing and public-facing content — replacing a growing flat collection of Markdown files with a navigable, searchable, CI-rendered site. |
 | [IDEA-023](open/idea-023-led-resistor-guide.md) | 📖 docs | LED Current-Limiting Resistor Guide — Matched Brightness for 5 mm LEDs | A builder-facing reference table for selecting the correct Vorwiderstand for any common 5 mm LED colour so they appear at roughly equal perceived brightness when driven directly from a 3.3 V GPIO. |
-| [IDEA-027](open/idea-027-circuit-skill.md) | 🛠️ tooling | Circuit-Skill — AI-Assisted Schematic Generation with ERC, BOM, and Netlist Export | &gt; |
 | [IDEA-029](open/idea-029-configurable-select-long-press-pairing.md) | ⚡ firmware | Configurable SELECT Long-Press to Activate BLE Pairing Mode | Very-long-press on the SELECT button activates BLE pairing mode; the feature is opt-in via config.json so it can be disabled for testing and CI. |
 | [IDEA-031](open/idea-031-extract-task-system-standalone-repo.md) | 🛠️ tooling | Extract the task-and-idea system into a standalone public GitHub repository | Lift the docs-as-code task + idea management system out of AwesomeStudioPedal into its own public repo so other small teams can use it and this project can consume it as an installable tool. |
 | [IDEA-032](open/idea-032-extract-circuits-as-docs-standalone-repo.md) | 🛠️ tooling | Extract the circuits-as-docs system into a standalone public GitHub repository | Lift the Schemdraw-based schematic generator, pre-commit staleness hook, and docs-as-code wiring pattern into a standalone public repo so other hardware projects can document their circuits the same way. |
@@ -42,7 +41,10 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-057](open/idea-057-contribution-governance-license-attribution-moderation.md) | 📱 apps | Contribution governance — license, attribution, content moderation, and low-friction onboarding | Contribution governance — pick a license, attribute contributors, moderate content, and onboard non-technical users without forcing them to learn Git. |
 | [IDEA-058](open/idea-058-detect-task-folder-status-drift.md) | 🛠️ tooling | Detect and repair inconsistent task-folder/status states left by parallel sessions | When a parallel session lands a task file in one folder but with a status that says it should live elsewhere, the next agent silently papers over it. Decide where to detect this and what to do about it. |
 | [IDEA-059](open/idea-059-reduced-expert-views-for-profiles.md) | 📱 apps | Reduced and expert views for profile screens — app and web configurator | Default to a reduced view of profile screens that hides expert-only knobs; full view is opt-in. Config editor is unaffected — editing implies expert. |
-| [IDEA-060](open/idea-060-community-hardware-configurations.md) | 📱 apps | Add debounce time to hardware config — and make hardware configs community-shareable | Add per-build debounce time to the existing hardware config, then mirror the community-profiles flow so builders can share known-good hardware configs. |
+| [IDEA-063](open/idea-063-community-shareable-hardware-configurations.md) | 📱 apps | Community-shareable hardware configurations | Mirror the community-profiles flow for hardware configs so builders can share known-good config.json files tagged by parts list / build. |
+| [IDEA-064](open/idea-064-ble-ota-firmware-update.md) | ⚡ firmware | BLE OTA firmware update — app pushes latest compatible firmware to pedal over Bluetooth | BLE-based over-the-air firmware update flow so users can keep the pedal on the latest compatible firmware without USB or Wi-Fi. |
+| [IDEA-066](open/idea-066-adopt-circuitsmith-when-ready.md) | 🛠️ tooling | Adopt gdt1975/circuitsmith for circuit-design tooling when ready | Watch upstream circuitsmith, evaluate when it stabilises, and adopt it as the source of YAML circuits / SVG / ERC / BOM / netlist for ASP — replacing the locally-planned Circuit-Skill (archived IDEA-027). |
+| [IDEA-067](open/idea-067-midi-interface-support.md) | 🔧 hardware | MIDI interface support — protocol, hardware, and configuration | Investigate MIDI support so the pedal can interoperate with MIDI-capable pedalboards — protocol variants, hardware options, configuration model, and whether real demand exists. |
 
 ## Archived Ideas
 
@@ -61,6 +63,7 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-024](archived/idea-024-profile-independent-actions.md) | ⚡ firmware | Profile-Independent Actions |
 | [IDEA-025](archived/idea-025-configurable-ble-device-name.md) | ⚡ firmware | Configurable BLE Device Name |
 | [IDEA-026](archived/idea-026-task-group-improvements.md) | 🛠️ tooling | Task Group Improvements |
+| [IDEA-027](archived/idea-027-circuit-skill.md) | 🛠️ tooling | Circuit-Skill — AI-Assisted Schematic Generation with ERC, BOM, and Netlist Export |
 | [IDEA-028](archived/idea-028-hardware-abstraction-layer.md) | ⚡ firmware | Hardware Abstraction Layer — replace #ifdef soup with a platform class hierarchy |
 | [IDEA-030](archived/idea-030-epic-suggested-branch-soft-enforcement.md) | 🛠️ tooling | Epic-Suggested Branch with Soft Enforcement |
 | [IDEA-037](archived/idea-037-app-content-pages.md) | 📱 apps | App content pages — Info/About, How-To, and supporting screens |
@@ -71,3 +74,7 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-049](archived/idea-049-logo-more-prominent.md) | 📱 apps | Make the logo more prominent across apps and tools |
 | [IDEA-051](archived/idea-051-atomic-commit-via-pathspec-and-mandatory-commit-path.md) | 🛠️ tooling | Atomic /commit via pathspec + mandatory hook-enforced /commit path |
 | [IDEA-056](archived/idea-056-ble-services-developer-guide.md) | 📖 docs | BLE services developer guide — authoritative doc for implementing/changing BLE services |
+| [IDEA-060](archived/idea-060-community-hardware-configurations.md) | ⚡ firmware | Add debounce time to the hardware config |
+| [IDEA-061](archived/idea-061-named-pins.md) | ⚡ firmware | Named pins — portable pin vocabulary for shareable profiles |
+| [IDEA-062](archived/idea-062-esp32-wiring-test-tool.md) | 🛠️ tooling | Interactive ESP32 wiring/solder test tool |
+| [IDEA-065](archived/idea-065-raspi-zero-w-support.md) | 🔧 hardware | Raspberry Pi Zero W support |

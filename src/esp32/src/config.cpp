@@ -44,5 +44,6 @@ HardwareConfig hardwareConfig = {
      0},
     CONF_HARDWARE_TARGET,
     false, // pairingEnabled — overridden at runtime from config.json
-    0      // pairingPin
+    0,     // pairingPin
+    100    // debounceMs — overridden at runtime from config.json
 };

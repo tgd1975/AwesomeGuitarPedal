@@ -23,6 +23,9 @@ set(PROD_SOURCES
     ${CMAKE_SOURCE_DIR}/src/host/src/host_config.cpp
     ${CMAKE_SOURCE_DIR}/src/host/src/host_logger.cpp
     ${CMAKE_SOURCE_DIR}/src/host/src/host_file_system.cpp
+    ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/wiring_config.cpp
+    ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/button_tracker.cpp
+    ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/led_mode.cpp
 )
 
 add_executable(pedal_tests
@@ -34,6 +37,8 @@ add_executable(pedal_tests
     unit/test_action_parsing.cpp
     unit/test_non_keyboard_actions.cpp
     unit/test_pin_action.cpp
+    unit/test_pin_name_table.cpp
+    unit/test_pin_names_load.cpp
     unit/test_independent_actions.cpp
     unit/test_ble_config_service.cpp
     unit/test_hardware_mismatch.cpp
@@ -41,6 +46,10 @@ add_executable(pedal_tests
     unit/test_action_json_roundtrip.cpp
     unit/test_host_pedal_app.cpp
     unit/test_app_integration.cpp
+    unit/test_wiring_button_tracker.cpp
+    unit/test_wiring_config_parse.cpp
+    unit/test_wiring_led_mode.cpp
+    unit/test_wiring_led_individual.cpp
     test_config_loader/test_main.cpp
     ${PROD_SOURCES}
 )
@@ -52,6 +61,8 @@ target_include_directories(pedal_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/host/include
     ${CMAKE_SOURCE_DIR}/test/mocks
     ${CMAKE_SOURCE_DIR}/test/fakes
+    ${CMAKE_SOURCE_DIR}/test/stubs
+    ${CMAKE_SOURCE_DIR}/test/test_wiring_shared
     ${arduinojson_SOURCE_DIR}/src
 )
 

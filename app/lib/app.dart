@@ -62,13 +62,14 @@ GoRouter _buildRouter() => GoRouter(
             final action = extra?['action'] as ActionConfig?;
             final onSave = extra?['onSave'] as void Function(ActionConfig)?;
             final profilesState = context.read<ProfilesState>();
-            final board =
-                profilesState.hardwareConfig?.boardTarget ?? BoardTarget.esp32;
+            final hw = profilesState.hardwareConfig;
+            final board = hw?.boardTarget ?? BoardTarget.esp32;
             return ActionEditorScreen(
               buttonId: buttonId,
               initial: action,
               onSave: onSave ?? (_) {},
               board: board,
+              hardwareConfig: hw,
             );
           },
         ),

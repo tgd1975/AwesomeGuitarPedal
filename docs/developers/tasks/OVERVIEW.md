@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 19** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 0** | **Total: 26** | ░░░░░░░░░░ 0%
+⚪ **Open: 15** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 23** | **Total: 45** | █████░░░░░ 51%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -15,15 +15,15 @@
 
 <a id="burn-up"></a>
 
-## Burn-up since v0.4.1
+## Burn-up since v0.5.0
 
 <table><tr><td>
 
 ```mermaid
 xychart-beta
     title "Cumulative tasks closed"
-    x-axis ["05-08", "05-10"]
-    line [2, 62]
+    x-axis ["05-11", "05-14"]
+    line [18, 22]
 ```
 
 </td><td>
@@ -31,8 +31,8 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Cumulative epics closed"
-    x-axis ["05-08", "05-10"]
-    line [0, 5]
+    x-axis ["05-11", "05-14"]
+    line [3, 3]
 ```
 
 </td><td>
@@ -40,9 +40,9 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
-    x-axis ["05-08", "05-10"]
-    line [0, 0]
-    line [0, 0]
+    x-axis ["05-11", "05-14"]
+    line [37.25, 53.25]
+    line [44.5, 64.5]
 ```
 
 </td></tr></table>
@@ -51,8 +51,8 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
-| 2026-05-08 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 2026-05-10 | 60 | 62 | 0 | 0 | 0 | 0 | 5 | 5 |
+| 2026-05-11 | 18 | 18 | 37.2 | 37.2 | 44.5 | 44.5 | 3 | 3 |
+| 2026-05-14 | 4 | 22 | 16 | 53.2 | 20 | 64.5 | 0 | 3 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
@@ -91,16 +91,35 @@ _No active tasks._
 | [TASK-354](open/task-354-firmware-version-read-characteristic.md) | Firmware — expose firmware-version read characteristic (+ DIS 0x180A decision) | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-355](open/task-355-firmware-config-readback.md) | Firmware — config readback (option chosen in TASK-353) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-365](open/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-366](open/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) | Senior | ⚪ open |
-| [TASK-367](open/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) | Senior | ⚪ open |
-| [TASK-368](open/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
 
 ## Closed Tasks
 
 | ID | Title | Effort |
 |----|-------|--------|
+| [TASK-365](closed/task-365-scope-ble-services-guide.md) | Scope the BLE services developer guide — file structure and existing-doc disposition | Small (&lt;2h) |
+| [TASK-366](closed/task-366-draft-catalog-and-recipe-sections.md) | Draft Service catalog + Recipe sections of the BLE services guide (with TASK-354 worked example) | Medium (2-8h) |
+| [TASK-367](closed/task-367-draft-conventions-invariants-gotchas.md) | Draft Conventions, Cross-cutting invariants, and Gotchas sections of the BLE services guide | Medium (2-8h) |
+| [TASK-368](closed/task-368-draft-tests-references-and-verify.md) | Draft Tests + References sections of the BLE services guide; verify success criterion; close epic | Small (&lt;2h) |
+| [TASK-374](closed/task-374-make-release-yml-tolerate-locally-archived-closed-tasks.md) | Make release.yml tolerate locally-archived closed tasks | XS (&lt;30m) |
+| [TASK-375](closed/task-375-add-debouncems-to-hardware-config-schema-and-model.md) | Add debounceMs to hardware-config schema, example JSON, and Dart model | Small (&lt;2h) |
+| [TASK-376](closed/task-376-esp32-button-reads-debouncems-from-hardware-config.md) | ESP32 — Button reads debounceMs from the loaded hardware config | Small (&lt;2h) |
+| [TASK-377](closed/task-377-define-v1-standard-pin-name-set.md) | Define the v1 standard pin-name set and pick its canonical home | Small (&lt;2h) |
+| [TASK-378](closed/task-378-hardware-config-pinnames-mapping.md) | Hardware config — pinNames mapping (physical pin → standard name) | Small (&lt;2h) |
+| [TASK-379](closed/task-379-profile-schema-accept-named-pin-references.md) | Profile schema — accept named-pin references alongside direct pin IDs | Small (&lt;2h) |
+| [TASK-380](closed/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) |
+| [TASK-381](closed/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) |
+| [TASK-382](closed/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) |
+| [TASK-383](closed/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) |
+| [TASK-384](closed/task-384-wiring-test-tool-button-mode.md) | Wiring test tool — button press logging, counters, and status display | Small (&lt;2h) |
+| [TASK-385](closed/task-385-wiring-test-tool-led-group-modes.md) | Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all) | Medium (2-8h) |
+| [TASK-386](closed/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) |
+| [TASK-387](closed/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) |
+| [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
+| [TASK-389](closed/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) |
+| [TASK-390](closed/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) |
+| [TASK-391](closed/task-391-missing-mapping-warning-surfaces.md) | Missing-mapping warning surfaces — profile editor + connected-pedal page | Small (&lt;2h) |
+| [TASK-392](closed/task-392-js-config-builder-pinnames-ux.md) | JS config-builder — pinNames mapping editor with autocomplete and non-standard validation | Small (&lt;2h) |
 
 ## Archived Releases
 

@@ -9,6 +9,7 @@
 #include "macro_action.h"
 #include "non_send_action.h"
 #include "pin_action.h"
+#include "pin_name_table.h"
 #include "send_action.h"
 #include "serial_action.h"
 #include <Arduino.h>
@@ -143,6 +144,10 @@ bool ConfigLoader::loadFromString(ProfileManager& profileManager,
         logger_->log("JSON parsing failed:", error.c_str());
         return false;
     }
+
+    // EPIC-029 / TASK-380. Reset counter at the start of each load so
+    // the end-of-load summary reflects only this run.
+    unresolvedNamedPinRefs_ = 0;
 
     for (uint8_t i = 0; i < hardwareConfig.numProfiles; i++)
     {
@@ -286,6 +291,37 @@ std::unique_ptr<Action> ConfigLoader::createSendCharActionFromJson(const JsonObj
     return nullptr;
 }
 
+std::unique_ptr<Action> ConfigLoader::createPinActionFromJson(const JsonObject& actionJson,
+                                                              Action::Type type)
+{
+    // EPIC-029 / TASK-380. "pin" accepts two forms (schema:
+    // profiles.schema.json#pinRef): an integer GPIO or a standard role
+    // name resolved against g_pinNameTable.
+    ArduinoJson::JsonVariantConst raw = actionJson["pin"];
+    if (raw.is<const char*>())
+    {
+        const char* name = raw.as<const char*>();
+        uint8_t resolved = g_pinNameTable.lookup(name);
+        if (resolved == PinNameTable::kUnresolved)
+        {
+            ++unresolvedNamedPinRefs_;
+            std::string msg = std::string("PinAction: unresolved named pin '") +
+                              (name ? name : "") +
+                              "' — action dropped (hardware config's pinNames has no mapping)";
+            logger_->log(msg.c_str());
+            return nullptr;
+        }
+        return std::make_unique<PinAction>(type, resolved);
+    }
+    int pin = raw | -1;
+    if (pin < 0)
+    {
+        logger_->log("PinAction: missing or invalid 'pin' field");
+        return nullptr;
+    }
+    return std::make_unique<PinAction>(type, static_cast<uint8_t>(pin));
+}
+
 /**
  * @brief Creates an Action object from JSON configuration
  *
@@ -372,15 +408,7 @@ std::unique_ptr<Action> ConfigLoader::createActionFromJson(const JsonObject& act
         case Action::Type::PinToggle:
         case Action::Type::PinHighWhilePressed:
         case Action::Type::PinLowWhilePressed:
-        {
-            int pin = actionJson["pin"] | -1;
-            if (pin < 0)
-            {
-                logger_->log("PinAction: missing or invalid 'pin' field");
-                return nullptr;
-            }
-            return std::make_unique<PinAction>(type, static_cast<uint8_t>(pin));
-        }
+            return createPinActionFromJson(actionJson, type);
         default:
             break;
     }

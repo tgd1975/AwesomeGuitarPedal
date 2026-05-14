@@ -3,10 +3,11 @@ import 'package:go_router/go_router.dart';
 import '../constants/action_types.dart';
 import '../models/action_config.dart';
 import '../models/hardware_config.dart';
+import '../models/pin_ref.dart';
 import '../services/action_value_resolver.dart';
 import '../widgets/action_type_dropdown.dart';
 import '../widgets/key_value_field.dart';
-import '../widgets/pin_field.dart';
+import '../widgets/pin_ref_field.dart';
 
 class ActionEditorScreen extends StatefulWidget {
   const ActionEditorScreen({
@@ -16,6 +17,7 @@ class ActionEditorScreen extends StatefulWidget {
     required this.onSave,
     this.embeddedMode = false,
     this.board = BoardTarget.esp32,
+    this.hardwareConfig,
   });
 
   final String buttonId;
@@ -26,6 +28,12 @@ class ActionEditorScreen extends StatefulWidget {
   final bool embeddedMode;
   final BoardTarget board;
 
+  /// Active hardware config — used by [PinRefField] to render the
+  /// inline mapping hint next to named pin references. Optional so
+  /// callers that don't have it (legacy code paths, tests) keep
+  /// working; the hint just won't render.
+  final HardwareConfig? hardwareConfig;
+
   @override
   State<ActionEditorScreen> createState() => _ActionEditorScreenState();
 }
@@ -34,7 +42,7 @@ class _ActionEditorScreenState extends State<ActionEditorScreen> {
   late String _type;
   late TextEditingController _valueCtrl;
   late TextEditingController _nameCtrl;
-  late TextEditingController _pinCtrl;
+  PinRef? _pinRef;
 
   @override
   void initState() {
@@ -42,16 +50,13 @@ class _ActionEditorScreenState extends State<ActionEditorScreen> {
     _type = editorActionType(widget.initial?.type, widget.initial?.value);
     _valueCtrl = TextEditingController(text: widget.initial?.value ?? '');
     _nameCtrl = TextEditingController(text: widget.initial?.name ?? '');
-    _pinCtrl = TextEditingController(
-      text: widget.initial?.pin?.toString() ?? '',
-    );
+    _pinRef = widget.initial?.pinRef;
   }
 
   @override
   void dispose() {
     _valueCtrl.dispose();
     _nameCtrl.dispose();
-    _pinCtrl.dispose();
     super.dispose();
   }
 
@@ -115,7 +120,7 @@ class _ActionEditorScreenState extends State<ActionEditorScreen> {
     final config = ActionConfig(
       type: savedActionType(_type),
       value: _needsValue ? _valueCtrl.text : null,
-      pin: _isPin ? int.tryParse(_pinCtrl.text) : null,
+      pinRef: _isPin ? _pinRef : null,
       name: _nameCtrl.text.isEmpty ? null : _nameCtrl.text,
       longPress: initial?.longPress,
       doublePress: initial?.doublePress,
@@ -136,7 +141,13 @@ class _ActionEditorScreenState extends State<ActionEditorScreen> {
         ),
         const SizedBox(height: 16),
         if (_needsValue) KeyValueField(type: _type, controller: _valueCtrl),
-        if (_isPin) PinField(controller: _pinCtrl, board: widget.board),
+        if (_isPin)
+          PinRefField(
+            initial: _pinRef,
+            board: widget.board,
+            hardwareConfig: widget.hardwareConfig,
+            onChanged: (next) => setState(() => _pinRef = next),
+          ),
         const SizedBox(height: 16),
         TextField(
           controller: _nameCtrl,

@@ -82,6 +82,8 @@ bool ConfigLoader::saveToFile(const ProfileManager& profileManager, const std::s
 void ConfigLoader::logLoadedConfig(const ProfileManager& profileManager) const
 {
     logger_->log("--- Config loaded ---");
+    uint16_t profilesLoaded = 0;
+    uint16_t actionsLoaded = 0;
     for (uint8_t i = 0; i < hardwareConfig.numProfiles; i++)
     {
         const Profile* profile = profileManager.getProfile(i);
@@ -90,6 +92,7 @@ void ConfigLoader::logLoadedConfig(const ProfileManager& profileManager) const
             continue;
         }
 
+        ++profilesLoaded;
         logger_->log("Profile: ", profile->getName().c_str());
 
         char btnLabel[2];
@@ -101,6 +104,7 @@ void ConfigLoader::logLoadedConfig(const ProfileManager& profileManager) const
                 continue;
             }
 
+            ++actionsLoaded;
             Btn::name(b, btnLabel);
             const char* typeStr = ProfileManager::getActionTypeString(action->getType());
 
@@ -117,6 +121,13 @@ void ConfigLoader::logLoadedConfig(const ProfileManager& profileManager) const
             logger_->log(line.c_str());
         }
     }
+    // EPIC-029 / TASK-380. End-of-load summary line — counts are useful
+    // even when unresolvedNamedPinRefs_ is zero (visibility into how
+    // much config actually bound).
+    std::string summary = std::string("Config load summary: ") + std::to_string(profilesLoaded) +
+                          " profiles, " + std::to_string(actionsLoaded) + " actions, " +
+                          std::to_string(unresolvedNamedPinRefs_) + " unresolved named pin refs";
+    logger_->log(summary.c_str());
 }
 
 void ConfigLoader::actionToJson(const Action* action, JsonObject& out)

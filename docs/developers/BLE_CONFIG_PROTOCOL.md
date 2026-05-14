@@ -134,9 +134,10 @@ discovery after connecting to the pedal by name or address.
 The Config service does not interfere with keyboard report delivery — chunked writes are
 processed in the main loop between HID events.
 
-See [BLE_CONFIG_IMPLEMENTATION_NOTES.md](BLE_CONFIG_IMPLEMENTATION_NOTES.md) for a full
+See [BLE_SERVICES_GUIDE.md → Gotchas](BLE_SERVICES_GUIDE.md#gotchas) for a full
 account of the BlueZ interference problem and the other engineering challenges encountered
-during implementation.
+during implementation. (The historical `BLE_CONFIG_IMPLEMENTATION_NOTES.md` is now a redirect
+stub pointing at that section.)
 
 ## Constants
 

@@ -28,8 +28,10 @@ void main() {
     test('full round-trip preserves all fields', () {
       final cfg = HardwareConfig.fromJson(kBase);
       final json = cfg.toJson();
-      // pairing_pin is always emitted (null when absent in source)
-      expect(json, equals({...kBase, 'pairing_pin': null}));
+      // pairing_pin is always emitted (null when absent in source).
+      // debounceMs is always emitted with its default (100) when absent
+      // in source (EPIC-028).
+      expect(json, equals({...kBase, 'pairing_pin': null, 'debounceMs': 100}));
     });
 
     test('nrf52840 round-trip', () {
@@ -97,6 +99,140 @@ void main() {
       final json = Map<String, dynamic>.from(kBase)..['pairing_pin'] = 999999;
       final cfg = HardwareConfig.fromJson(json);
       expect(cfg.pairingPin, 999999);
+    });
+  });
+
+  group('debounceMs', () {
+    final kBase = {
+      'hardware': 'esp32',
+      'numButtons': 2,
+      'numProfiles': 4,
+      'numSelectLeds': 2,
+      'ledBluetooth': 26,
+      'ledPower': 25,
+      'ledSelect': [5, 18],
+      'buttonSelect': 21,
+      'buttonPins': [13, 12],
+    };
+
+    test('absent debounceMs defaults to 100', () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.debounceMs, 100);
+    });
+
+    test('integer debounceMs is parsed', () {
+      final json = Map<String, dynamic>.from(kBase)..['debounceMs'] = 50;
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.debounceMs, 50);
+    });
+
+    test('debounceMs round-trips through toJson', () {
+      final json = Map<String, dynamic>.from(kBase)..['debounceMs'] = 250;
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.toJson()['debounceMs'], 250);
+    });
+
+    test('default debounceMs round-trips as 100 in toJson', () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.toJson()['debounceMs'], 100);
+    });
+  });
+
+  group('pinNames (EPIC-029 / TASK-378)', () {
+    final kBase = {
+      'hardware': 'esp32',
+      'numButtons': 2,
+      'numProfiles': 4,
+      'numSelectLeds': 2,
+      'ledBluetooth': 26,
+      'ledPower': 25,
+      'ledSelect': [5, 18],
+      'buttonSelect': 21,
+      'buttonPins': [13, 12],
+    };
+
+    test('absent pinNames → empty map', () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.pinNames, isEmpty);
+    });
+
+    test('absent pinNames is omitted from toJson (no behavioural regression)',
+        () {
+      final cfg = HardwareConfig.fromJson(kBase);
+      expect(cfg.toJson().containsKey('pinNames'), isFalse);
+    });
+
+    test('parses stringified-int pin keys to ints', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '12': 'button_b'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.pinNames, {13: 'button_a', 12: 'button_b'});
+    });
+
+    test('round-trips pinNames as stringified-int keys', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.toJson()['pinNames'], {'13': 'button_a'});
+    });
+
+    test('nameOf returns the role mapped to a pin', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '26': 'led_bluetooth'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.nameOf(13), 'button_a');
+      expect(cfg.nameOf(26), 'led_bluetooth');
+    });
+
+    test('nameOf returns null for unmapped pin', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.nameOf(99), isNull);
+    });
+
+    test('pinOf returns the pin mapped to a role', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '12': 'button_b'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.pinOf('button_a'), 13);
+      expect(cfg.pinOf('button_b'), 12);
+    });
+
+    test('pinOf returns null for unmapped role', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.pinOf('led_power'), isNull);
+    });
+
+    test('pinOf with duplicate role mappings returns the lowest-numbered pin',
+        () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '27': 'button_a'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.pinOf('button_a'), 13);
+    });
+
+    test('duplicatePinNames is empty for one-to-one mappings', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '12': 'button_b'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.duplicatePinNames, isEmpty);
+    });
+
+    test('duplicatePinNames surfaces names mapped from multiple pins', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a', '27': 'button_a', '12': 'button_b'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(cfg.duplicatePinNames, {'button_a'});
+    });
+
+    test('pinNames map is unmodifiable after construction', () {
+      final json = Map<String, dynamic>.from(kBase)
+        ..['pinNames'] = {'13': 'button_a'};
+      final cfg = HardwareConfig.fromJson(json);
+      expect(() => cfg.pinNames[99] = 'button_z', throwsUnsupportedError);
     });
   });
 

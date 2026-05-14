@@ -43,6 +43,13 @@
     }
   },
   "$defs": {
+    "pinRef": {
+      "description": "Reference to a physical pin in a Pin* action. EPIC-029 / TASK-379. Two forms — pick one per occurrence; a single profile may mix both: (a) Direct: an integer GPIO number (0..39) — always works, hardware-specific. (b) Named: a string from the v1 standard set in pin-names.schema.json — portable across builds, resolved against the active hardware config's pinNames mapping at use time. The builder doc (TASK-382) explains which to prefer and when.",
+      "oneOf": [
+        { "type": "integer", "minimum": 0, "maximum": 39 },
+        { "$ref": "pin-names.schema.json" }
+      ]
+    },
     "actionObject": {
       "type": "object",
       "additionalProperties": true,
@@ -85,27 +92,42 @@
           "additionalProperties": true
         },
         {
-          "properties": { "type": { "const": "PinHighAction" } },
+          "properties": {
+            "type": { "const": "PinHighAction" },
+            "pin":  { "$ref": "#/$defs/pinRef" }
+          },
           "required": ["type", "pin"],
           "additionalProperties": true
         },
         {
-          "properties": { "type": { "const": "PinLowAction" } },
+          "properties": {
+            "type": { "const": "PinLowAction" },
+            "pin":  { "$ref": "#/$defs/pinRef" }
+          },
           "required": ["type", "pin"],
           "additionalProperties": true
         },
         {
-          "properties": { "type": { "const": "PinToggleAction" } },
+          "properties": {
+            "type": { "const": "PinToggleAction" },
+            "pin":  { "$ref": "#/$defs/pinRef" }
+          },
           "required": ["type", "pin"],
           "additionalProperties": true
         },
         {
-          "properties": { "type": { "const": "PinHighWhilePressedAction" } },
+          "properties": {
+            "type": { "const": "PinHighWhilePressedAction" },
+            "pin":  { "$ref": "#/$defs/pinRef" }
+          },
           "required": ["type", "pin"],
           "additionalProperties": true
         },
         {
-          "properties": { "type": { "const": "PinLowWhilePressedAction" } },
+          "properties": {
+            "type": { "const": "PinLowWhilePressedAction" },
+            "pin":  { "$ref": "#/$defs/pinRef" }
+          },
           "required": ["type", "pin"],
           "additionalProperties": true
         },

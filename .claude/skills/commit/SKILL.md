@@ -100,17 +100,13 @@ keeps blast radius scoped to the single commit attempt.
    untracked, and adding them is at best a no-op and at worst stages
    working-tree state you didn't intend.
 
-3. **Invoke the wrapper script** with the message via heredoc, ending
-   with the standard
-   `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>` trailer
-   (omit the trailer if the user is committing a non-agent change
-   manually):
+3. **Invoke the wrapper script** with the message via heredoc. Do
+   **not** add a `Co-Authored-By: Claude …` trailer — the project owner
+   has opted out of LLM co-authorship trailers in commit messages.
 
    ```bash
    scripts/commit-pathspec.sh "$(cat <<'EOF'
    <commit message>
-
-   Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
    EOF
    )" <file> [<file> …]
    ```

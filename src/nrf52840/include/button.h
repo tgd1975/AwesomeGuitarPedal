@@ -20,13 +20,28 @@ public:
     volatile uint8_t pressCount = 0;       /**< Incremented by ISR; decremented by event() */
     volatile bool awaitingRelease = false; /**< True after press, until pin goes HIGH */
     unsigned long lastDebounceTime = 0;    /**< Timestamp of last accepted ISR */
-    unsigned long debounceDelay = 100;     /**< Minimum ms between accepted events */
+    unsigned long debounceDelay = 100;     /**< Minimum ms between accepted events (default 100) */
 
     /**
-     * @brief Constructs a Button for the given pin
+     * @brief Constructs a Button for the given pin using the default 100 ms
+     *        debounce window.
      * @param PIN GPIO pin number
      */
     explicit Button(uint8_t PIN);
+
+    /**
+     * @brief Constructs a Button with an explicit debounce window (EPIC-028).
+     *
+     * Mirrors the ESP32 2-arg constructor so the shared pedal_app.cpp
+     * compiles on both targets. The on-device debounce path on nRF52840
+     * is not exercised by any task in EPIC-028; the parity audit
+     * (TASK-360) will revisit on-device behaviour when the hardware is
+     * reachable again.
+     *
+     * @param PIN GPIO pin number
+     * @param debounceMs Debounce window in milliseconds
+     */
+    Button(uint8_t PIN, unsigned long debounceMs);
 
     /** @brief Configures the pin as input with pull-up */
     void setup() override;

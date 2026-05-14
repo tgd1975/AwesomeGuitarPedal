@@ -13,6 +13,7 @@ This folder contains utility scripts for development, CI/CD, and maintenance tas
 | [`format-code.sh`](format-code.sh) | Format all C++ files with clang-format | `./format-code.sh` |
 | [`generate-schematic.py`](generate-schematic.py) | Circuit schematic generator for AwesomeStudioPedal. | `python3 generate-schematic.py` |
 | [`generate_hid_display_table.py`](generate_hid_display_table.py) | Generate `app/lib/constants/hid_display_table.dart`. | `python3 generate_hid_display_table.py` |
+| [`generate_wiring_config_header.py`](generate_wiring_config_header.py) | Generate the embedded hardware-config header used by the wiring test tool. | `python3 generate_wiring_config_header.py` |
 | [`housekeep.py`](housekeep.py) | Central housekeeping for the task system. | `python3 housekeep.py` |
 | [`install_git_hooks.sh`](install_git_hooks.sh) | Install repo-side git hooks into .git/hooks/. | `./install_git_hooks.sh` |
 | [`migrate_tasks.py`](migrate_tasks.py) | Migrate tasks from REPOSITORY_IMPROVEMENT_CONCEPT.md into | `python3 migrate_tasks.py` |
@@ -77,6 +78,12 @@ This folder contains utility scripts for development, CI/CD, and maintenance tas
 **Purpose**: Generate `app/lib/constants/hid_display_table.dart`.
 
 **Usage**: `python3 generate_hid_display_table.py`
+
+### generate_wiring_config_header.py
+
+**Purpose**: Generate the embedded hardware-config header used by the wiring test tool.
+
+**Usage**: `python3 generate_wiring_config_header.py`
 
 ### housekeep.py
 

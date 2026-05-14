@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/ble_service.dart';
 import '../theme/asp_theme.dart';
 import '../widgets/content_page_scaffold.dart';
+import '../widgets/unresolved_pins_banner.dart';
 
 class ConnectedPedalScreen extends StatefulWidget {
   const ConnectedPedalScreen({super.key});
@@ -46,6 +47,10 @@ class _ConnectedPedalScreenState extends State<ConnectedPedalScreen> {
             const _DisconnectedBanner(),
             const SizedBox(height: 16),
           ],
+          // EPIC-029 / TASK-391. Surface unresolved named pin refs in
+          // the loaded profile set against the active hardware config,
+          // mirroring the firmware's end-of-load summary (TASK-380).
+          const UnresolvedPinsBanner(),
           FutureBuilder<String?>(
             future: _boardFuture,
             builder: (context, snapshot) => _Row(
