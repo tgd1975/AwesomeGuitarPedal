@@ -1,9 +1,11 @@
 ---
 id: TASK-387
 title: Wiring test tool — final key bindings, ? help legend, builder doc, close epic
-status: active
+status: closed
+closed: 2026-05-14
 opened: 2026-05-11
 effort: Small (<2h)
+effort_actual: Small (<2h)
 complexity: Medium
 human-in-loop: Clarification
 epic: wiring-test-tool
