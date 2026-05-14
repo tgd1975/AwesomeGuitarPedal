@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 19** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 18** | **Total: 45** | ████░░░░░░ 40%
+⚪ **Open: 19** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 19** | **Total: 45** | ████░░░░░░ 42%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -58,9 +58,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-383](active/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) | Medium | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -115,6 +113,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-380](closed/task-380-esp32-resolve-named-pins-at-config-load.md) | ESP32 firmware — resolve named-pin references at config load | Medium (2-8h) |
 | [TASK-381](closed/task-381-configurator-named-pin-ux-autocomplete-validation-warning.md) | Configurator / app UX — autocomplete, validation, and missing-mapping warning for named pins | Medium (2-8h) |
 | [TASK-382](closed/task-382-named-pins-builder-docs-and-github-addition-process.md) | Named pins — builder docs and GitHub process for proposing additions | Small (&lt;2h) |
+| [TASK-383](closed/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) |
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 | [TASK-389](closed/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) |
 | [TASK-390](closed/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) |
