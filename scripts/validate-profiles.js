@@ -5,12 +5,18 @@ const fs   = require('fs');
 const path = require('path');
 const Ajv  = require('ajv');
 
-const ROOT         = path.resolve(__dirname, '..');
-const SCHEMA_PATH  = path.join(ROOT, 'data', 'profiles.schema.json');
-const PROFILES_DIR = path.join(ROOT, 'profiles');
+const ROOT             = path.resolve(__dirname, '..');
+const SCHEMA_PATH      = path.join(ROOT, 'data', 'profiles.schema.json');
+const PIN_NAMES_PATH   = path.join(ROOT, 'data', 'pin-names.schema.json');
+const PROFILES_DIR     = path.join(ROOT, 'profiles');
 
-const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
-const ajv    = new Ajv({ strict: false });
+const schema   = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+const pinNames = JSON.parse(fs.readFileSync(PIN_NAMES_PATH, 'utf8'));
+const ajv      = new Ajv({ strict: false });
+// EPIC-029: profiles.schema.json $refs "pin-names.schema.json" for the pinRef
+// vocabulary. Register the referenced schema *before* compiling profiles so
+// AJV resolves the $ref instead of throwing MissingRefError.
+ajv.addSchema(pinNames);
 const validate = ajv.compile(schema);
 
 function walkDir(dir, results = []) {
