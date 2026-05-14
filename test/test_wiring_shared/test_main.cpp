@@ -6,19 +6,26 @@
 // CONFIG=<path>) and drives an interactive serial UI for verifying
 // the electrical correctness of a freshly soldered board.
 //
-//   - TASK-383 — env scaffolding, banner, single-key console
-//   - TASK-384 — button press logging + coverage summary
-//   - TASK-385 — LED group modes (on/off/blinking/chase/cycle-all)
-//   - TASK-386 — LED individual mode (selection, on/off, all-toggle) ← this task
-//   - TASK-387 — final keystroke bindings + ? legend + builder doc
+// Bindings (final, see also docs/builders/WIRING_TEST_TOOL.md):
 //
-// Provisional bindings used here will be revised in TASK-387:
-//   Group   : o on  | f off  | b blinking
-//             c chase-on | C chase-off | a cycle-all
-//   Indiv   : m toggle group/individual
-//             n next sel | p prev sel | g<digit> goto sel
-//             o sel on   | f sel off  | t all-toggle
-//   Misc    : s summary
+//   Group mode (default at boot)
+//     o   all LEDs ON                 c   chase-on
+//     f   all LEDs OFF                C   chase-off
+//     b   blink at ~2 Hz              a   cycle-all
+//     m   switch to individual
+//
+//   Individual mode
+//     m         switch to group
+//     n / p     next / prev LED in iteration order
+//     g<digit>  goto LED by index
+//     o / f     selected LED on / off
+//     O / F     every non-selected LED on / off
+//     t         all-toggle (selected = NOT others; alternates on each press)
+//
+//   Always available
+//     s   reprint status block
+//     ?   reprint keystroke legend (mode-aware)
+//     q   reset the device
 
 #include "button_tracker.h"
 #include "led_mode.h"
@@ -121,6 +128,14 @@ namespace
                 wiring_test::allToggleSelected(g_config, g_ledRuntime);
                 announceMode();
                 return true;
+            case 'O':
+                wiring_test::setAllOthersLit(g_config, g_ledRuntime, /*lit=*/true);
+                announceMode();
+                return true;
+            case 'F':
+                wiring_test::setAllOthersLit(g_config, g_ledRuntime, /*lit=*/false);
+                announceMode();
+                return true;
             case 'g':
                 if (g_config.numLeds == 0)
                 {
@@ -217,10 +232,20 @@ namespace
             case 'S':
                 announceMode();
                 break;
+            case '?':
+                wiring_test::printHelpLegend(&g_ledRuntime);
+                break;
+            case 'q':
+            case 'Q':
+                Serial.println("[wiring-test] resetting on 'q' — see you in a moment.");
+                Serial.flush();
+                delay(50);
+                ESP.restart();
+                break;
             default:
                 if (c >= 0x20 && c < 0x7f)
                 {
-                    Serial.printf("(unbound key '%c' — bindings finalised in TASK-387)\n", c);
+                    Serial.printf("(unbound key '%c' — press '?' for the legend)\n", c);
                 }
                 break;
         }

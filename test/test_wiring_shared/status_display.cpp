@@ -116,11 +116,72 @@ namespace wiring_test
         printModeLine(runtime, nowMs);
 
         Serial.println("------------------------------------------------------------");
-        Serial.println("Group: o on / f off / b blinking / c chase-on / C chase-off / a cycle-all");
-        Serial.println(
-            "Indiv: m toggle | n/p next/prev | g<digit> goto | o/f sel on/off | t all-toggle");
-        Serial.println("Misc:  s summary | ? help (TASK-387)");
+        Serial.println("Press '?' for the keystroke legend.");
         Serial.println("------------------------------------------------------------");
+    }
+
+    namespace
+    {
+
+        void printGroupLegend()
+        {
+            Serial.println("--- Group-mode keys ---");
+            Serial.println("  o   all LEDs ON");
+            Serial.println("  f   all LEDs OFF");
+            Serial.println("  b   all LEDs BLINK at ~2 Hz");
+            Serial.println("  c   chase-on  (all off, walker lights)");
+            Serial.println("  C   chase-off (all on, walker darkens)");
+            Serial.println("  a   cycle-all (sweep every mode above on a 3 s cadence)");
+            Serial.println("  m   switch to INDIVIDUAL mode");
+        }
+
+        void printIndividualLegend()
+        {
+            Serial.println("--- Individual-mode keys ---");
+            Serial.println("  m         switch to GROUP mode");
+            Serial.println("  n / p     next / previous LED in the iteration order");
+            Serial.println("  g<digit>  go to LED by index (0..numLeds-1)");
+            Serial.println("  o / f     selected LED on / off");
+            Serial.println("  O / F     every non-selected LED on / off");
+            Serial.println("  t         all-toggle (sel = inverted state of others;");
+            Serial.println("            successive presses alternate parity)");
+        }
+
+        void printMiscLegend()
+        {
+            Serial.println("--- Always available ---");
+            Serial.println("  s   reprint the status block");
+            Serial.println("  ?   reprint this legend");
+            Serial.println("  q   reset the device");
+        }
+
+    } // namespace
+
+    void printHelpLegend(const LedRuntime* runtime)
+    {
+        Serial.println();
+        Serial.println("============================================================");
+        Serial.println("  Wiring test tool — keystroke legend");
+        Serial.println("============================================================");
+
+        bool inIndividual = (runtime != nullptr) && (runtime->topMode == TopMode::Individual);
+        if (runtime == nullptr)
+        {
+            printGroupLegend();
+            Serial.println();
+            printIndividualLegend();
+        }
+        else if (inIndividual)
+        {
+            printIndividualLegend();
+        }
+        else
+        {
+            printGroupLegend();
+        }
+        Serial.println();
+        printMiscLegend();
+        Serial.println("============================================================");
     }
 
 } // namespace wiring_test

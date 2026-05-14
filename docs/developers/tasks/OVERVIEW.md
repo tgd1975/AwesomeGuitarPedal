@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 16** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 22** | **Total: 45** | █████░░░░░ 49%
+⚪ **Open: 15** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 22** | **Total: 45** | █████░░░░░ 49%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -23,7 +23,7 @@
 xychart-beta
     title "Cumulative tasks closed"
     x-axis ["05-11", "05-14"]
-    line [18, 21]
+    line [18, 22]
 ```
 
 </td><td>
@@ -41,8 +41,8 @@ xychart-beta
 xychart-beta
     title "Cumulative effort hours — green: estimate, blue: actual"
     x-axis ["05-11", "05-14"]
-    line [37.25, 48.25]
-    line [44.5, 59.5]
+    line [37.25, 53.25]
+    line [44.5, 64.5]
 ```
 
 </td></tr></table>
@@ -52,14 +52,16 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | Date | Tasks closed | Cum. tasks | Est. h | Cum. est. h | Actual h | Cum. actual h | Epics closed | Cum. epics |
 |------|-------------:|-----------:|-------:|------------:|---------:|--------------:|-------------:|-----------:|
 | 2026-05-11 | 18 | 18 | 37.2 | 37.2 | 44.5 | 44.5 | 3 | 3 |
-| 2026-05-14 | 3 | 21 | 11 | 48.2 | 15 | 59.5 | 0 | 3 |
+| 2026-05-14 | 4 | 22 | 16 | 53.2 | 20 | 64.5 | 0 | 3 |
 <!-- BURNUP:END -->
 
 <!-- GENERATED -->
 
 ## Active Tasks
 
-_No active tasks._
+| ID | Title | Effort | Complexity | Status |
+|----|-------|--------|------------|--------|
+| [TASK-387](active/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) | Medium | 🔵 **active** |
 
 ## Paused Tasks
 
@@ -92,7 +94,6 @@ _No active tasks._
 | [TASK-355](open/task-355-firmware-config-readback.md) | Firmware — config readback (option chosen in TASK-353) | Medium (2-8h) | Senior | ⚪ open |
 | [TASK-356](open/task-356-firmware-active-profile-notify.md) | Firmware — active-profile-index notify characteristic | Small (&lt;2h) | Medium | ⚪ open |
 | [TASK-370](open/task-370-make-schemdraw-svgs-deterministic.md) | Make Schemdraw-generated SVGs deterministic so the Docs CI staleness guard can pass | Small (&lt;2h) | Medium | ⚪ open |
-| [TASK-387](open/task-387-wiring-test-tool-final-bindings-help-legend-builder-doc.md) | Wiring test tool — final key bindings, ? help legend, builder doc, close epic | Small (&lt;2h) | Medium | ⚪ open |
 
 ## Closed Tasks
 

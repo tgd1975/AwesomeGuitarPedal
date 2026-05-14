@@ -29,4 +29,11 @@ namespace wiring_test
                           const LedRuntime* runtime,
                           uint32_t nowMs);
 
+    // Print the keystroke legend for the *current* mode (group or
+    // individual). The legend is the canonical mid-test reference;
+    // builders are expected to hit '?' rather than memorise it.
+    // ``runtime`` may be nullptr — we then fall back to printing
+    // both legends so the user gets something useful.
+    void printHelpLegend(const LedRuntime* runtime);
+
 } // namespace wiring_test

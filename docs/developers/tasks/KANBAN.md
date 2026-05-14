@@ -97,13 +97,13 @@ kanban
 
 ## wiring-test-tool
 
-_⚪ 1 open · 🔵 0 active · 🟡 0 paused · 🟢 4 closed · ████████░░ 80%_
+_⚪ 0 open · 🔵 1 active · 🟡 0 paused · 🟢 4 closed · ████████░░ 80%_
 
 ```mermaid
 kanban
   Open
-    TASK_387["Wiring test tool — final key bindings, ? help legend, builder doc, close epic"]
   Active
+    TASK_387["Wiring test tool — final key bindings, ? help legend, builder doc, close epic"]
   Paused
   Closed
     TASK_383["Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32)"]
