@@ -1,19 +1,21 @@
-// Wiring-test tool — entry point (TASK-383 skeleton).
+// Wiring-test tool — entry point.
 //
 // This firmware is *not* the production pedal firmware. It boots the
 // embedded hardware-config JSON (generated at build time by
 // scripts/generate_wiring_config_header.py from the Make target's
-// CONFIG=<path>) and prints a banner describing the configured
-// buttons and LEDs. Subsequent tasks fill in the interactive surface:
-//   - TASK-384 — button press logging + coverage summary
+// CONFIG=<path>) and drives an interactive serial UI for verifying
+// the electrical correctness of a freshly soldered board.
+//
+//   - TASK-383 — env scaffolding, banner, single-key console
+//   - TASK-384 — button press logging + coverage summary  ← this task
 //   - TASK-385 — LED group modes (on/off/blinking/chase/cycle-all)
 //   - TASK-386 — LED individual mode
 //   - TASK-387 — final keystroke bindings + ? legend + builder doc
 //
-// For now, every keystroke is acknowledged on the serial console so a
-// builder can verify their terminal is delivering single chars (no
-// line buffering) before the real bindings land.
+// Provisional bindings used here will be revised in TASK-387:
+//   's'  — print summary block (banner + per-button press counters)
 
+#include "button_tracker.h"
 #include "status_display.h"
 #include "wiring_config.h"
 #include "wiring_config_embedded.h"
@@ -23,6 +25,7 @@ namespace
 {
 
     wiring_test::WiringConfig g_config{};
+    wiring_test::ButtonState g_buttonStates[wiring_test::kMaxButtons]{};
 
     void halt(const char* reason)
     {
@@ -33,19 +36,25 @@ namespace
         }
     }
 
-    void echoKey(char c)
+    void handleKey(char c)
     {
         if (c == '\r' || c == '\n')
         {
             return;
         }
-        if (c >= 0x20 && c < 0x7f)
+        switch (c)
         {
-            Serial.printf("key: '%c' (0x%02x)\n", c, static_cast<unsigned>(c) & 0xffu);
-        }
-        else
-        {
-            Serial.printf("key: 0x%02x\n", static_cast<unsigned>(c) & 0xffu);
+            case 's':
+            case 'S':
+                wiring_test::printStatusBlock(
+                    g_config, wiring_test::CONFIG_FILENAME, g_buttonStates);
+                break;
+            default:
+                if (c >= 0x20 && c < 0x7f)
+                {
+                    Serial.printf("(unbound key '%c' — bindings land in TASK-385/386/387)\n", c);
+                }
+                break;
         }
     }
 
@@ -62,7 +71,8 @@ void setup()
         halt(result.message);
     }
 
-    wiring_test::printBanner(g_config, wiring_test::CONFIG_FILENAME);
+    wiring_test::initButtonTracker(g_config, g_buttonStates);
+    wiring_test::printStatusBlock(g_config, wiring_test::CONFIG_FILENAME, g_buttonStates);
 }
 
 void loop()
@@ -74,6 +84,21 @@ void loop()
         {
             break;
         }
-        echoKey(static_cast<char>(ch));
+        handleKey(static_cast<char>(ch));
+    }
+
+    // Drain any presses that landed since the last loop iteration.
+    while (true)
+    {
+        auto event =
+            wiring_test::pollButtonTracker(g_config, g_buttonStates, g_config.debounceMs, millis());
+        if (! event.fired)
+        {
+            break;
+        }
+        char line[96];
+        wiring_test::formatPressLine(
+            line, sizeof(line), g_config.buttons[event.buttonIndex], event.debouncedLevel);
+        Serial.print(line);
     }
 }

@@ -1,7 +1,7 @@
 ---
 id: TASK-384
 title: Wiring test tool — button press logging, counters, and status display
-status: open
+status: active
 opened: 2026-05-11
 effort: Small (<2h)
 complexity: Medium

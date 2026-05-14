@@ -38,6 +38,7 @@ namespace wiring_test
         uint8_t numButtons;
         WiringLed leds[kMaxLeds];
         uint8_t numLeds;
+        uint32_t debounceMs; // EPIC-028 default 100; clamped 1..1000
     };
 
     enum class ParseStatus

@@ -11,6 +11,9 @@ namespace wiring_test
     {
 
         // Copy a string into a fixed buffer, always null-terminated.
+        // Avoids strncpy on purpose — gcc's stringop-truncation warns
+        // when src may be exactly dstLen-1, which the parser can hit
+        // for long pinNames entries; a hand copy stays clean.
         void copyString(char* dst, size_t dstLen, const char* src)
         {
             if (dstLen == 0)
@@ -22,8 +25,13 @@ namespace wiring_test
                 dst[0] = '\0';
                 return;
             }
-            strncpy(dst, src, dstLen - 1);
-            dst[dstLen - 1] = '\0';
+            size_t i = 0;
+            while (i + 1 < dstLen && src[i] != '\0')
+            {
+                dst[i] = src[i];
+                ++i;
+            }
+            dst[i] = '\0';
         }
 
         // Look up the pin's symbolic name in the (optional) pinNames map. The
@@ -113,6 +121,21 @@ namespace wiring_test
         // pinNames is optional (EPIC-029 v1; absent on legacy configs).
         auto pinNames = root["pinNames"].as<ArduinoJson::JsonObject>();
 
+        // EPIC-028 debounce window. Default to 100 ms when absent; clamp
+        // to the schema's 1..1000 ms range so a hand-edited bad value
+        // can't lock the tool out of reading any presses.
+        uint32_t debounce =
+            root.containsKey("debounceMs") ? root["debounceMs"].as<uint32_t>() : 100u;
+        if (debounce < 1u)
+        {
+            debounce = 1u;
+        }
+        if (debounce > 1000u)
+        {
+            debounce = 1000u;
+        }
+        out.debounceMs = debounce;
+
         if (root.containsKey("hardware"))
         {
             copyString(out.hardware, sizeof(out.hardware), root["hardware"].as<const char*>());
@@ -129,11 +152,19 @@ namespace wiring_test
         {
             return fail(ParseStatus::MissingField, "buttonPins[] missing");
         }
-        uint8_t numButtons =
-            root.containsKey("numButtons") ? root["numButtons"].as<uint8_t>() : buttonPins.size();
-        if (numButtons > buttonPins.size())
+        size_t arrLen = buttonPins.size();
+        if (arrLen > 255u)
         {
-            numButtons = buttonPins.size();
+            arrLen = 255u;
+        }
+        uint8_t numButtons = static_cast<uint8_t>(arrLen);
+        if (root.containsKey("numButtons"))
+        {
+            uint8_t requested = root["numButtons"].as<uint8_t>();
+            if (requested < numButtons)
+            {
+                numButtons = requested;
+            }
         }
         for (uint8_t i = 0; i < numButtons; i++)
         {
@@ -160,12 +191,19 @@ namespace wiring_test
         auto ledSelect = root["ledSelect"].as<ArduinoJson::JsonArray>();
         if (! ledSelect.isNull())
         {
-            uint8_t numSelectLeds = root.containsKey("numSelectLeds")
-                                        ? root["numSelectLeds"].as<uint8_t>()
-                                        : ledSelect.size();
-            if (numSelectLeds > ledSelect.size())
+            size_t selLen = ledSelect.size();
+            if (selLen > 255u)
             {
-                numSelectLeds = ledSelect.size();
+                selLen = 255u;
+            }
+            uint8_t numSelectLeds = static_cast<uint8_t>(selLen);
+            if (root.containsKey("numSelectLeds"))
+            {
+                uint8_t requested = root["numSelectLeds"].as<uint8_t>();
+                if (requested < numSelectLeds)
+                {
+                    numSelectLeds = requested;
+                }
             }
             for (uint8_t i = 0; i < numSelectLeds; i++)
             {

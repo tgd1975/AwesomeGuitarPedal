@@ -6,7 +6,8 @@
 namespace wiring_test
 {
 
-    void printBanner(const WiringConfig& cfg, const char* configFilename)
+    void
+    printStatusBlock(const WiringConfig& cfg, const char* configFilename, const ButtonState* states)
     {
         Serial.println();
         Serial.println("============================================================");
@@ -15,6 +16,7 @@ namespace wiring_test
                       FIRMWARE_VERSION,
                       cfg.hardware,
                       configFilename != nullptr ? configFilename : "<embedded>");
+        Serial.printf("  debounce %lu ms\n", static_cast<unsigned long>(cfg.debounceMs));
         Serial.println("============================================================");
 
         Serial.println("Buttons:");
@@ -25,11 +27,13 @@ namespace wiring_test
         for (uint8_t i = 0; i < cfg.numButtons; i++)
         {
             const auto& b = cfg.buttons[i];
-            Serial.printf("  %-20s GPIO %2u  (active-%s%s)\n",
+            uint32_t count = (states != nullptr) ? states[i].pressCount : 0u;
+            Serial.printf("  %-20s GPIO %2u  (active-%s%s)  count=%lu\n",
                           b.name,
                           static_cast<unsigned>(b.pin),
                           b.activeLow ? "low" : "high",
-                          b.isSelect ? ", select" : "");
+                          b.isSelect ? ", select" : "",
+                          static_cast<unsigned long>(count));
         }
 
         Serial.println("LEDs:");
@@ -47,7 +51,7 @@ namespace wiring_test
         }
 
         Serial.println("------------------------------------------------------------");
-        Serial.println("Press '?' for help. (Bindings land in TASK-387.)");
+        Serial.println("Keys: 's' summary | '?' help (TASK-387). Press a button to log.");
         Serial.println("------------------------------------------------------------");
     }
 

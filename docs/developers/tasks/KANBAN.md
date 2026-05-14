@@ -97,16 +97,16 @@ kanban
 
 ## wiring-test-tool
 
-_⚪ 4 open · 🔵 0 active · 🟡 0 paused · 🟢 1 closed · ██░░░░░░░░ 20%_
+_⚪ 3 open · 🔵 1 active · 🟡 0 paused · 🟢 1 closed · ██░░░░░░░░ 20%_
 
 ```mermaid
 kanban
   Open
-    TASK_384["Wiring test tool — button press logging, counters, and status display"]
     TASK_385["Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all)"]
     TASK_386["Wiring test tool — LED individual mode (selection, on/off, all-toggle)"]
     TASK_387["Wiring test tool — final key bindings, ? help legend, builder doc, close epic"]
   Active
+    TASK_384["Wiring test tool — button press logging, counters, and status display"]
   Paused
   Closed
     TASK_383["Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32)"]

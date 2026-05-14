@@ -6,20 +6,22 @@
 // blank line in front so the new block is visually separated from
 // whatever scrolled past.
 //
-// TASK-383 prints only the boot banner. TASK-384/385/386 will extend
-// this header with the press counters, button state, LED mode, and
-// selection highlight.
+// TASK-384 extends the block to include per-button press counters.
+// TASK-385/386 will add LED mode and selection highlight.
 
 #pragma once
 
+#include "button_tracker.h"
 #include "wiring_config.h"
 
 namespace wiring_test
 {
 
-    // Print the one-screen banner: tool name, firmware version, embedded
-    // config filename, configured buttons, configured LEDs, and a hint
-    // pointing at the (TASK-387) help legend.
-    void printBanner(const WiringConfig& cfg, const char* configFilename);
+    // Print the one-screen status block. ``states`` may be nullptr
+    // (TASK-383 boot banner before the tracker initialises) — in
+    // which case all press counters render as 0.
+    void printStatusBlock(const WiringConfig& cfg,
+                          const char* configFilename,
+                          const ButtonState* states);
 
 } // namespace wiring_test
