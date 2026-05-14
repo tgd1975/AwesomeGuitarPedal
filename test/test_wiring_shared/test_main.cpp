@@ -8,13 +8,17 @@
 //
 //   - TASK-383 — env scaffolding, banner, single-key console
 //   - TASK-384 — button press logging + coverage summary
-//   - TASK-385 — LED group modes (on/off/blinking/chase/cycle-all) ← this task
-//   - TASK-386 — LED individual mode
+//   - TASK-385 — LED group modes (on/off/blinking/chase/cycle-all)
+//   - TASK-386 — LED individual mode (selection, on/off, all-toggle) ← this task
 //   - TASK-387 — final keystroke bindings + ? legend + builder doc
 //
 // Provisional bindings used here will be revised in TASK-387:
-//   's' summary  | 'o' on  | 'f' off  | 'b' blinking
-//   'c' chase-on | 'C' chase-off  | 'a' cycle-all
+//   Group   : o on  | f off  | b blinking
+//             c chase-on | C chase-off | a cycle-all
+//   Indiv   : m toggle group/individual
+//             n next sel | p prev sel | g<digit> goto sel
+//             o sel on   | f sel off  | t all-toggle
+//   Misc    : s summary
 
 #include "button_tracker.h"
 #include "led_mode.h"
@@ -30,6 +34,7 @@ namespace
     wiring_test::ButtonState g_buttonStates[wiring_test::kMaxButtons]{};
     wiring_test::LedRuntime g_ledRuntime{};
     uint8_t g_lastWrittenLevels[wiring_test::kMaxLeds]{};
+    bool g_awaitingGotoDigit = false;
 
     void halt(const char* reason)
     {
@@ -45,8 +50,6 @@ namespace
         for (uint8_t i = 0; i < g_config.numLeds; i++)
         {
             pinMode(g_config.leds[i].pin, OUTPUT);
-            // Park each LED in its physical-off level so a builder
-            // sees a clean board immediately on boot.
             uint8_t off = g_config.leds[i].activeHigh ? LOW : HIGH;
             digitalWrite(g_config.leds[i].pin, off);
             g_lastWrittenLevels[i] = off;
@@ -73,18 +76,14 @@ namespace
             g_config, wiring_test::CONFIG_FILENAME, g_buttonStates, &g_ledRuntime, millis());
     }
 
-    bool dispatchGroupMode(char c)
+    bool inIndividual() { return g_ledRuntime.topMode == wiring_test::TopMode::Individual; }
+
+    bool dispatchGroupKey(char c)
     {
         using wiring_test::GroupMode;
         GroupMode mode;
         switch (c)
         {
-            case 'o':
-                mode = GroupMode::On;
-                break;
-            case 'f':
-                mode = GroupMode::Off;
-                break;
             case 'b':
                 mode = GroupMode::Blinking;
                 break;
@@ -97,6 +96,7 @@ namespace
             case 'a':
                 mode = GroupMode::CycleAll;
                 break;
+            // 'o' and 'f' overload — see dispatchKey below.
             default:
                 return false;
         }
@@ -105,16 +105,112 @@ namespace
         return true;
     }
 
+    bool dispatchIndividualKey(char c)
+    {
+        switch (c)
+        {
+            case 'n':
+                wiring_test::selectNextLed(g_config, g_ledRuntime);
+                announceMode();
+                return true;
+            case 'p':
+                wiring_test::selectPrevLed(g_config, g_ledRuntime);
+                announceMode();
+                return true;
+            case 't':
+                wiring_test::allToggleSelected(g_config, g_ledRuntime);
+                announceMode();
+                return true;
+            case 'g':
+                if (g_config.numLeds == 0)
+                {
+                    Serial.println("(no LEDs configured to goto)");
+                    return true;
+                }
+                g_awaitingGotoDigit = true;
+                Serial.printf("goto: type a digit [0..%u]\n",
+                              static_cast<unsigned>(g_config.numLeds - 1u));
+                return true;
+        }
+        return false;
+    }
+
     void handleKey(char c)
     {
         if (c == '\r' || c == '\n')
         {
             return;
         }
-        if (dispatchGroupMode(c))
+
+        // Two-keystroke 'g<digit>' goto — only meaningful in individual mode.
+        if (g_awaitingGotoDigit)
+        {
+            g_awaitingGotoDigit = false;
+            if (c >= '0' && c <= '9')
+            {
+                uint8_t idx = static_cast<uint8_t>(c - '0');
+                if (wiring_test::selectLedByIndex(g_config, g_ledRuntime, idx))
+                {
+                    Serial.printf("selected [%u]\n", static_cast<unsigned>(idx));
+                    announceMode();
+                }
+                else
+                {
+                    Serial.printf("(no LED [%u] — only %u configured)\n",
+                                  static_cast<unsigned>(idx),
+                                  static_cast<unsigned>(g_config.numLeds));
+                }
+            }
+            else
+            {
+                Serial.println("(goto cancelled — non-digit)");
+            }
+            return;
+        }
+
+        // 'm' — toggle between group and individual mode.
+        if (c == 'm' || c == 'M')
+        {
+            if (inIndividual())
+            {
+                wiring_test::enterGroupMode(g_ledRuntime, millis());
+            }
+            else
+            {
+                wiring_test::enterIndividualMode(g_config, g_ledRuntime, millis());
+            }
+            announceMode();
+            return;
+        }
+
+        // 'o' / 'f' overload: in group mode → set GroupMode::On / Off.
+        // In individual mode → set selected LED on / off.
+        if (c == 'o' || c == 'f')
+        {
+            if (inIndividual())
+            {
+                wiring_test::setSelectedLit(g_ledRuntime, c == 'o');
+                announceMode();
+            }
+            else
+            {
+                using wiring_test::GroupMode;
+                wiring_test::setGroupMode(
+                    g_ledRuntime, c == 'o' ? GroupMode::On : GroupMode::Off, millis());
+                announceMode();
+            }
+            return;
+        }
+
+        if (! inIndividual() && dispatchGroupKey(c))
         {
             return;
         }
+        if (inIndividual() && dispatchIndividualKey(c))
+        {
+            return;
+        }
+
         switch (c)
         {
             case 's':
@@ -124,7 +220,7 @@ namespace
             default:
                 if (c >= 0x20 && c < 0x7f)
                 {
-                    Serial.printf("(unbound key '%c' — bindings land in TASK-386/387)\n", c);
+                    Serial.printf("(unbound key '%c' — bindings finalised in TASK-387)\n", c);
                 }
                 break;
         }
@@ -135,7 +231,7 @@ namespace
 void setup()
 {
     Serial.begin(115200);
-    delay(1500); // give USB-CDC / monitor a moment to attach
+    delay(1500);
 
     auto result = wiring_test::parseWiringConfig(wiring_test::CONFIG_JSON, g_config);
     if (result.status != wiring_test::ParseStatus::Ok)

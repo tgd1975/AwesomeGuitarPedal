@@ -16,19 +16,36 @@ namespace wiring_test
                 Serial.println("LED mode: off (uninit)");
                 return;
             }
-            GroupMode top = runtime->groupMode;
-            if (top == GroupMode::CycleAll)
+            if (runtime->topMode == TopMode::Individual)
+            {
+                Serial.printf("LED mode: individual  (selected: [%u])\n",
+                              static_cast<unsigned>(runtime->selectedLed));
+                return;
+            }
+            if (runtime->groupMode == GroupMode::CycleAll)
             {
                 GroupMode active = effectiveMode(*runtime, nowMs);
-                Serial.printf("LED mode: cycle-all -> %s  (sub-mode %u/%u)\n",
+                Serial.printf("LED mode: group cycle-all -> %s  (sub-mode %u/%u)\n",
                               groupModeName(active),
                               static_cast<unsigned>(runtime->cycleSubModeIndex + 1u),
                               static_cast<unsigned>(kCycleSubModeCount));
             }
             else
             {
-                Serial.printf("LED mode: %s\n", groupModeName(top));
+                Serial.printf("LED mode: group %s\n", groupModeName(runtime->groupMode));
             }
+        }
+
+        bool isSelectedHere(const LedRuntime* runtime, uint8_t i)
+        {
+            return runtime != nullptr && runtime->topMode == TopMode::Individual &&
+                   runtime->selectedLed == i;
+        }
+
+        bool individualLitHere(const LedRuntime* runtime, uint8_t i)
+        {
+            return runtime != nullptr && runtime->topMode == TopMode::Individual &&
+                   runtime->individualLit[i];
         }
 
     } // namespace
@@ -71,21 +88,38 @@ namespace wiring_test
         {
             Serial.println("  (none configured)");
         }
+        bool inIndividual = runtime != nullptr && runtime->topMode == TopMode::Individual;
         for (uint8_t i = 0; i < cfg.numLeds; i++)
         {
             const auto& l = cfg.leds[i];
-            Serial.printf("  [%u] %-20s GPIO %2u  (active-%s)\n",
-                          static_cast<unsigned>(i),
-                          l.name,
-                          static_cast<unsigned>(l.pin),
-                          l.activeHigh ? "high" : "low");
+            const char* selectMark = isSelectedHere(runtime, i) ? "*" : " ";
+            if (inIndividual)
+            {
+                Serial.printf("  %s [%u] %-20s GPIO %2u  (active-%s)  state=%s\n",
+                              selectMark,
+                              static_cast<unsigned>(i),
+                              l.name,
+                              static_cast<unsigned>(l.pin),
+                              l.activeHigh ? "high" : "low",
+                              individualLitHere(runtime, i) ? "ON" : "off");
+            }
+            else
+            {
+                Serial.printf("    [%u] %-20s GPIO %2u  (active-%s)\n",
+                              static_cast<unsigned>(i),
+                              l.name,
+                              static_cast<unsigned>(l.pin),
+                              l.activeHigh ? "high" : "low");
+            }
         }
 
         printModeLine(runtime, nowMs);
 
         Serial.println("------------------------------------------------------------");
+        Serial.println("Group: o on / f off / b blinking / c chase-on / C chase-off / a cycle-all");
         Serial.println(
-            "Keys: 's' summary | 'o'/'f'/'b'/'c'/'C'/'a' LED group modes | '?' help (TASK-387)");
+            "Indiv: m toggle | n/p next/prev | g<digit> goto | o/f sel on/off | t all-toggle");
+        Serial.println("Misc:  s summary | ? help (TASK-387)");
         Serial.println("------------------------------------------------------------");
     }
 

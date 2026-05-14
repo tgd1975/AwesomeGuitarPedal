@@ -35,14 +35,22 @@ namespace wiring_test
 
     void initLedRuntime(LedRuntime& runtime, uint32_t nowMs)
     {
+        runtime.topMode = TopMode::Group;
         runtime.groupMode = GroupMode::Off;
         runtime.modeStartMs = nowMs;
         runtime.cycleSubModeIndex = 0;
         runtime.cycleSubModeStartMs = nowMs;
+        runtime.selectedLed = 0;
+        for (uint8_t i = 0; i < kMaxLeds; i++)
+        {
+            runtime.individualLit[i] = false;
+        }
+        runtime.allToggleParity = false;
     }
 
     void setGroupMode(LedRuntime& runtime, GroupMode mode, uint32_t nowMs)
     {
+        runtime.topMode = TopMode::Group;
         runtime.groupMode = mode;
         runtime.modeStartMs = nowMs;
         runtime.cycleSubModeIndex = 0;
@@ -72,6 +80,10 @@ namespace wiring_test
 
     void tickLedRuntime(LedRuntime& runtime, uint32_t nowMs)
     {
+        if (runtime.topMode != TopMode::Group)
+        {
+            return;
+        }
         if (runtime.groupMode != GroupMode::CycleAll)
         {
             return;
@@ -141,6 +153,15 @@ namespace wiring_test
                           uint32_t nowMs,
                           uint8_t levels[])
     {
+        if (runtime.topMode == TopMode::Individual)
+        {
+            for (uint8_t i = 0; i < cfg.numLeds; i++)
+            {
+                levels[i] = levelFor(cfg.leds[i], runtime.individualLit[i]);
+            }
+            return;
+        }
+
         GroupMode mode = effectiveMode(runtime, nowMs);
         switch (mode)
         {
@@ -166,6 +187,90 @@ namespace wiring_test
                 fillStatic(cfg, levels, /*lit=*/false);
                 break;
         }
+    }
+
+    void enterIndividualMode(const WiringConfig& cfg, LedRuntime& runtime, uint32_t nowMs)
+    {
+        // Snapshot the current group-mode levels so the LEDs hold
+        // their last visible state across the mode switch.
+        uint8_t levels[kMaxLeds]{};
+        computeLedLevels(cfg, runtime, nowMs, levels);
+        for (uint8_t i = 0; i < cfg.numLeds; i++)
+        {
+            runtime.individualLit[i] = (levels[i] == levelFor(cfg.leds[i], /*lit=*/true));
+        }
+        runtime.topMode = TopMode::Individual;
+        if (runtime.selectedLed >= cfg.numLeds && cfg.numLeds > 0)
+        {
+            runtime.selectedLed = 0;
+        }
+    }
+
+    void enterGroupMode(LedRuntime& runtime, uint32_t nowMs)
+    {
+        runtime.topMode = TopMode::Group;
+        // Reset the group animation anchor so the first frame of the
+        // resumed mode starts cleanly (otherwise blink/chase would
+        // freeze-frame on whatever phase they were in pre-individual).
+        runtime.modeStartMs = nowMs;
+        runtime.cycleSubModeStartMs = nowMs;
+    }
+
+    void selectNextLed(const WiringConfig& cfg, LedRuntime& runtime)
+    {
+        if (cfg.numLeds == 0)
+        {
+            return;
+        }
+        runtime.selectedLed = static_cast<uint8_t>((runtime.selectedLed + 1u) % cfg.numLeds);
+    }
+
+    void selectPrevLed(const WiringConfig& cfg, LedRuntime& runtime)
+    {
+        if (cfg.numLeds == 0)
+        {
+            return;
+        }
+        runtime.selectedLed =
+            static_cast<uint8_t>((runtime.selectedLed + cfg.numLeds - 1u) % cfg.numLeds);
+    }
+
+    bool selectLedByIndex(const WiringConfig& cfg, LedRuntime& runtime, uint8_t index)
+    {
+        if (index >= cfg.numLeds)
+        {
+            return false;
+        }
+        runtime.selectedLed = index;
+        return true;
+    }
+
+    void setSelectedLit(LedRuntime& runtime, bool lit)
+    {
+        runtime.individualLit[runtime.selectedLed] = lit;
+    }
+
+    void setAllOthersLit(const WiringConfig& cfg, LedRuntime& runtime, bool lit)
+    {
+        for (uint8_t i = 0; i < cfg.numLeds; i++)
+        {
+            if (i != runtime.selectedLed)
+            {
+                runtime.individualLit[i] = lit;
+            }
+        }
+    }
+
+    void allToggleSelected(const WiringConfig& cfg, LedRuntime& runtime)
+    {
+        // Each press flips the polarity so successive 't' presses
+        // alternate (others-on/selected-off ↔ others-off/selected-on).
+        bool othersLit = ! runtime.allToggleParity;
+        for (uint8_t i = 0; i < cfg.numLeds; i++)
+        {
+            runtime.individualLit[i] = (i == runtime.selectedLed) ? ! othersLit : othersLit;
+        }
+        runtime.allToggleParity = ! runtime.allToggleParity;
     }
 
 } // namespace wiring_test

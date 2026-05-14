@@ -27,14 +27,31 @@ namespace wiring_test
         CycleAll, // 'a' — sweeps every mode above back-to-back
     };
 
+    enum class TopMode : uint8_t
+    {
+        Group = 0,  // group-mode state machine (TASK-385)
+        Individual, // per-LED selection + drive (TASK-386)
+    };
+
     struct LedRuntime
     {
+        TopMode topMode;
+        // Group-mode bookkeeping (TASK-385). Survives a round-trip
+        // through individual mode untouched, so 'm' restores cleanly.
         GroupMode groupMode;
         uint32_t modeStartMs; // wall-clock anchor for animations
-        // Sub-mode pointer used only by GroupMode::CycleAll. Index
-        // into the kCycleSubModes table; advances on a fixed cadence.
         uint8_t cycleSubModeIndex;
         uint32_t cycleSubModeStartMs;
+        // Individual-mode bookkeeping (TASK-386). selectedLed indexes
+        // cfg.leds[]. ``individualLit[i]`` carries the user-set state
+        // for LED i — populated from the live group-mode levels on
+        // first transition into individual mode so the switch is not
+        // jarring. ``allToggleParity`` flips on every 't' so successive
+        // presses alternate (others-on/selected-off ↔ others-off/
+        // selected-on).
+        uint8_t selectedLed;
+        bool individualLit[kMaxLeds];
+        bool allToggleParity;
     };
 
     // Period for the blinking and chase animations.
@@ -57,9 +74,11 @@ namespace wiring_test
     void initLedRuntime(LedRuntime& runtime, uint32_t nowMs);
     void setGroupMode(LedRuntime& runtime, GroupMode mode, uint32_t nowMs);
 
-    // Resolve the *effective* mode at a given instant — for plain
-    // group modes this is the configured mode; for CycleAll it is
-    // the current sub-mode. Pure.
+    // Resolve the *effective* group mode at a given instant — for
+    // plain group modes this is the configured mode; for CycleAll
+    // it is the current sub-mode. Pure. Only meaningful in
+    // ``TopMode::Group``; individual mode short-circuits the level
+    // computation.
     GroupMode effectiveMode(const LedRuntime& runtime, uint32_t nowMs);
 
     // Compute the desired physical levels (HIGH/LOW) for every LED in
@@ -72,7 +91,30 @@ namespace wiring_test
 
     // Tick CycleAll's sub-mode index forward when its cadence elapses.
     // Caller invokes once per loop iteration; safe to call for non-
-    // CycleAll modes (no-op).
+    // CycleAll modes (no-op). Also no-op in individual mode.
     void tickLedRuntime(LedRuntime& runtime, uint32_t nowMs);
+
+    // Individual-mode operations (TASK-386). All are pure transforms
+    // on ``LedRuntime``; the firmware drives writes via
+    // computeLedLevels() on the next loop iteration.
+
+    // Enter individual mode. Snapshots the current group-mode levels
+    // into ``individualLit[]`` so the LEDs do not flicker on switch.
+    void enterIndividualMode(const WiringConfig& cfg, LedRuntime& runtime, uint32_t nowMs);
+    // Resume the previously configured group mode. The group state
+    // (mode, animation start, cycle index) was preserved.
+    void enterGroupMode(LedRuntime& runtime, uint32_t nowMs);
+
+    void selectNextLed(const WiringConfig& cfg, LedRuntime& runtime);
+    void selectPrevLed(const WiringConfig& cfg, LedRuntime& runtime);
+    // Returns false if the index is out of range; selection unchanged.
+    bool selectLedByIndex(const WiringConfig& cfg, LedRuntime& runtime, uint8_t index);
+
+    void setSelectedLit(LedRuntime& runtime, bool lit);
+    void setAllOthersLit(const WiringConfig& cfg, LedRuntime& runtime, bool lit);
+    // Sets every non-selected LED to one state and the selected LED
+    // to its opposite. Successive calls flip both — see
+    // ``allToggleParity`` on LedRuntime.
+    void allToggleSelected(const WiringConfig& cfg, LedRuntime& runtime);
 
 } // namespace wiring_test

@@ -49,6 +49,7 @@ add_executable(pedal_tests
     unit/test_wiring_button_tracker.cpp
     unit/test_wiring_config_parse.cpp
     unit/test_wiring_led_mode.cpp
+    unit/test_wiring_led_individual.cpp
     test_config_loader/test_main.cpp
     ${PROD_SOURCES}
 )
