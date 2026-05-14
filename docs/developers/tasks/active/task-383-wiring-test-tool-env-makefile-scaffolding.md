@@ -1,7 +1,7 @@
 ---
 id: TASK-383
 title: Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32)
-status: open
+status: active
 opened: 2026-05-11
 effort: Medium (2-8h)
 complexity: Medium

@@ -5,6 +5,7 @@
         build-esp32 upload-esp32 uploadfs-esp32 monitor-esp32 run-esp32 \
         test-esp32-button test-esp32-multipress test-esp32-serial test-esp32-profiles \
         test-esp32-pin-io test-esp32-ble-config test-esp32-ble-pairing test-esp32-leds test-esp32-gpio2-probe \
+        test-esp32-wiring \
         build-nrf52840 upload-nrf52840 uploadfs-nrf52840 monitor-nrf52840 run-nrf52840 \
         test-nrf52840-button test-nrf52840-serial test-nrf52840-profiles test-nrf52840-leds \
         test-host test-flutter clean-test \
@@ -160,6 +161,28 @@ test-esp32-leds: ## Flash LED hardware diagnostic + open monitor (requires ESP32
 test-esp32-gpio2-probe: ## Flash GPIO 2 toggle probe + open monitor (does this board have an onboard LED on GPIO 2?)
 	pio run -e nodemcu-32s-gpio2-probe --target upload
 	pio device monitor -e nodemcu-32s-gpio2-probe
+
+# Wiring test tool — flashes the interactive wiring/solder test firmware
+# (EPIC-030) for a freshly soldered ESP32 board. Embeds the named hardware
+# config JSON at compile time. CONFIG= is mandatory; missing or unreadable
+# paths fail before the build starts.
+test-esp32-wiring: ## Flash interactive wiring test tool (set CONFIG=<hardware-config.json>; MONITOR=1 to tail serial)
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "ERROR: CONFIG=<path-to-hardware-config.json> is required."; \
+		echo "Example: make test-esp32-wiring CONFIG=data/config.json"; \
+		exit 2; \
+	fi
+	@if [ ! -f "$(CONFIG)" ]; then \
+		echo "ERROR: config not readable: $(CONFIG)"; \
+		echo "Pass an existing file path."; \
+		exit 2; \
+	fi
+	ASP_WIRING_CONFIG="$(CONFIG)" pio run -e nodemcu-32s-wiring-test --target upload
+	@if [ "$(MONITOR)" = "1" ]; then \
+		pio device monitor -e nodemcu-32s-wiring-test; \
+	else \
+		echo "Tip: add MONITOR=1 to tail the serial monitor, or run \`pio device monitor -e nodemcu-32s-wiring-test\`."; \
+	fi
 
 ##@ Tests — nRF52840 (device required)
 

@@ -6,7 +6,7 @@ status: open
 opened: 2026-05-11
 closed:
 assigned:
-branch: feature/wiring-test-tool
+branch: feature/firmware
 ---
 
 Seeded by IDEA-062 (Interactive ESP32 wiring/solder test tool).

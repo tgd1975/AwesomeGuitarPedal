@@ -1,6 +1,6 @@
 # Ideas Overview
 
-**Open: 36** | **Archived: 28**
+**Open: 37** | **Archived: 28**
 
 Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until they are either converted into structured tasks or archived. Archived ideas are kept for history in [`archived/`](archived/). See [README.md](README.md) for the file-naming convention (one row per IDEA, sub-notes use the `idea-NNN.<sub-slug>.md` form).
 
@@ -44,6 +44,7 @@ Ideas are lightweight, qualitative proposals tracked in [`open/`](open/) until t
 | [IDEA-063](open/idea-063-community-shareable-hardware-configurations.md) | 📱 apps | Community-shareable hardware configurations | Mirror the community-profiles flow for hardware configs so builders can share known-good config.json files tagged by parts list / build. |
 | [IDEA-064](open/idea-064-ble-ota-firmware-update.md) | ⚡ firmware | BLE OTA firmware update — app pushes latest compatible firmware to pedal over Bluetooth | BLE-based over-the-air firmware update flow so users can keep the pedal on the latest compatible firmware without USB or Wi-Fi. |
 | [IDEA-066](open/idea-066-adopt-circuitsmith-when-ready.md) | 🛠️ tooling | Adopt gdt1975/circuitsmith for circuit-design tooling when ready | Watch upstream circuitsmith, evaluate when it stabilises, and adopt it as the source of YAML circuits / SVG / ERC / BOM / netlist for ASP — replacing the locally-planned Circuit-Skill (archived IDEA-027). |
+| [IDEA-067](open/idea-067-midi-interface-support.md) | 🔧 hardware | MIDI interface support — protocol, hardware, and configuration | Investigate MIDI support so the pedal can interoperate with MIDI-capable pedalboards — protocol variants, hardware options, configuration model, and whether real demand exists. |
 
 ## Archived Ideas
 
