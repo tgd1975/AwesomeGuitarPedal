@@ -6,22 +6,27 @@
 // blank line in front so the new block is visually separated from
 // whatever scrolled past.
 //
-// TASK-384 extends the block to include per-button press counters.
-// TASK-385/386 will add LED mode and selection highlight.
+// TASK-384 added per-button press counters; TASK-385 added the
+// active group-mode label. TASK-386 will add the individual-mode
+// selection highlight.
 
 #pragma once
 
 #include "button_tracker.h"
+#include "led_mode.h"
 #include "wiring_config.h"
+#include <stdint.h>
 
 namespace wiring_test
 {
 
-    // Print the one-screen status block. ``states`` may be nullptr
-    // (TASK-383 boot banner before the tracker initialises) — in
-    // which case all press counters render as 0.
+    // Print the one-screen status block. ``states`` and ``runtime``
+    // may both be nullptr (boot before init) — counters render as 0
+    // and the mode label renders as "off (uninit)".
     void printStatusBlock(const WiringConfig& cfg,
                           const char* configFilename,
-                          const ButtonState* states);
+                          const ButtonState* states,
+                          const LedRuntime* runtime,
+                          uint32_t nowMs);
 
 } // namespace wiring_test

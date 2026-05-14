@@ -25,6 +25,7 @@ set(PROD_SOURCES
     ${CMAKE_SOURCE_DIR}/src/host/src/host_file_system.cpp
     ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/wiring_config.cpp
     ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/button_tracker.cpp
+    ${CMAKE_SOURCE_DIR}/test/test_wiring_shared/led_mode.cpp
 )
 
 add_executable(pedal_tests
@@ -47,6 +48,7 @@ add_executable(pedal_tests
     unit/test_app_integration.cpp
     unit/test_wiring_button_tracker.cpp
     unit/test_wiring_config_parse.cpp
+    unit/test_wiring_led_mode.cpp
     test_config_loader/test_main.cpp
     ${PROD_SOURCES}
 )

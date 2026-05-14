@@ -1,7 +1,7 @@
 ---
 id: TASK-385
 title: Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all)
-status: open
+status: active
 opened: 2026-05-11
 effort: Medium (2-8h)
 complexity: Medium

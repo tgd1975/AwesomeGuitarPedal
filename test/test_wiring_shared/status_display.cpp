@@ -6,8 +6,38 @@
 namespace wiring_test
 {
 
-    void
-    printStatusBlock(const WiringConfig& cfg, const char* configFilename, const ButtonState* states)
+    namespace
+    {
+
+        void printModeLine(const LedRuntime* runtime, uint32_t nowMs)
+        {
+            if (runtime == nullptr)
+            {
+                Serial.println("LED mode: off (uninit)");
+                return;
+            }
+            GroupMode top = runtime->groupMode;
+            if (top == GroupMode::CycleAll)
+            {
+                GroupMode active = effectiveMode(*runtime, nowMs);
+                Serial.printf("LED mode: cycle-all -> %s  (sub-mode %u/%u)\n",
+                              groupModeName(active),
+                              static_cast<unsigned>(runtime->cycleSubModeIndex + 1u),
+                              static_cast<unsigned>(kCycleSubModeCount));
+            }
+            else
+            {
+                Serial.printf("LED mode: %s\n", groupModeName(top));
+            }
+        }
+
+    } // namespace
+
+    void printStatusBlock(const WiringConfig& cfg,
+                          const char* configFilename,
+                          const ButtonState* states,
+                          const LedRuntime* runtime,
+                          uint32_t nowMs)
     {
         Serial.println();
         Serial.println("============================================================");
@@ -36,7 +66,7 @@ namespace wiring_test
                           static_cast<unsigned long>(count));
         }
 
-        Serial.println("LEDs:");
+        Serial.println("LEDs (chase iteration order top-to-bottom):");
         if (cfg.numLeds == 0)
         {
             Serial.println("  (none configured)");
@@ -44,14 +74,18 @@ namespace wiring_test
         for (uint8_t i = 0; i < cfg.numLeds; i++)
         {
             const auto& l = cfg.leds[i];
-            Serial.printf("  %-20s GPIO %2u  (active-%s)\n",
+            Serial.printf("  [%u] %-20s GPIO %2u  (active-%s)\n",
+                          static_cast<unsigned>(i),
                           l.name,
                           static_cast<unsigned>(l.pin),
                           l.activeHigh ? "high" : "low");
         }
 
+        printModeLine(runtime, nowMs);
+
         Serial.println("------------------------------------------------------------");
-        Serial.println("Keys: 's' summary | '?' help (TASK-387). Press a button to log.");
+        Serial.println(
+            "Keys: 's' summary | 'o'/'f'/'b'/'c'/'C'/'a' LED group modes | '?' help (TASK-387)");
         Serial.println("------------------------------------------------------------");
     }
 
