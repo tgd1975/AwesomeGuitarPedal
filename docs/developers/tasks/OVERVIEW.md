@@ -5,7 +5,7 @@
 
 <!-- markdownlint-disable-file MD033 -->
 
-⚪ **Open: 16** | 🔵 **Active: 1** | 🟡 **Paused: 7** | 🟢 **Closed: 21** | **Total: 45** | █████░░░░░ 47%
+⚪ **Open: 16** | 🔵 **Active: 0** | 🟡 **Paused: 7** | 🟢 **Closed: 22** | **Total: 45** | █████░░░░░ 49%
 
 **Jump to:** [Burn-up](#burn-up) · [Active Tasks](#active-tasks) · [Paused Tasks](#paused-tasks) · [Open Tasks](#open-tasks) · [Closed Tasks](#closed-tasks)
 
@@ -59,9 +59,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 
 ## Active Tasks
 
-| ID | Title | Effort | Complexity | Status |
-|----|-------|--------|------------|--------|
-| [TASK-386](active/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) | Medium | 🔵 **active** |
+_No active tasks._
 
 ## Paused Tasks
 
@@ -116,6 +114,7 @@ _Legend: green line = estimate (midpoint hours from `effort:`); blue line = actu
 | [TASK-383](closed/task-383-wiring-test-tool-env-makefile-scaffolding.md) | Wiring test tool — PlatformIO env, Makefile target, and compile-time CONFIG flag (ESP32) | Medium (2-8h) |
 | [TASK-384](closed/task-384-wiring-test-tool-button-mode.md) | Wiring test tool — button press logging, counters, and status display | Small (&lt;2h) |
 | [TASK-385](closed/task-385-wiring-test-tool-led-group-modes.md) | Wiring test tool — LED group modes (on/off/blinking/chase/cycle-all) | Medium (2-8h) |
+| [TASK-386](closed/task-386-wiring-test-tool-led-individual-mode.md) | Wiring test tool — LED individual mode (selection, on/off, all-toggle) | Medium (2-8h) |
 | [TASK-388](closed/task-388-fix-nodemcu-32s-test-pio-env-so-on-device-button-tests-build.md) | Fix nodemcu-32s-test PlatformIO env so on-device button tests build | Small (&lt;2h) |
 | [TASK-389](closed/task-389-pin-names-catalog-service.md) | PinNamesCatalog service — Flutter-side reader of pin-names.schema.json | Small (&lt;2h) |
 | [TASK-390](closed/task-390-action-editor-named-pin-ux.md) | Action editor (Flutter) — named-pin picker with autocomplete and inline mapping hint | Medium (2-8h) |

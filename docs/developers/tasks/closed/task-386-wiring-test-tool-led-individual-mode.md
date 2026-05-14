@@ -1,9 +1,11 @@
 ---
 id: TASK-386
 title: Wiring test tool — LED individual mode (selection, on/off, all-toggle)
-status: active
+status: closed
+closed: 2026-05-14
 opened: 2026-05-11
 effort: Medium (2-8h)
+effort_actual: Medium (2-8h)
 complexity: Medium
 human-in-loop: No
 epic: wiring-test-tool
