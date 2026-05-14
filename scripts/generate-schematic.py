@@ -21,6 +21,12 @@ import schemdraw
 import schemdraw.elements as elm
 
 matplotlib.use("Agg")
+# Deterministic clipPath ids in the emitted SVG. Without this, matplotlib
+# salts each run with system entropy, producing a different
+# `<clipPath id="pXXXXXXXXXX">` on every regen — which makes the docs.yml
+# staleness guard fire even when the circuit is unchanged. Pin a fixed
+# salt so successive regens produce byte-identical output.
+matplotlib.rcParams["svg.hashsalt"] = "asp-schematic-v1"
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 LED_R = 220    # current-limiting resistor, ohms
@@ -216,6 +222,12 @@ def _draw(mcu_label: str, right_pins: list, left_pins: list, output: str) -> Non
         '<g id="figure_1">',
         '<rect width="100%" height="100%" fill="white"/>\n <g id="figure_1">',
     )
+    # Strip matplotlib's wall-clock <dc:date> metadata so successive
+    # regens produce byte-identical SVGs (paired with the
+    # svg.hashsalt rcParam above). Without this the docs.yml
+    # staleness guard fires on every regen.
+    import re
+    svg = re.sub(r"\s*<dc:date>[^<]*</dc:date>\n?", "", svg)
     svg_path.write_text(svg)
     print(f"Saved: {output}")
 
