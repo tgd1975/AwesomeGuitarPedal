@@ -34,5 +34,23 @@
         "https://json.schemastore.org/github-workflow.json": [
             ".github/workflows/test.yml"
         ]
+    },
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#2E1F1F",
+        "titleBar.activeForeground": "#E8E8E8",
+        "titleBar.inactiveBackground": "#251717",
+        "titleBar.inactiveForeground": "#9C9C9C",
+        "titleBar.border": "#1B1010",
+
+        "activityBar.background": "#2E1F1F",
+        "activityBar.foreground": "#E8E8E8",
+        "activityBar.inactiveForeground": "#9C9C9C",
+        "activityBar.border": "#1B1010",
+
+        "statusBar.background": "#251717",
+        "statusBar.foreground": "#E8E8E8",
+        "statusBar.border": "#1B1010",
+        "statusBar.debuggingBackground": "#382626",
+        "statusBar.noFolderBackground": "#1B1010"
     }
 }
